@@ -1,0 +1,205 @@
+<!DOCTYPE html> 
+<html lang="es"> 
+  <head> 
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title>Configuracion Server</title> 
+<link id="template-file" href="templates/template.ejs" rel="import" />  
+
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+     <link href="css/dashboard.css" rel="stylesheet">
+  </head> 
+  <body> 
+    <script>
+    var getImport = document.querySelector('#template-file'); 
+var getContent = getImport.import.querySelector('#template'); 
+document.body.appendChild(document.importNode(getContent, true));  
+
+  </script>
+         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header" id="page-header">Configuración de Json</h1>
+        <div class='row'>
+            <div class='span12 col-md-12 columns twelve large-12'>
+                <p> <button class='btn btn-primary' id='setschema'>Actualizar</button></p>
+
+                <textarea id='schema' style='width: 100%; height: 450px; font-family: monospace;' class='form-control'></textarea>
+            </div>
+        </div>
+        </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>  
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+(function() {
+    var schema;
+    if(window.location.href.match('[?&]schema=([^&]+)')) {
+        try {
+            schema = JSON.parse(LZString.decompressFromBase64(window.location.href.match('[?&]schema=([^&]+)')[1]));
+        }
+        catch(e) {
+            console.log('invalid starting schema');
+        }
+    }
+
+    // Default starting schema
+    if(!schema) {
+        schema = {
+            title: "Contenido",
+            type: "object",
+            properties: {
+                Titulo: {
+                    type: "string",
+                    description: "Titulo del Contenido a Visualizar",
+                    minLength: 4
+                },
+                Contenido_Trasmedia: {
+                    type: "object",
+                    title: "Contenido Trasmedia",
+                    properties: {
+                        Imagenes: {
+                            type: "array",
+                            format: "table",
+                            title: "Imagenes",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title: "Imagen",
+                                properties: {
+                                    URL: {
+                                        type: "string"
+                                    },
+                                    Tiempo: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                        Videos: {
+                            type: "array",
+                            format: "table",
+                            title: "Videos",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title: "Video",
+                                properties: {
+                                    URL: {
+                                        type: "string"
+                                    },
+                                    Tiempo: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                         Paginas: {
+                            type: "array",
+                            format: "table",
+                            title: "Paginas",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title: "Pagina",
+                                properties: {
+                                    URL: {
+                                        type: "string"
+                                    },
+                                    Tiempo: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                         Texto: {
+                            type: "array",
+                            format: "table",
+                            title: "Texto",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title: "Texto",
+                                properties: {
+                                    URL: {
+                                        type: "string"
+                                    },
+                                    Tiempo: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        },
+                         Chats: {
+                            type: "array",
+                            format: "table",
+                            title: "Chats",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title: "Chat",
+                                properties: {
+                                    URL: {
+                                        type: "string"
+                                    },
+                                    Tiempo: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                Contenido_Live: {
+                    type: "object",
+                    title: "Contenido Live",
+                    properties: {
+                        Escenas: {
+                            type: "array",
+                            format: "table",
+                            title: "Escenas",
+                            uniqueItems: true,
+                            items: {
+                                type: "object",
+                                title: "Escena",
+                                properties: {
+                                   Id_Escena: {
+                                        type: "string"
+                                    },
+                                    URL: {
+                                        type: "string"
+                                    },
+                                    Escena_Padre: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Divs/textareas on the page
+    var $schema = document.getElementById('schema');
+    // Buttons
+    var $set_schema_button = document.getElementById('setschema');
+
+    // Start the schema and output textareas with initial values
+    $schema.value = JSON.stringify(schema,null,2);
+    $set_schema_button.addEventListener('click',function() {
+        try {
+            schema = JSON.parse($schema.value);
+        }
+        catch(e) {
+            alert('Invalid Schema: '+e.message);
+            return;
+        }
+    });
+
+})();
+</script>
+  </body> 
+</html>

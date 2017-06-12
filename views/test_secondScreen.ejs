@@ -2,62 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dibujemos</title>
+  <title>Back end</title>
   <link rel="stylesheet" href="stylesheets/style.css">
 </head>
 <body style="text-align:center">
-     <div style="margin:0 auto;">
-<input id="namespaceToConnect" type="text" placeholder="video id to connect">
-<button onclick="javascript: joinToNamespace()">Connect to Namespace</button>
 
-     </div>
+<button id="ruido">Sincronizar Por audio</button>
      <div id='opciones'style="margin:0 auto;">
 	<h2>Opciones a Escoger</h2>
 
      </div>
   <script src="/socket.io/socket.io.js"></script>
-<script>
-    var socket = null;
-	var ns_socket= null;
-	var url = 'http://' + window.location.host;
-   (function(){
-       socket = io.connect(url);        
-   })()
-    
-   function enviarAccion(){
-   alert('Has escogido: '+this.textContent);
-      var id = document.getElementById("namespaceToConnect").value;
-       var namespaceName =this.textContent+'.mp4';
-       socket.emit('opcion_2c', {sala:id ,option : namespaceName})
-   }
-   function joinToNamespace(){
-       var id = document.getElementById("namespaceToConnect").value;
-        socket.emit('crearSala', {sala : id}, function(data){
-		alert('se unio al video :'+data.sala);
-       })
-	   }
-       socket.on('op_second_screen',function(e){
-
-			 var op=document.getElementById("opciones");
-		var padre = op.parentNode;
-		padre.removeChild(op);
-		   op= document.createElement('div');
-			op.id = 'opciones';
-			op.style.margin = '0 auto';	
-			 var h= document.createElement('h2');
-			h.innerHTML = 'Opciones a Escoger';
-			op.appendChild(h);
-			   for( i = 0; i < e.escenas.length; i++) {
-			   var nuevoBoton = document.createElement('button');
-				nuevoBoton.type = 'button';
-				nuevoBoton.textContent = e.escenas[i].escena[1].src.split('.mp4')[0];
-				nuevoBoton.addEventListener('click', enviarAccion);
-				op.appendChild(nuevoBoton);
-				}
-				padre.appendChild(op);
-			
-		});  
-       
-</script>
+<script src="javascripts/all2.js"></script>
 </body>
 </html>

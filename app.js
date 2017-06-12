@@ -7,12 +7,16 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var io = require('socket.io');
+var HashMap = require('hashmap');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/data";
+
 var connections = 0;
 
 var app = express();
 var server = http.createServer(app);
 io = io.listen(server);
-
+var map_ids_idsonido = new HashMap();
 // all environments
 app.set('port', process.env.PORT || 3331);
 app.set('views', path.join(__dirname, 'views'));
@@ -23,13 +27,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
-}
+}  
 
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.createCollection("estructura_json_contenido", function(err, res) {
+    if (err) throw err;
+    console.log("Table estructura_json_contenido!");
+  });
+   db.createCollection("json_contenidos_subidos", function(err, res) {
+    if (err) throw err;
+    console.log("Table json_contenidos_subidos!");
+    db.close();
+  });
+  });
 app.get('/', function(req, res){
   res.render('index', { title: '1 Pantalla DEMO' });
 });
 app.get('/2v', function(req, res){
   res.render('test_secondScreen', { title: '2 Pantalla DEMO' });
+});
+app.get('/contenido', function(req, res){
+  res.render('page_contenido', { title: 'Subir Contenido' });
+});
+app.get('/config_json', function(req, res){
+  res.render('config_json', { title: 'Configuración Json' });
 });
 io.set('log level', 1);
 
@@ -51,14 +73,28 @@ io.sockets.on('connection', function (socket) {
 	  io.to(data.sala).emit('op_second_screen',data.opciones);
   });
     socket.on('crearSala', function (data, callback) {
-    // transmitimos el movimiento a todos los clientes conectados
+    // transmitimos el movimiento a todos los clienftes conectados
 	  console.log('Sala:', data.sala);
     socket.join(data.sala);
 	  callback({sala : data.sala});
   });
+      socket.on('registrar_id_socket', function (data) {
+    // transmitimos el movimiento a todos los clientes conectados
+	  console.log('is socket:', data.id_s);
+	  map_ids_idsonido.set( data.id_audio,data.id_s);
+
+  });
+      socket.on('unir_Sala', function (data) {
+    // transmitimos el movimiento a todos los clientes conectados
+	  console.log('unir_Sala:',data.sala);
+	  	  console.log('Invitado:', data.invitado);
+		  var ids=map_ids_idsonido.get(data.invitado)
+socket.broadcast.to(ids).emit('invitacion_Sala', {sala:data.sala,invitado:data.invitado});
+  });
   socket.on('disconnect', function() {
     connections--;
     console.log('connected', connections);
+	 map_ids_idsonido.remove(socket.id)
     socket.broadcast.emit('connections', {connections:connections});
   });
 });
