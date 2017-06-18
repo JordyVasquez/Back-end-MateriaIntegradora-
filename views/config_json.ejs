@@ -25,6 +25,10 @@
         <h1 class="page-header" id="page-header">Configuración de Json</h1>
         <div class='row'>
             <div class='span12 col-md-12 columns twelve large-12'>
+              <div id="error" class="alert alert-danger alert-dismissable fade in">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Danger!</strong> This alert box could indicate a dangerous or potentially negative action.
+  </div>
                 <form action="/jsonConf" method="post">
                  <p> <button class='btn btn-primary'  id='submit' type="submit">Actualizar</button></p>
 
@@ -50,14 +54,7 @@
     <script>
         (function() {
             var schema;
-            if (window.location.href.match('[?&]schema=([^&]+)')) {
-                try {
-                    schema = JSON.parse(LZString.decompressFromBase64(window.location.href.match('[?&]schema=([^&]+)')[1]));
-                } catch (e) {
-                    console.log('invalid starting schema');
-                }
-            }
-
+            schema = JSON.parse(LZString.decompressFromBase64('<%= json%>'));
             // Default starting schema
             if (!schema) {
                 schema = {
@@ -196,6 +193,18 @@
                 }
             }
 
+             var msm;
+            msm = '<%= msm%>';
+            // Default starting schema
+            if (msm.localeCompare("OK") == 0) {
+
+                var elDiv = document.getElementById('error');
+                elDiv.style.display = 'none';
+            } else {
+
+                var elDiv = document.getElementById('error');
+                elDiv.style.display = 'block';
+            }
             // Divs/textareas on the page
             var $schema = document.getElementById('schema');
             // Start the schema and output textareas with initial values

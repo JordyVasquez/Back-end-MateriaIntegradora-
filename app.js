@@ -1,8 +1,6 @@
-
 /**
  * Module dependencies.
  */
-
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -20,7 +18,9 @@ io = io.listen(server);
 var map_ids_idsonido = new HashMap();
 // all environments
 app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(bodyParser.urlencoded({
+    extended: true
+})); // support encoded bodies
 app.set('port', process.env.PORT || 3331);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -29,134 +29,320 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
-}  
+    app.use(express.errorHandler());
+}
 
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  db.createCollection("estructura_json_contenido", function(err, res) {
-    if (err) throw err;
-    console.log("Table estructura_json_contenido!");
-  });
-   db.createCollection("json_contenidos_subidos", function(err, res) {
-    if (err) throw err;
-    console.log("Table json_contenidos_subidos!");
-    db.close();
-  });
-  });
-app.post('/jsonConf', function(req, res){
-  var json_confi = req.body.schema2;
-console.log("Table json_contenidos_subidos!"+json_confi);
-res.render('subir_cont', { title: 'Configuración Json',json:json_confi});
-   // res.render('page_contenido', { title: 'Subir Contenido' });
-  //res.render('index', { title: '1 Pantalla DEMO' });
+app.post('/jsonConf', function(req, res) {
+    var json_confi = req.body.schema2;
+    console.log("Table json_contenidos_subidos!" + json_confi);
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var myobj = {
+            name: "config",
+            json: json_confi
+        };
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config").find(query).toArray(function(err, result) {
+            if (err) {
+                throw err;
+                res.render('config_json', {
+                    title: 'Configuración Json',
+                    json: '',msm:'error'
+                });
+            } else if (result.length > 0) {
+                var newvalues = {
+                    $set: {
+                        json: json_confi
+                    }
+                };
+                db.collection("Json_Config").update(query, newvalues, function(err, result) {
+                    if (err){ throw err
+                                    res.render('config_json', {
+                    title: 'Configuración Json',
+                    json: '',msm:'error'
+                })}
+                    else {
+                        console.log(result.result.nModified + " record updated");
+                        res.render('vista_json', {
+                            title: 'Vista Json',
+                    json: json_confi,msm:'OK'
+                        });
+                    }
+                });
+            } else {
+                db.collection("Json_Config").insertOne(myobj, function(err, result) {
+                           if (err){ throw err
+                                    res.render('config_json', {
+                    title: 'Configuración Json',
+                    json: '',msm:'error'
+                })}
+                    else {
+                        console.log("1 record inserted");
+                        res.render('vista_json', {
+                            title: 'Vista Json',
+                    json: json_confi,msm:'OK'
+                        });
+                    }
+                });
+            }
+            console.log(result.length);
+            db.close();
+        });
+
+    });
+
+    // res.render('page_contenido', { title: 'Subir Contenido' });
+    //res.render('index', { title: '1 Pantalla DEMO' });
 });
-app.get('/', function(req, res){
-  res.render('index', { title: '1 Pantalla DEMO' });
+app.get('/', function(req, res) {
+    res.render('index', {
+        title: '1 Pantalla DEMO'
+    });
 });
-app.get('/2v', function(req, res){
-  res.render('test_secondScreen', { title: '2 Pantalla DEMO' });
+app.get('/2v', function(req, res) {
+    res.render('test_secondScreen', {
+        title: '2 Pantalla DEMO'
+    });
 });
-app.get('/contenido', function(req, res){
-  res.render('page_contenido', { title: 'Subir Contenido' });
+app.get('/vista_json', function(req, res) {
+  MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+                     res.render('vista_json', {
+                            title: 'Vista Json',
+                    json: '',msm:'error'
+                        });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config").find(query).toArray(function(err, result) {
+            if (err) {
+                     res.render('vista_json', {
+                            title: 'Vista Json',
+                    json: '',msm:'error'
+                        });
+                throw err;
+
+            } else if (result.length > 0) {
+                console.log(result);
+                res.render('vista_json', {
+                    title: 'Vista Json',
+                    json: result[0].json,msm:'view'
+                });
+            } else {
+               res.render('vista_json', {
+                    title: 'Vista Json',
+                    json: '',msm:'view'
+                });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
 });
-app.get('/config_json', function(req, res){
-  res.render('config_json', { title: 'Configuración Json' });
+app.get('/contenido', function(req, res) {
+    res.render('page_contenido', {
+        title: 'Subir Contenido'
+    });
 });
-app.get('/subir_cont', function(req, res){
-  //res.render('subir_cont', { title: 'Configuración Json',json: });
+app.get('/subir_cont', function(req, res) {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('config_json', {
+                title: 'Configuración Json',
+                msm: 'error al conectar con la bse mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('subir_cont', {
+                    title: 'Subir Contenido',
+                    msm: 'error al conectar con la bse mongodb',
+                    json: ''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                console.log(result);
+                res.render('subir_cont', {
+                    title: 'Subir Contenido',
+                    json: result[0].json
+                });
+            } else {
+                res.render('subir_cont', {
+                    title: 'Subir Contenido',
+                    json: ''
+                });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
+
 });
+app.get('/config_json', function(req, res) {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('config_json', {
+                title: 'Configuración Json',
+                msm: 'error al conectar con la base mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('config_json', {
+                    title: 'Configuración Json',
+                    msm: 'error al conectar con la base mongodb',
+                    json: ''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                console.log(result);
+                res.render('config_json', {
+                    title: 'Configuración Json',
+                    json: result[0].json,msm:'OK'
+                });
+            } else {
+                res.render('config_json', {
+                    title: 'Configuración Json',
+                    json: '',msm:'OK'
+                });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
+});
+
 io.set('log level', 1);
 
 // Escuchamos conexiones entrantes
-io.sockets.on('connection', function (socket) {
-  connections++;
-  console.log('connected', connections);
-
-   // socket.broadcast.emit('move', data);
-
-    socket.on('opcion_2c', function (data) {
-	  console.log('Sala:', data.sala);
-	 console.log('Sala:', data.option);
-	  io.to(data.sala).emit('opcion_1c',data.option);
-  });
-    socket.on('opciones', function (data) {
-    // transmitimos el movimiento a todos los clienntes conectados
-	  console.log('Opciones:', data.opciones);
-	  io.to(data.sala).emit('op_second_screen',data.opciones);
-  });
-    socket.on('crearSala', function (data, callback) {
-    // transmitimos el movimiento a todos los clienftes conectados
-	  console.log('Sala:', data.sala);
-    socket.join(data.sala);
-	  callback({sala : data.sala});
-  });
-      socket.on('registrar_id_socket', function (data) {
-    // transmitimos el movimiento a todos los clientes conectados
-	  console.log('is socket:', data.id_s);
-	  map_ids_idsonido.set( data.id_audio,data.id_s);
-
-  });
-      socket.on('unir_Sala', function (data) {
-    // transmitimos el movimiento a todos los clientes conectados
-	  console.log('unir_Sala:',data.sala);
-	  	  console.log('Invitado:', data.invitado);
-		  var ids=map_ids_idsonido.get(data.invitado)
-socket.broadcast.to(ids).emit('invitacion_Sala', {sala:data.sala,invitado:data.invitado});
-  });
-  socket.on('disconnect', function() {
-    connections--;
+io.sockets.on('connection', function(socket) {
+    connections++;
     console.log('connected', connections);
-	 map_ids_idsonido.remove(socket.id)
-    socket.broadcast.emit('connections', {connections:connections});
-  });
+
+    // socket.broadcast.emit('move', data);
+
+    socket.on('opcion_2c', function(data) {
+        console.log('Sala:', data.sala);
+        console.log('Sala:', data.option);
+        io.to(data.sala).emit('opcion_1c', data.option);
+    });
+    socket.on('opciones', function(data) {
+        // transmitimos el movimiento a todos los clienntes conectados
+        console.log('Opciones:', data.opciones);
+        io.to(data.sala).emit('op_second_screen', data.opciones);
+    });
+    socket.on('crearSala', function(data, callback) {
+        // transmitimos el movimiento a todos los clienftes conectados
+        console.log('Sala:', data.sala);
+        socket.join(data.sala);
+        callback({
+            sala: data.sala
+        });
+    });
+    socket.on('registrar_id_socket', function(data) {
+        // transmitimos el movimiento a todos los clientes conectados
+        console.log('is socket:', data.id_s);
+        map_ids_idsonido.set(data.id_audio, data.id_s);
+
+    });
+    socket.on('unir_Sala', function(data) {
+        // transmitimos el movimiento a todos los clientes conectados
+        console.log('unir_Sala:', data.sala);
+        console.log('Invitado:', data.invitado);
+        var ids = map_ids_idsonido.get(data.invitado)
+        socket.broadcast.to(ids).emit('invitacion_Sala', {
+            sala: data.sala,
+            invitado: data.invitado
+        });
+    });
+    socket.on('disconnect', function() {
+        connections--;
+        console.log('connected', connections);
+        map_ids_idsonido.remove(socket.id)
+        socket.broadcast.emit('connections', {
+            connections: connections
+        });
+    });
 });
 app.get('/movies/:movieName', (req, res) => {
     const movieName = req.params.movieName;
-   const movieFile = './movies/'+movieName;
+    const movieFile = './movies/' + movieName;
 
-  screen(movieFile,res,req);
- });
-  function screen(path,res,req,ban) {
-  var stat = fs.statSync(path);
-  var total = stat.size;
-  if (req.headers['range']) {
-    var range = req.headers.range;
-    var parts = range.replace(/bytes=/, "").split("-");
-    var partialstart = parts[0];
-    var partialend = parts[1];
-
-    var start = parseInt(partialstart, 10);
-    var end = partialend ? parseInt(partialend, 10) : total-1;
-    var chunksize = (end-start)+1;
-    console.log('RANGE : ' + start + ' - ' + end + ' = ' + chunksize);
-
-    var file = fs.createReadStream(path, {start: start, end: end});
-
-    res.writeHead(206, { 'Content-Range': 'bytes ' + start + '-' + end + '/' + total, 'Accept-Ranges': 'bytes', 'Content-Length': chunksize, 'Content-Type': 'video/mp4' });
-    
-	    console.log('ALL: ');
-	file.on('open', () => file.pipe(res));
-	 console.log('ALL2: ');
-		file.on('end', function () {  // done
-    console.log("fin");
-
-  });
-   file.on('error', (streamErr) => res.end('errr'+streamErr));
-  } else {
-    console.log('ALL: ' + total);
-    res.writeHead(200, { 'Content-Length': total, 'Content-Type': 'video/mp4' });
-	    var file = fs.createReadStream(path);
-       file.on('open', () => file.pipe(res));
-		file.on('end', function () {  // done
-    console.log("fin"); 
-
-  });
-  }
-					
-}
-
-server.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+    screen(movieFile, res, req);
 });
 
+function screen(path, res, req, ban) {
+    var stat = fs.statSync(path);
+    var total = stat.size;
+    if (req.headers['range']) {
+        var range = req.headers.range;
+        var parts = range.replace(/bytes=/, "").split("-");
+        var partialstart = parts[0];
+        var partialend = parts[1];
+
+        var start = parseInt(partialstart, 10);
+        var end = partialend ? parseInt(partialend, 10) : total - 1;
+        var chunksize = (end - start) + 1;
+        console.log('RANGE : ' + start + ' - ' + end + ' = ' + chunksize);
+
+        var file = fs.createReadStream(path, {
+            start: start,
+            end: end
+        });
+
+        res.writeHead(206, {
+            'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'video/mp4'
+        });
+
+        console.log('ALL: ');
+        file.on('open', () => file.pipe(res));
+        console.log('ALL2: ');
+        file.on('end', function() { // done
+            console.log("fin");
+
+        });
+        file.on('error', (streamErr) => res.end('errr' + streamErr));
+    } else {
+        console.log('ALL: ' + total);
+        res.writeHead(200, {
+            'Content-Length': total,
+            'Content-Type': 'video/mp4'
+        });
+        var file = fs.createReadStream(path);
+        file.on('open', () => file.pipe(res));
+        file.on('end', function() { // done
+            console.log("fin");
+
+        });
+    }
+
+}
+
+server.listen(app.get('port'), function() {
+    console.log('Express server listening on port ' + app.get('port'));
+});
