@@ -10,6 +10,7 @@ var io = require('socket.io');
 var HashMap = require('hashmap');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/data";
+var bodyParser = require('body-parser');
 
 var connections = 0;
 
@@ -18,6 +19,8 @@ var server = http.createServer(app);
 io = io.listen(server);
 var map_ids_idsonido = new HashMap();
 // all environments
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.set('port', process.env.PORT || 3331);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -41,6 +44,13 @@ MongoClient.connect(url, function(err, db) {
     db.close();
   });
   });
+app.post('/jsonConf', function(req, res){
+  var json_confi = req.body.schema2;
+console.log("Table json_contenidos_subidos!"+json_confi);
+res.render('subir_cont', { title: 'Configuración Json',json:json_confi});
+   // res.render('page_contenido', { title: 'Subir Contenido' });
+  //res.render('index', { title: '1 Pantalla DEMO' });
+});
 app.get('/', function(req, res){
   res.render('index', { title: '1 Pantalla DEMO' });
 });
@@ -52,6 +62,9 @@ app.get('/contenido', function(req, res){
 });
 app.get('/config_json', function(req, res){
   res.render('config_json', { title: 'Configuración Json' });
+});
+app.get('/subir_cont', function(req, res){
+  //res.render('subir_cont', { title: 'Configuración Json',json: });
 });
 io.set('log level', 1);
 
