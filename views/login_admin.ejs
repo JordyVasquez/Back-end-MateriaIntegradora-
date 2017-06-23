@@ -1,0 +1,122 @@
+<!DOCTYPE html> 
+<html lang="es"> 
+  <head> 
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title align="center">Login ADMIN</title> 
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+     <link href="css/dashboard.css" rel="stylesheet">
+	 <link href="css/login.css" rel="stylesheet">
+  </head> 
+  <body> 
+    
+
+
+	
+	<div class="container">
+        <div class="row">
+       <div class="col-md-6 col-md-offset-3">
+                <div>
+          <h1 align="center" class="page-header" id="page-header" >Contenidos Subidos al Servidor</h1>
+
+        </div>
+        <img  src="images/logo_admin.png" alt="..." class="img-circle center-block">
+
+        </div>
+      </div>
+      </br>
+  <div class="row">
+      <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
+        <form method="post" action="/config_json" id="loginForm" onsubmit="return submitForm(this);"">
+          <div class="form-group input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            <input class="form-control" type="text" id='username' name='username' placeholder="username"/>          
+          </div>
+          <div class="form-group input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            <input class="form-control" type="password" id='password' name='password' placeholder="password"/>
+            <input type="hidden" name="salt" id="salt" value="">     
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-danger btn-block btn-lg active center-block" onclick="openWindowWithPost();">Login</button>
+          </div>
+        </form>        
+      </div>  
+        
+ </div> 
+	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>  
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    <script src="javascripts/sha512.js"></script>
+    <script src="javascripts/md5.js"></script>
+    <script src="javascripts/md5.min.js"></script>
+    <script src="javascripts/hmac-sha512.js"></script> 
+    <script src="javascripts/hmac.js"></script> 
+    <script src="javascripts/core.js"></script> 
+    <script>
+      function openWindowWithPost(something, additional, misc) {
+        var f = document.getElementById('loginForm');
+        var usuario = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        alert("pass normal: "+password);
+        var passwordMD5 = CryptoJS.MD5(password);
+        alert("MD5: "+passwordMD5);
+        var result2 = saltHashPassword(passwordMD5.toString());
+        document.getElementById('salt').value = result2.salt;
+        //f.username.value = "something";
+        f.password.value = result2.passwordHash;
+        alert(usuario);
+        alert(f.password.value);
+        alert("Salt: "+document.getElementById('salt').value)
+        
+
+        //window.open('', 'TheWindow');
+        f.submit();
+      }
+
+      function stringGen(len)
+      {
+          var text = " ";
+      
+          var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+      
+          for( var i=0; i < len; i++ )
+              text += charset.charAt(Math.floor(Math.random() * charset.length));
+      
+          return text;
+      }
+
+      function sha512func(password, salt){
+          var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, salt); /** Hashing algorithm sha512 */
+          hmac.update(password);
+          alert('hash pass: '+hmac.toString(CryptoJS.enc.Hex));
+          var hash = hmac.finalize();
+          alert('value hash: '+hash);
+      
+          return {
+              salt:salt,    
+              passwordHash:hash
+          };
+      };
+      function saltHashPassword(userpassword) {
+      
+          salt=stringGen(16) ;
+          alert(salt);
+          var saltAES = CryptoJS.AES.encrypt(salt, "My Secret Passphrase");
+          alert("saltAES: "+saltAES);
+          passwordData = sha512func(userpassword, salt);
+          alert('UserPassword = '+userpassword);
+          alert('Passwordhash = '+passwordData.passwordHash);
+          alert('nSalt = '+passwordData.salt);
+          return {
+              salt:saltAES.toString(),   
+             passwordHash:passwordData.passwordHash
+          };
+      }
+    </script>
+  </body> 
+</html>
