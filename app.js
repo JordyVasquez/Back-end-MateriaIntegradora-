@@ -2,6 +2,10 @@
  * Module dependencies.
  */
 var express = require('express');
+var crypto = require('crypto');   
+var md5 = require('md5');
+var CryptoJS = require("crypto-js");
+var sha512 = require('js-sha512');
 var http = require('http');
 var path = require('path');
 var io = require('socket.io');
@@ -11,6 +15,15 @@ var url = "mongodb://localhost:27017/data";
 var bodyParser = require('body-parser');
 
 var connections = 0;
+var salt= '';
+var passwordData = '';
+var passwordHash = '';
+var nombre = '';
+var passAdminHash = '';
+var resultDB = '';
+var resultStr = '';
+var finalJson = '';
+var finalPassDB = '';
 
 var app = express();
 var server = http.createServer(app);
@@ -24,6 +37,8 @@ app.use(bodyParser.urlencoded({
 app.set('port', process.env.PORT || 3331);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -149,6 +164,9 @@ app.get('/contenido', function(req, res) {
     res.render('page_contenido', {
         title: 'Subir Contenido'
     });
+});
+app.get('/login', function(req, res){
+  res.render('login_admin', { title: 'Login Admin' });
 });
 app.get('/subir_cont', function(req, res) {
     MongoClient.connect(url, function(err, db) {
@@ -342,6 +360,98 @@ function screen(path, res, req, ban) {
     }
 
 }
+
+var genRandomString = function(length){
+    return crypto.randomBytes(Math.ceil(length/2))
+            .toString('hex') /** convert to hexadecimal format */
+            .slice(0,length);   /** return required number of characters */
+};
+
+var sha512f = function(password, salt){
+    var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+    console.log("sha512f salt: "+salt);
+    console.log("sha512f pass: "+password);
+    hash.update(password);
+    var value = hash.digest('hex');
+    console.log("sha512f value: "+value);
+    return {
+        salt:salt,
+        passwordHash:value
+    };
+};
+
+function saltHashPassword(userpassword) {
+    salt = genRandomString(16); /** Gives us salt of length 16 */
+    passwordData = sha512f(userpassword, salt);
+    console.log('UserPassword = '+userpassword);
+    console.log('Passwordhash = '+passwordData.passwordHash);
+    console.log('nSalt = '+passwordData.salt);
+}
+
+/*var passwordMD5 = md5("awesome6");
+console.log("awesome6: "+passwordMD5);
+MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var myobj = { username: "sjcastro", password: passwordMD5};
+      db.collection("users").insertOne(myobj, function(err, res) {
+      if (err) throw err;
+      console.log("1 record inserted");
+      db.close();
+      });
+  });*/
+
+app.post('/config_json2',function(req,res){
+  var params;
+  nombre=req.body.username;
+  console.log("User name = "+nombre);
+  //res.send(nombre);
+  passwordHash=req.body.password;
+  var salt=req.body.salt;
+  var bytes  = CryptoJS.AES.decrypt( salt.toString(), 'My Secret Passphrase');
+  var saltDecAes = bytes.toString(CryptoJS.enc.Utf8);
+  console.log('saldDecrypt AES: ', saltDecAes);
+  console.log("User name = "+nombre+", password is "+passwordHash+", salt is "+saltDecAes);
+  MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+       db.collection("users").find({username: nombre}).toArray(function(err, result) {
+        if (err) throw err;
+        resultDB = result; 
+        resultStr = JSON.stringify(resultDB)
+        console.log("dd: " +resultStr);
+        resultStr = resultStr.replace('[','')
+        resultStr = resultStr.replace(']','')
+        console.log("frase2: "+ resultStr);
+        finalPassDB = JSON.parse(resultStr); //password de la base
+        console.log("PassDB: "+ finalPassDB.password);
+
+        params = sha512f(finalPassDB.password, saltDecAes); 
+        console.log("Param HashPassDB: "+ params.passwordHash);
+        var compare = params.passwordHash.localeCompare(passwordHash);
+        if(compare == 0){
+            console.log("CORRECTO");
+            res.redirect('/config_json');
+        }
+        else{
+          console.log("inCORRECTO");
+          res.send("error: "+nombre);
+        }
+        
+        db.close();
+       });
+  
+}); 
+
+
+  /*MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var myobj = { username: nombre, password: passwordHash};
+      db.collection("users").insertOne(myobj, function(err, res) {
+      if (err) throw err;
+      console.log("1 record inserted");
+      db.close();
+      });
+  });*/
+});
 
 server.listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
