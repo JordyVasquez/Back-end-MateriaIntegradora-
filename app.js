@@ -166,7 +166,14 @@ app.get('/contenido', function(req, res) {
     });
 });
 app.get('/login', function(req, res){
-  res.render('login_admin', { title: 'Login Admin' });
+  //res.render('login_admin', { title: 'Login Admin' });
+  res.render('login_admin', {
+    title: 'Login Admin',
+    band: 'false',
+    msm : 'OK',
+    username: ''
+
+            });
 });
 app.get('/subir_cont', function(req, res) {
     MongoClient.connect(url, function(err, db) {
@@ -433,7 +440,13 @@ app.post('/config_json2',function(req,res){
         }
         else{
           console.log("inCORRECTO");
-          res.send("error: "+nombre);
+          //res.send("error: "+nombre);
+          res.render('login_admin', {
+                 msm: 'error',
+                 band: 'true',
+                 username: nombre
+            });
+          
         }
         
         db.close();
