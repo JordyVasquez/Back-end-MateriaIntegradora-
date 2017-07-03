@@ -6,6 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Configuracion Server</title>
     <link id="template-file" href="templates/template.ejs" rel="import" />
+     <link href="dist/jsoneditor.css" rel="stylesheet" type="text/css">
+     <style>
+    html, body {
+      font: 11pt sans-serif;
+    }
+    #jsoneditor {
+      width: 500px;
+      height: 500px;
+    }
+  </style>
     <script>
         var LZString = {
             _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
@@ -630,7 +640,8 @@
                     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                     <strong>Info!</strong> En Hora Buena se guardo satisfactoriamente.
                 </div>
-                <textarea id='schema' name='schema' style='width: 100%; height: 450px; font-family: monospace;' class='form-control' disabled></textarea>
+                <div id='schema' name='schema'></div>
+
 
 
 
@@ -644,6 +655,8 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+        <script src="dist/jsoneditor.js"></script>
+
     <script>
         (function() {
             var schema;
@@ -660,9 +673,12 @@
                 var elDiv = document.getElementById('retro_sucess');
                 elDiv.style.display = 'none';
             }
-            var $schema = document.getElementById('schema');
-            // Start the schema and output textareas with initial values
-            $schema.value = JSON.stringify(schema, null, 2);
+              var container = document.getElementById('schema');
+
+              var options = {
+                mode: 'view'
+              };
+            var editor = new JSONEditor(container, options, schema);
 
         })();
     </script>

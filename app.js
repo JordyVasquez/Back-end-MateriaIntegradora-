@@ -9,9 +9,9 @@ var HashMap = require('hashmap');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/data";
 var bodyParser = require('body-parser');
-
+var urlp = require("url");
 var connections = 0;
-
+var multipart = require('connect-multiparty');
 var app = express();
 var server = http.createServer(app);
 io = io.listen(server);
@@ -21,17 +21,39 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({
     extended: true
 })); // support encoded bodies
+
+//Express 4
 app.set('port', process.env.PORT || 3331);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(multipart())
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
+app.post('/admin_cont_sub', function(req, res) {
+    var actividad = req.body.actividad;
+    var title = req.body.title;
+    if('new'.localeCompare(actividad)==0){
 
+console.log('new')
+    }
+    else if('delete'.localeCompare(actividad)==0){
+console.log('delete')
+
+    }
+     else if('edit'.localeCompare(actividad)==0){
+console.log('edit')
+
+    }
+      else if('view'.localeCompare(actividad)==0){
+
+console.log('view')
+    }
+   
+});
 app.post('/jsonConf', function(req, res) {
     var json_confi = req.body.schema2;
     console.log("Table json_contenidos_subidos!" + json_confi);
@@ -49,7 +71,8 @@ app.post('/jsonConf', function(req, res) {
                 throw err;
                 res.render('config_json', {
                     title: 'Configuración Json',
-                    json: '',msm:'error'
+                    json: '',
+                    msm: 'error'
                 });
             } else if (result.length > 0) {
                 var newvalues = {
@@ -58,31 +81,37 @@ app.post('/jsonConf', function(req, res) {
                     }
                 };
                 db.collection("Json_Config").update(query, newvalues, function(err, result) {
-                    if (err){ throw err
-                                    res.render('config_json', {
-                    title: 'Configuración Json',
-                    json: '',msm:'error'
-                })}
-                    else {
+                    if (err) {
+                        throw err
+                        res.render('config_json', {
+                            title: 'Configuración Json',
+                            json: '',
+                            msm: 'error'
+                        })
+                    } else {
                         console.log(result.result.nModified + " record updated");
                         res.render('vista_json', {
                             title: 'Vista Json',
-                    json: json_confi,msm:'OK'
+                            json: json_confi,
+                            msm: 'OK'
                         });
                     }
                 });
             } else {
                 db.collection("Json_Config").insertOne(myobj, function(err, result) {
-                           if (err){ throw err
-                                    res.render('config_json', {
-                    title: 'Configuración Json',
-                    json: '',msm:'error'
-                })}
-                    else {
+                    if (err) {
+                        throw err
+                        res.render('config_json', {
+                            title: 'Configuración Json',
+                            json: '',
+                            msm: 'error'
+                        })
+                    } else {
                         console.log("1 record inserted");
                         res.render('vista_json', {
                             title: 'Vista Json',
-                    json: json_confi,msm:'OK'
+                            json: json_confi,
+                            msm: 'OK'
                         });
                     }
                 });
@@ -96,10 +125,25 @@ app.post('/jsonConf', function(req, res) {
     // res.render('page_contenido', { title: 'Subir Contenido' });
     //res.render('index', { title: '1 Pantalla DEMO' });
 });
-app.get('/', function(req, res) {
-    res.render('index', {
-        title: '1 Pantalla DEMO'
-    });
+app.get('/escenas/*', function(req, res) {
+    var pathname = urlp.parse(req.url).pathname.split('escenas')[1].replace('/','');
+        console.log("Petición para " + pathname + " recibida.");
+    MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+   var query = { title:pathname};
+  db.collection("Contenidos").find(query).toArray(function(err, result) {
+    if (err) throw err;
+     else if (result.length > 0) {
+ console.log("json!" + result[0].json);
+        res.render('index', {
+                title: '1 Pantalla DEMO',
+                escenas:result[0].json
+            });
+         }
+    db.close();
+  });
+});
+   
 });
 app.get('/2v', function(req, res) {
     res.render('test_secondScreen', {
@@ -107,13 +151,14 @@ app.get('/2v', function(req, res) {
     });
 });
 app.get('/vista_json', function(req, res) {
-  MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
-                     res.render('vista_json', {
-                            title: 'Vista Json',
-                    json: '',msm:'error'
-                        });
+            res.render('vista_json', {
+                title: 'Vista Json',
+                json: '',
+                msm: 'error'
+            });
 
         }
         var query = {
@@ -121,22 +166,25 @@ app.get('/vista_json', function(req, res) {
         };
         db.collection("Json_Config").find(query).toArray(function(err, result) {
             if (err) {
-                     res.render('vista_json', {
-                            title: 'Vista Json',
-                    json: '',msm:'error'
-                        });
+                res.render('vista_json', {
+                    title: 'Vista Json',
+                    json: '',
+                    msm: 'error'
+                });
                 throw err;
 
             } else if (result.length > 0) {
                 console.log(result);
                 res.render('vista_json', {
                     title: 'Vista Json',
-                    json: result[0].json,msm:'view'
+                    json: result[0].json,
+                    msm: 'view'
                 });
             } else {
-               res.render('vista_json', {
+                res.render('vista_json', {
                     title: 'Vista Json',
-                    json: '',msm:'view'
+                    json: '',
+                    msm: 'view'
                 });
 
             }
@@ -150,7 +198,22 @@ app.get('/contenido', function(req, res) {
         title: 'Subir Contenido'
     });
 });
+app.get('/contenidos_subidos', function(req, res) {
+    MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("Contenidos").find({}).toArray(function(err, result) {
+    if (err) throw err;
+     res.render('contenidos_subidos', {
+        title: 'Escenas Guardadas',
+        resultado: result
+    });
+    db.close();
+  });
+   
+});
+    });
 app.get('/subir_cont', function(req, res) {
+    var nombre = req.query.title;
     MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
@@ -169,20 +232,79 @@ app.get('/subir_cont', function(req, res) {
                 res.render('subir_cont', {
                     title: 'Subir Contenido',
                     msm: 'error al conectar con la bse mongodb',
-                    json: ''
+                    json: '',
+                  escenas:''
                 });
                 throw err;
 
             } else if (result.length > 0) {
-                console.log(result);
-                res.render('subir_cont', {
-                    title: 'Subir Contenido',
-                    json: result[0].json
-                });
+                var path = { title:nombre};
+                  db.collection("Contenidos").find(path).toArray(function(err, result2) {
+                    if (err) throw err;
+                     else if (result2.length > 0) {
+               
+                        res.render('subir_cont', {
+                            title: 'Subir Contenido',
+                            json: result[0].json,
+                            escenas:result2[0].json
+                        });
+                         }
+                    db.close();
+                  });
+
             } else {
                 res.render('subir_cont', {
                     title: 'Subir Contenido',
-                    json: ''
+                    json: '',
+                  escenas:'' 
+                });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
+
+});
+app.get('/subir_cont_new', function(req, res) {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('config_json', {
+                title: 'Configuración Json',
+                msm: 'error al conectar con la bse mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('subir_cont', {
+                    title: 'Subir Contenido',
+                    msm: 'error al conectar con la bse mongodb',
+                    json: '',
+                  escenas:''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                      res.render('subir_cont', {
+                            title: 'Subir Contenido',
+                            json: result[0].json,
+                            escenas:''
+                        });
+                         
+                    db.close();
+                
+
+            } else {
+                res.render('subir_cont', {
+                    title: 'Subir Contenido',
+                    json: '',
+                  escenas:'' 
                 });
 
             }
@@ -219,12 +341,14 @@ app.get('/config_json', function(req, res) {
                 console.log(result);
                 res.render('config_json', {
                     title: 'Configuración Json',
-                    json: result[0].json,msm:'OK'
+                    json: result[0].json,
+                    msm: 'OK'
                 });
             } else {
                 res.render('config_json', {
                     title: 'Configuración Json',
-                    json: '',msm:'OK'
+                    json: '',
+                    msm: 'OK'
                 });
 
             }
@@ -292,6 +416,78 @@ app.get('/movies/:movieName', (req, res) => {
 
     screen(movieFile, res, req);
 });
+app.post('/upload', function(req, res) {
+    //El modulo 'fs' (File System) que provee Nodejs nos permite manejar los archivos
+    var fs = require('fs')
+    var json_con = req.body.output2;
+    var title = req.body.Titulo;
+ var fileKeys = Object.keys(req.files);
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var myobj = {
+            title: title,
+            json: json_con
+        };
+        var query = {
+            title: title
+        };
+        db.collection("Contenidos").find(query).toArray(function(err, result) {
+            if (err) {
+                throw err;
+               
+            } else if (result.length > 0) {
+                var newvalues = {
+                    $set: {
+                        json: json_con
+                    }
+                };
+                db.collection("Contenidos").update(query, newvalues, function(err, result) {
+                    if (err) {
+                        throw err
+                        
+                    } else {
+                        console.log(result.result.nModified + " record updated");
+                                         res.render('page_contenido', {
+                            title: 'Subir Contenido'
+                        });
+                    }
+                });
+            } else {
+                db.collection("Contenidos").insertOne(myobj, function(err, result) {
+                    if (err) {
+                        throw err
+                       
+                    } else {
+                        console.log("1 record inserted");
+                        res.render('page_contenido', {
+                            title: 'Subir Contenido'
+                        });
+                    }
+                });
+            }
+            console.log(result.length);
+            db.close();
+        });
+
+    });
+fileKeys.forEach(function(key) {
+ var file = req.files[key],
+        name = file.name,
+        type = file.type,
+        path = __dirname + "/public/contenidos/" + name;
+           fs.rename(file.path, path, function(err) {
+        if (err) res.send("Ocurrio un error al intentar subir la imagen");
+    });
+
+
+});
+
+      
+ 
+   
+      
+
+})
 
 function screen(path, res, req, ban) {
     var stat = fs.statSync(path);

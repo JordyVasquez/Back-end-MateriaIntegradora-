@@ -60,8 +60,7 @@
         });
 
         function enviarAccion() {
-            alert('Has escogido: ' + this.textContent);
-            var namespaceName = this.textContent + '.mp4';
+            var namespaceName = this.value ;
             socket.emit('opcion_2c', {
                 sala: id_sala,
                 option: namespaceName
@@ -90,7 +89,8 @@
             for (i = 0; i < e.escenas.length; i++) {
                 var nuevoBoton = document.createElement('button');
                 nuevoBoton.type = 'button';
-                nuevoBoton.textContent = e.escenas[i].escena[1].src.split('.mp4')[0];
+                nuevoBoton.value = e.escenas[i].Escena;
+                 nuevoBoton.textContent = e.escenas[i].Name_Escena;
                 nuevoBoton.addEventListener('click', enviarAccion);
                 op.appendChild(nuevoBoton);
             }

@@ -45,31 +45,10 @@ $('#con').html(contador);
         sserver.start();
         var url = 'http://' + window.location.host;
         var dir_movies = '/movies/'
-        var text = '{ "escena":[{"next_escenas":[' +
-            '{"escena":[' +
-            '{"next_escenas":[' +
-            '{"escena":[' +
-            '{"next_escenas":""},' +
-            '{"src":"save_him.mp4"}' +
-            ']},' +
-            '{"escena":[' +
-            '{"next_escenas":""},' +
-            '{"src":"save_him.mp4"}' +
-            ']}]},' +
-            '{"src":"save_him.mp4"}]},' +
-            '{"escena":[' +
-            '{"next_escenas":[' +
-            '{"escena":[' +
-            '{"next_escenas":""},' +
-            '{"src":"leave_it.mp4"}' +
-            ']},' +
-            '{"escena":[' +
-            '{"next_escenas":""},' +
-            '{"src":"leave_it.mp4"}' +
-            ']}]},' +
-            '{"src":"leave_it.mp4"}]}]},' +
-            '{"src":"inicial.mp4"}]' +
-            '}';
+         var $schema2 = document.getElementById('schema2');
+         var text= JSON.parse($schema2.value);
+         text=JSON.stringify(text.Contenido_Live, null, 2);
+         alert(text);
 
         var videos_seq = JSON.parse(text);
         var id = Math.round($.now() * Math.random() / 100000);
@@ -83,18 +62,19 @@ $('#con').html(contador);
                 sala: id
             }, function(data) {
               //  $('#identificador').html(data.sala);
-            })
+            }) 
 
         });
         var btnplay = document.getElementById("play");
         btnplay.addEventListener('click', play);
         var video = document.getElementById("video_principal");
-        video.src = dir_movies + videos_seq.escena[1].src;
+        var inicio=searchInicio(videos_seq)
+        video.src = inicio.Escena;
         video.load(); // if HTML source element is used
 
         video.addEventListener("ended", function() {
             var fileURL = "/movies/h3mBeVNzVeo.mp4"; // get input field                    
-            var escenas = searchVideoOnArray(video.src, videos_seq);
+            var escenas = searchVideoOnArray(inicio.Id_Escena, videos_seq);
             socket.emit('opciones', {
                 sala: id,
                 opciones: {
@@ -116,26 +96,34 @@ $('#con').html(contador);
           });*/
         socket.on('opcion_1c', function(e) {
 
-            var fileURL = dir_movies + e; // get input field                    
+            var fileURL = e; // get input field                    
 
             video.src = fileURL;
             video.play();
         });
 
-        function searchVideoOnArray(nameKey, myArray) {
-            if ((url + dir_movies + myArray.escena[1].src) === (nameKey)) {
-                return myArray.escena[0].next_escenas;
-            }
-            if (myArray.escena[0].next_escenas != '') {
-                for (var i = 0; i < myArray.escena[0].next_escenas.length; i++) {
-                    var res = searchVideoOnArray(nameKey, myArray.escena[0].next_escenas[i])
-                    if (res != '') {
-                        break;
-                    }
+        function searchVideoOnArray(Key, myArray) {
+             var escs = [];
+             for (var i = 0; i < myArray.Escenas.length; i++) {
+                     if(Key.localeCompare(myArray.Escenas[i].Escena_Padre)==0){
+                    escs.push(myArray.Escenas[i]);
+
+                     }
                 }
-                return res;
-            }
-            return '';
+                return escs;
+               
+           
+        }
+         function searchInicio(myArray) {
+             for (var i = 0; i < myArray.Escenas.length; i++) {
+                     if("".localeCompare(myArray.Escenas[i].Escena_Padre)==0){
+                    return myArray.Escenas[i];
+
+                     }
+                }
+                return escs;
+               
+           
         }
 
         function play() {

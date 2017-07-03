@@ -25,19 +25,22 @@ document.body.appendChild(document.importNode(getContent, true));
   </script>
          <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header" id="page-header">Subir al Servidor</h1>
-
         </div>
             <div class='class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2'>
-        <div class='span8 col-md-6 columns eight large-8'>
+        <div class='span8 col-md-8 columns eight large-8'>
             <h2>Ingresar los datos para el Contenido</h2>
             <p>La estructura es generada por el json de configuración.</p>
-
+       <form action="/upload" method='POST' id='subir' name="subir" enctype='multipart/form-data'>
             <div id='editor'></div>
+             <p> <button class='btn btn-primary'  id='enviar' type="button">Subir</button></p>
+
+<input id='output2' type='hidden' name='output2' style='width: 100%; height: 450px; font-family: monospace;' class='form-control'></input>
+              </form>
         </div>
-        <div class='span4 col-md-6 columns four large-4'>
+        <div class='span4 col-md-4 columns four large-4'>
 
             <h2>JSON Generado</h2>
-            <p>Ud puede tambien cambiar aqui el contenido del json<button class='btn btn-primary' id='setvalue'>Actualizar Json Generado</button></p>
+            <p><button class='btn btn-primary' id='setvalue'>Actualizar Json Generado</button></p>
             <textarea id='output' style='width: 100%; height: 300px; font-family: monospace;' class='form-control'></textarea>
 
 
@@ -45,15 +48,7 @@ document.body.appendChild(document.importNode(getContent, true));
             <p>This will update whenever the form changes to show validation errors if there are any.</p>
             <textarea id='validate' style='width: 100%; height: 150px; font-family: monospace;' readonly disabled class='form-control'></textarea>
         </div>
-        <div class='row'>
-            <div class='span12 col-md-12 columns twelve large-12'>
-                <h2>JSON de Configuración</h2>
 
-                <textarea id='schema' style='width: 100%; height: 450px; font-family: monospace;' class='form-control' disabled>
-                  
-                </textarea>
-            </div>
-        </div>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
@@ -61,13 +56,17 @@ document.body.appendChild(document.importNode(getContent, true));
      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>  
     <script src="js/bootstrap.min.js"></script>
         <script src='js/jsoneditor.js'></script>
+
     <script>
 (function() {
 var schema;
  schema = JSON.parse(LZString.decompressFromBase64('<%= json%>'));
-
+ var escena='';
+ escena = LZString.decompressFromBase64('<%= escenas%>');
+    //if()
+            //alert(LZString.decompressFromBase64('<%= escenas%>'))
+      JSONEditor.defaults.options.form_name_root = false;
     // Divs/textareas on the page
-    var $schema = document.getElementById('schema');
     var $output = document.getElementById('output');
     var $editor = document.getElementById('editor');
     var $validate = document.getElementById('validate');
@@ -78,24 +77,6 @@ var schema;
 
     var jsoneditor;
 
-    var updateDirectLink = function() {
-        var url = window.location.href.replace(/\?.*/,'');
-
-        url += '?schema='+LZString.compressToBase64(JSON.stringify(schema));
-        url += '&value='+LZString.compressToBase64(JSON.stringify(jsoneditor.getValue()));
-
-        for(var i in JSONEditor.defaults.options) {
-            if(!JSONEditor.defaults.options.hasOwnProperty(i)) continue;
-            if(JSONEditor.defaults.options[i]===false) continue;
-            else if(JSONEditor.defaults.options[i]===true) {
-                url += '&'+i;
-            }
-            else {
-                url += '&'+i+'='+JSONEditor.defaults.options[i];
-            }
-        }
-
-    };
 
     var reload = function(keep_value) {
         var startval = (jsoneditor && keep_value)? jsoneditor.getValue() : window.startval;
@@ -112,8 +93,22 @@ var schema;
         jsoneditor.on('change',function() {
             var json = jsoneditor.getValue();
 
-            $output.value = JSON.stringify(json,null,2);
+            if(escena!=null){
+              if(escena.localeCompare('')==0){
 
+                $output.value = JSON.stringify(json,null,2); 
+              }
+
+              else {
+                $output.value = escena; 
+              }
+  
+            }
+            else{
+             $output.value = JSON.stringify(json,null,2); 
+            }
+
+      jsoneditor.setValue(JSON.parse($output.value));
             var validation_errors = jsoneditor.validate();
             // Show validation errors if there are any
             if(validation_errors.length) {
@@ -123,13 +118,42 @@ var schema;
                 $validate.value = 'valid';
             }
 
-            updateDirectLink();
         });
     };
+ var rename = function() {
+        var header=document.getElementById('editor');
+        var rs=header.getElementsByClassName('row');
+        for (var i = 0; i < rs.length; i++) {
+        var inputs=rs[i].getElementsByTagName('input');
+         for (var j = 0; j < inputs.length; j++) {
+       inputs[j].name=inputs[j].name.replace('root[',"")
+       inputs[j].name=inputs[j].name.replace(/\[/g,"__");
+      inputs[j].name=inputs[j].name.replace(/]/g,"");    
+        }
+        }
 
+    };
+     var rename_file = function() {
+        var header=document.getElementById('editor');
+        var rs=header.getElementsByClassName('row');
+        for (var i = 0; i < rs.length; i++) {
+        var inputs=rs[i].getElementsByTagName('input');
+         for (var j = 0; j < inputs.length; j++) {
+          if(inputs[j].type.localeCompare("file")==0){
+          var hermano=inputs[j].parentNode.parentNode.nextSibling;
+           var name=inputs[j].previousSibling.innerHTML;
+           var inp=hermano.getElementsByTagName('input')[0].name;
+           var cambio=inp.split("__");
+           var cm=cambio[cambio.length-1];
+          inputs[j].name=inp.replace(cm,name);
+          }  
+        }
+        }
+
+    };
     // Start the schema and output textareas with initial values
-    $schema.value = JSON.stringify(schema,null,2);
     $output.value = '';
+
 
     // When the 'update form' button is clicked, set the editor's value
     $set_value_button.addEventListener('click',function() {
@@ -150,11 +174,63 @@ var schema;
     }
 
     JSONEditor.defaults.options.object_layout = 'normal';
+    // Specify upload handler
+      JSONEditor.defaults.options.upload = function(type, file, cbs) {
+        if (type === 'root.upload_fail') cbs.failure('Upload failed');
+        else {
+          var tick = 0;
+
+          var tickFunction = function() {
+            tick += 20;
+            console.log('progress: ' + tick);
+
+            if (tick < 100) {
+              cbs.updateProgress(tick);
+              window.setTimeout(tickFunction, 50)
+            } else if (tick == 100) {
+              cbs.updateProgress();
+              window.setTimeout(tickFunction, 500)
+            } else {
+              cbs.success('/contenidos/' + file.name);
+            }
+          };
+
+          window.setTimeout(tickFunction)
+        }
+      };
+      JSONEditor.defaults.options.form_name_root = false;
     JSONEditor.defaults.options.show_errors = 'interaction';
    JSONEditor.defaults.options['disable_edit_json'] = true;
       JSONEditor.defaults.options['disable_properties'] = true;
    JSONEditor.defaults.options['disable_array_delete_last_row'] = true;
     reload();
+rename();
+         var $set_schema_button = document.getElementById('enviar');
+                $set_schema_button.addEventListener('click',function() {
+                  var bolid=false;
+                    rename();
+                     var headerw=document.subir.Titulo;
+             
+                
+                rename_file();
+                      try {
+                    var $schema2 = document.getElementById('output2');
+                    var $schema = document.getElementById('output');
+                    $schema2.value = LZString.compressToBase64($schema.value);
+                }
+                catch(e) {
+                    alert('Invalid Schema: '+e.message);
+                    return;
+                }
+                 if(headerw.value.localeCompare("")!=0){
+
+                    document.subir.submit(); 
+                 }
+                 else{
+
+                  alert("Titulo esta vacio")
+                 }
+            });
 })();
 </script>
   </body> 
