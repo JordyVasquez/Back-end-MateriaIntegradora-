@@ -51,22 +51,86 @@ if ('development' == app.get('env')) {
 app.post('/admin_cont_sub', function(req, res) {
     var actividad = req.body.actividad;
     var title = req.body.title;
-    if('new'.localeCompare(actividad)==0){
-
-console.log('new')
+ if('delete'.localeCompare(actividad)==0){
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+   var path = { title:title};
+  db.collection("Contenidos").deleteOne(path, function(err, obj) {
+    if (err) throw err;
+    else{
+        MongoClient.connect(url, function(err, db) {
+                              if (err) throw err;
+                              db.collection("Contenidos").find({}).toArray(function(err, result) {
+                                if (err) throw err;
+                                 res.render('contenidos_subidos', {
+                                    title: 'Escenas Guardadas',
+                                    resultado: result
+                                });
+                                db.close();
+                              });
+                               
+                            });
     }
-    else if('delete'.localeCompare(actividad)==0){
-console.log('delete')
+    console.log("1 document deleted");
+  });
+});
 
     }
      else if('edit'.localeCompare(actividad)==0){
-console.log('edit')
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('config_json', {
+                title: 'Configuración Json',
+                msm: 'error al conectar con la bse mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('subir_cont', {
+                    title: 'Subir Contenido',
+                    msm: 'error al conectar con la bse mongodb',
+                    json: '',
+                  escenas:''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                var path = { title:title};
+                  db.collection("Contenidos").find(path).toArray(function(err, result2) {
+                    if (err) throw err;
+                     else if (result2.length > 0) {
+               
+                        res.render('subir_cont', {
+                            title: 'Subir Contenido',
+                            json: result[0].json,
+                            escenas:result2[0].json
+                        });
+                         }
+                    db.close();
+                  });
+
+            } else {
+                res.render('subir_cont', {
+                    title: 'Subir Contenido',
+                    json: '',
+                  escenas:'' 
+                });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
 
     }
-      else if('view'.localeCompare(actividad)==0){
-
-console.log('view')
-    }
+    
    
 });
 app.post('/jsonConf', function(req, res) {
@@ -242,60 +306,6 @@ app.get('/login', function(req, res){
 });
 
 app.get('/subir_cont', function(req, res) {
-    var nombre = req.query.title;
-    MongoClient.connect(url, function(err, db) {
-        if (err) {
-            throw err;
-            res.render('config_json', {
-                title: 'Configuración Json',
-                msm: 'error al conectar con la bse mongodb',
-                json: ''
-            });
-
-        }
-        var query = {
-            name: "config"
-        };
-        db.collection("Json_Config").find(query).toArray(function(err, result) {
-            if (err) {
-                res.render('subir_cont', {
-                    title: 'Subir Contenido',
-                    msm: 'error al conectar con la bse mongodb',
-                    json: '',
-                  escenas:''
-                });
-                throw err;
-
-            } else if (result.length > 0) {
-                var path = { title:nombre};
-                  db.collection("Contenidos").find(path).toArray(function(err, result2) {
-                    if (err) throw err;
-                     else if (result2.length > 0) {
-               
-                        res.render('subir_cont', {
-                            title: 'Subir Contenido',
-                            json: result[0].json,
-                            escenas:result2[0].json
-                        });
-                         }
-                    db.close();
-                  });
-
-            } else {
-                res.render('subir_cont', {
-                    title: 'Subir Contenido',
-                    json: '',
-                  escenas:'' 
-                });
-
-            }
-            console.log(result.length);
-            db.close();
-        });
-    });
-
-});
-app.get('/subir_cont_new', function(req, res) {
     MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
@@ -475,10 +485,18 @@ app.post('/upload', function(req, res) {
                         throw err
                         
                     } else {
-                        console.log(result.result.nModified + " record updated");
-                                         res.render('page_contenido', {
-                            title: 'Subir Contenido'
-                        });
+                            MongoClient.connect(url, function(err, db) {
+                              if (err) throw err;
+                              db.collection("Contenidos").find({}).toArray(function(err, result) {
+                                if (err) throw err;
+                                 res.render('contenidos_subidos', {
+                                    title: 'Escenas Guardadas',
+                                    resultado: result
+                                });
+                                db.close();
+                              });
+                               
+                            });
                     }
                 });
             } else {
@@ -487,10 +505,18 @@ app.post('/upload', function(req, res) {
                         throw err
                        
                     } else {
-                        console.log("1 record inserted");
-                        res.render('page_contenido', {
-                            title: 'Subir Contenido'
+                        MongoClient.connect(url, function(err, db) {
+                      if (err) throw err;
+                      db.collection("Contenidos").find({}).toArray(function(err, result) {
+                        if (err) throw err;
+                         res.render('contenidos_subidos', {
+                            title: 'Escenas Guardadas',
+                            resultado: result
                         });
+                        db.close();
+                      });
+                       
+                    });
                     }
                 });
             }
