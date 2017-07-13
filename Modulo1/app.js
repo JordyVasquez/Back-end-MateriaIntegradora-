@@ -10,9 +10,12 @@ var http = require('http');
 var path = require('path');
 var io = require('socket.io');
 var HashMap = require('hashmap');
+var cons= require('consolidate');
+var path = require("path");
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/data";
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser'); 
 var urlp = require("url");
 var connections = 0;
 var multipart = require('connect-multiparty');
@@ -21,7 +24,7 @@ var passwordData = '';
 var passwordHash = '';
 var nombre = '';
 var passAdminHash = '';
-var resultDB = '';
+var resultDB =   '';
 var resultStr = '';
 var finalJson = '';
 var finalPassDB = '';
@@ -29,11 +32,28 @@ var app = express();
 var server = http.createServer(app);
 io = io.listen(server);
 var map_ids_idsonido = new HashMap();
+var flagSession = false;
+var now = null;
+var expired = null;
+
+app.engine('.html',cons.jade);
+app.set('view engine','html');
 // all environments
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({
     extended: true
 })); // support encoded bodies
+app.use(express.cookieParser());
+app.use(express.bodyParser());
+//app.use(express.session({secret: 'mi secreto'}));
+/*app.use(express.session({
+    secret  : 'sdfsdSDFD5sf4rt4egrt4drgsdFSD4e5',
+    //store   : new storage({ client : conn, cleanup: false }),
+    cookie  : { maxAge  : new Date(Date.now() + (20000)) },
+    
+}));*/
+app.use(cookieParser('my secret here'));
+const minute = 20 * 1000;
 
 //Express 4
 app.set('port', process.env.PORT || 3331);
@@ -44,6 +64,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multipart())
+
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
@@ -274,25 +295,92 @@ app.get('/vista_json', function(req, res) {
     });
 });
 app.get('/contenido', function(req, res) {
-    res.render('page_contenido', {
-        title: 'Subir Contenido'
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    //console.log("Expired: "+expired);
+    if(now >= expired){
+        console.log("ENTER");    
+        res.clearCookie('remember');
+        console.log("Session var: "+req.cookies.remember);
+        res.render('login_admin', {
+            title: 'Login Admin',
+            band: 'true',
+            msm : 'expired',
+            username: ''
+
+                    });
+
+        console.log("Ha finalizado la sesion");
+        //flagSession = false;
+    }
+    else{  
+          expired = new Date(Date.now() + 10000);
+          console.log("Expired: "+expired);              
+          res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired }); 
+          res.render('page_contenido', {
+                title: 'Subir Contenido', Nombre:req.cookies.remember
+            });   
+    }        
+
+    
+
+});
+
+app.get('/ver', function(req, res) {
+    res.render('ver', {
+        title: 'ver html'
     });
 });
 
 app.get('/contenidos_subidos', function(req, res) {
-    MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  db.collection("Contenidos").find({}).toArray(function(err, result) {
-    if (err) throw err;
-     res.render('contenidos_subidos', {
-        title: 'Escenas Guardadas',
-        resultado: result
-    });
-    db.close();
-  });
-   
+    console.log("Session var INICIO: "+req.cookies.remember);
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    //console.log("Expired: "+expired);
+    if(now >= expired){
+        console.log("ENTER");    
+        //delete req.session.mivariable;
+        res.clearCookie('remember');
+        console.log("Session var: "+req.cookies.remember);
+        res.render('login_admin', {
+            title: 'Login Admin',
+            band: 'true',
+            msm : 'expired',
+            username: ''
+
+                    });
+
+        console.log("Ha finalizado la sesion");
+        //flagSession = false;
+    }
+    //}    
+
+    /*if(typeof req.session.mivariable == 'undefined'){
+            res.render('ver',{Titulo:'Ver variable', Nombre:'la variable no existe'});
+            //res.render('ver',{Titulo:'Ver variable', Nombre:req.session.mivariable});
+    }*/
+    else{  
+          expired = new Date(Date.now() + 10000);
+          console.log("Expired: "+expired);              
+          res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });
+                
+          MongoClient.connect(url, function(err, db) {
+          if (err) throw err;
+          db.collection("Contenidos").find({}).toArray(function(err, result) {
+            if (err) throw err;
+             res.render('contenidos_subidos', {
+                title: 'Escenas Guardadas',
+                resultado: result
+            });
+            db.close();
+          });
+       
+        })
+             ;
+           
+       
+    }
 });
-    });
 
 app.get('/login', function(req, res){
   //res.render('login_admin', { title: 'Login Admin' });
@@ -663,13 +751,19 @@ app.post('/config_json2',function(req,res){
         if(compare == 0){
             var id_session = Math.round(Date.now()*Math.random()/100000);
             console.log("CORRECTO");
+            flagSession = true;
             console.log("id: "+id_session);
-            res.redirect('/contenido');
+            expired = new Date(Date.now() + (20000));
+            console.log("now: "+new Date(Date.now())+" expired: "+expired);
+            //res.redirect('/contenido');
+            //req.session.mivariable=id_session;
+            res.cookie('remember', 1, { maxAge: minute });
+            res.render('page_contenido',{Titulo:'contenido', band: 'true', Nombre:id_session, Expire:expired});
 
         }
         else{
           console.log("inCORRECTO");
-          //res.send("error: "+nombre);
+          //res.op_second_screen    ("error: "+nombre);
           res.render('login_admin', {
                  msm: 'error',
                  band: 'true',
@@ -693,7 +787,35 @@ app.post('/config_json2',function(req,res){
       db.close();
       });
   });*/
-});
+  });
+
+
+
+app.get('/cerrar2',function (req,res) {
+        delete req.session.mivariable;
+        res.render('login_admin', {
+            title: 'Login Admin',
+            band: 'false',
+            msm : 'OK',
+            username: ''
+
+                    });
+        console.log("Ha finalizado la sesion");
+        flagSession = false;
+    });
+
+app.get('/cerrar',function (req,res) {
+        res.clearCookie('remember');
+        res.render('login_admin', {
+            title: 'Login Admin',
+            band: 'false',
+            msm : 'OK',
+            username: ''
+
+                    });
+        console.log("Ha finalizado la sesion");
+        //flagSession = false;
+    });
 
 function stringGen(len)
       {

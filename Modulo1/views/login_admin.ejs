@@ -46,6 +46,9 @@
           <div id="error" style=" display: none" class="alert alert-danger">
             <strong>Error!</strong> El nombre de usuario o contrase&ntilde;a es incorrecto. Ingrese de nuevo.
           </div>  
+          <div id="expired" style=" display: none" class="alert alert-danger">
+            <strong>Error!</strong> La sesión ha expirado. Por favor, ingrese de nuevo.
+          </div> 
         </form>        
       </div>  
         
@@ -72,15 +75,24 @@
           //alert('<%= msm %>');
           var msm = "<%= msm %>";
           var elDiv = document.getElementById('error');
+          var elDiv2 = document.getElementById('expired');
               // Default starting schema
           if (msm.localeCompare("error") == 0) {
              
               elDiv.style.display = 'block';
               document.getElementById('username').value = '<%= username %>';
-          } else {
-
+          } 
+          else
               elDiv.style.display = 'none';
-          }
+                
+          if (msm.localeCompare("expired") == 0) {
+             
+              elDiv2.style.display = 'block';
+              document.getElementById('username').value = '<%= username %>';
+          } 
+          else 
+              elDiv2.style.display = 'none';
+          
       }
 
       function openWindowWithPost(something, additional, misc) {
