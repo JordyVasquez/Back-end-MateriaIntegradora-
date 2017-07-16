@@ -3,16 +3,35 @@ var express         = require("express"),
     bodyParser      = require("body-parser"),
     methodOverride  = require("method-override"),
     mongoose        = require('mongoose');
-var redis = require("redis");
+var http = require('http');
+var path = require('path');
+var urlp = require("url");
+var HashMap = require('hashmap');
+var cons= require('consolidate');
+var cookieParser = require('cookie-parser'); 
+var multipart = require('connect-multiparty');
+/*var redis = require("redis");
 
 var pub = redis.createClient();
-var sub = redis.createClient();
+var sub = redis.createClient();*/
 
 var server = app.listen(3000, function() {
   console.log("Node server running on http://localhost:3000");
 });  
 var socket = require('socket.io')
 var io = socket(server);
+
+// Middlewares
+app.set('port', process.env.PORT || 3000);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(require('stylus').middleware(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(multipart())
+//app.use(express.static('public'));
+
 
 
 io.sockets.on('connection', function(socket) {  
@@ -36,14 +55,6 @@ mongoose.connect('mongodb://root:1234@104.197.197.72:27017/admin', function(err,
   if(err) throw err;
   console.log('Connected to Database');
 });
-
-
-// Middlewares
-app.set('port', process.env.PORT || 3000);
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(methodOverride());
-app.use(express.static('public'));
 
 
 
@@ -73,6 +84,13 @@ tvshows.route('/tvshows/:id')
   .delete(TVShowCtrl.deleteTVShow);
 
 app.use(tvshows);
+app.get('/2v', function(req, res) {
+    //res.cookie('screen2', 1, { maxAge: minute });
+    res.render('test_secondScreen', {
+        title: '2 Pantalla DEMO'
+        //cookie: req.cookies.screen2
+    });
+});
   
 /*MongoClient.connect(url, function(err, db) {
       if (err) throw err;
@@ -116,7 +134,7 @@ app.get('/:name', function (req, res, next) {
 
 });
 
-sub.subscribe("analytics");
+/*sub.subscribe("analytics");
 sub.on("subscribe", function(channel, count) {
     console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
     pub.publish("analytics", "Bon cul, petite salope");
@@ -125,7 +143,7 @@ sub.on("subscribe", function(channel, count) {
 sub.on("message", function(channel, message) {
     console.log("Message from channel " + channel + ": " + message);
 });
-
+*/
 
 
 
