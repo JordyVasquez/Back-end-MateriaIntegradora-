@@ -20,25 +20,25 @@ var store = redis.createClient();
 var pub = redis.createClient();
 var sub = redis.createClient();
  
-io.sockets.on('connection', function (client) {
+io.sockets.on('connection', function (socket) {
     sub.subscribe("chatting");
     sub.on("message", function (channel, message) {
         console.log("message received on server from publish ");
-        client.send(message);
+        socket.send(message);
     });
-    client.on("message", function (msg) {
+    socket.on("message", function (msg) {
         console.log(msg);
         if(msg.type == "chat"){
             pub.publish("chatting",msg.message);
         }
         else if(msg.type == "setUsername"){
-            pub.publish("chatting","A new user in connected:" + msg.user);
+            pub.publish("chatting","A new user is connected: " + msg.user);
             store.sadd("onlineUsers",msg.user);
         }
     });
-    client.on('disconnect', function () {
+    socket.on('disconnect', function () {
         sub.quit();
-        pub.publish("chatting","User is disconnected :" + client.id);
+        pub.publish("chatting","User is disconnected :" + socket.id);
     });
      
   });
