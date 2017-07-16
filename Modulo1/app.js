@@ -946,7 +946,15 @@ app.post('/config_json2',function(req,res){
   });*/
   });
 
-
+app.get('/qr', function (req,res) {
+        res.render('QR', {
+            title: 'QR',
+            room : Math.round(Date.now()*Math.random()/100000),
+            
+                    });
+        //console.log("Ha finalizado la sesion");
+        //flagSession = false;
+});
 
 app.get('/cerrar2',function (req,res) {
         delete req.session.mivariable;
@@ -972,7 +980,7 @@ app.get('/cerrar',function (req,res) {
                     });
         console.log("Ha finalizado la sesion");
         //flagSession = false;
-    });
+});
 
 function stringGen(len)
       {
