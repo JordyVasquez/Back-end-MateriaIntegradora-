@@ -51,7 +51,7 @@ var url = "mongodb://localhost:27017/data";
   console.log('Connected to Database');
 });*/
 
-mongoose.connect('mongodb://localhost/data', function(err, res) {
+mongoose.connect('mongodb://root:1234@104.197.197.72:27017/admin', function(err, res) {
   if(err) throw err;
   console.log('Connected to Database');
 });
