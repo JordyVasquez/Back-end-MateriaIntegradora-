@@ -946,6 +946,10 @@ app.post('/config_json2',function(req,res){
   });*/
   });
 
+app.get('/', function(req, res){
+  res.render('index', { title: '1 Pantalla DEMO' });
+});
+
 app.get('/qr', function (req,res) {
         res.render('QR', {
             title: 'QR',

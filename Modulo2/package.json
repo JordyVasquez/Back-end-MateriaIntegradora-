@@ -3,7 +3,8 @@
   "version": "2.0.0",
   "dependencies": {
     "after": "^0.8.2",
-    "body-parser": "^1.5.1",
+    "body-parser": "^1.17.2",
+    "bson": "^1.0.4",
     "connect-multiparty": "^2.0.0",
     "consolidate": "^0.14.5",
     "cookie-parser": "^1.4.3",
@@ -11,10 +12,10 @@
     "express": "^4.13.4",
     "hashmap": "^2.1.0",
     "io": "^0.1.10",
-    "method-override": "^2.1.2",
-    "mongoose": "^3.6.20",
+    "method-override": "^2.3.9",
+    "mongoose": "^3.6.11",
     "redis": "^2.7.1",
-    "socket.io": "^1.4.5",
+    "socket.io": "^1.7.4",
     "stylus": "^0.54.5"
   }
 }
