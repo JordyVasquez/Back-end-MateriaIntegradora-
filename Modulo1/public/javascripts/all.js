@@ -128,6 +128,7 @@ $('#con').html(contador);
 
         function play() {
             var video = document.getElementById("video_principal");
+             this.style.display='none'
             video.play();
         }
     }, {

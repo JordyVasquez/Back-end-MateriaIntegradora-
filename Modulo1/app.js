@@ -11,12 +11,12 @@ var path = require('path');
 var io = require('socket.io');
 var HashMap = require('hashmap');
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/data";
+var url = "mongodb://root:1234@104.197.197.72:27017/admin";
 var bodyParser = require('body-parser');
+var multipart = require('connect-multiparty');
 var urlp = require("url");
 var connections = 0;
-var multipart = require('connect-multiparty');
-var salt= '';
+var salt= ''; 
 var passwordData = '';
 var passwordHash = '';
 var nombre = '';
@@ -31,6 +31,7 @@ io = io.listen(server);
 var map_ids_idsonido = new HashMap();
 // all environments
 app.use(bodyParser.json()); // support json encoded bodies
+app.use(multipart())
 app.use(bodyParser.urlencoded({
     extended: true
 })); // support encoded bodies
@@ -43,7 +44,6 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(multipart())
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
@@ -132,6 +132,76 @@ MongoClient.connect(url, function(err, db) {
     }
     
    
+});
+app.post('/jsonConf2Pantalla', function(req, res) {
+    var json_confi = req.body.schema2;
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var myobj = {
+            name: "config",
+            json: json_confi
+        };
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+                throw err;
+                res.render('config_json_2_pantalla', {
+                    title: 'Configuración Json',
+                    json: '',
+                    msm: 'error'
+                });
+            } else if (result.length > 0) {
+                var newvalues = {
+                    $set: {
+                        json: json_confi
+                    }
+                };
+                db.collection("Json_Config_2_Pantalla").update(query, newvalues, function(err, result) {
+                    if (err) {
+                        throw err
+                        res.render('config_json_2_pantalla', {
+                            title: 'Configuración Json',
+                            json: '',
+                            msm: 'error'
+                        })
+                    } else {
+                        console.log(result.result.nModified + " record updated");
+                        res.render('vista_json_2_pantalla', {
+                            title: 'Vista Json',
+                            json: json_confi,
+                            msm: 'OK'
+                        });
+                    }
+                });
+            } else {
+                db.collection("Json_Config_2_Pantalla").insertOne(myobj, function(err, result) {
+                    if (err) {
+                        throw err
+                        res.render('config_json_2_pantalla', {
+                            title: 'Configuración Json',
+                            json: '',
+                            msm: 'error'
+                        })
+                    } else {
+                        console.log("1 record inserted");
+                        res.render('vista_json_2_pantalla', {
+                            title: 'Vista Json',
+                            json: json_confi,
+                            msm: 'OK'
+                        });
+                    }
+                });
+            }
+            console.log(result.length);
+            db.close();
+        });
+
+    });
+
+    // res.render('page_contenido', { title: 'Subir Contenido' });
+    //res.render('index', { title: '1 Pantalla DEMO' });
 });
 app.post('/jsonConf', function(req, res) {
     var json_confi = req.body.schema2;
@@ -228,6 +298,49 @@ app.get('/escenas/*', function(req, res) {
 app.get('/2v', function(req, res) {
     res.render('test_secondScreen', {
         title: '2 Pantalla DEMO'
+    });
+});
+app.get('/vista_json_2_pantalla', function(req, res) {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('vista_json_2_pantalla', {
+                title: 'Vista Json',
+                json: '',
+                msm: 'error'
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('vista_json', {
+                    title: 'Vista Json',
+                    json: '',
+                    msm: 'error'
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                console.log(result);
+                res.render('vista_json_2_pantalla', {
+                    title: 'Vista Json',
+                    json: result[0].json,
+                    msm: 'view'
+                });
+            } else {
+                res.render('vista_json_2_pantalla', {
+                    title: 'Vista Json',
+                    json: '',
+                    msm: 'view'
+                });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
     });
 });
 app.get('/vista_json', function(req, res) {
@@ -353,6 +466,49 @@ app.get('/subir_cont', function(req, res) {
     });
 
 });
+app.get('/config_json_2_pantalla', function(req, res) {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('config_json_2_pantalla', {
+                title: 'Configuración Json',
+                msm: 'error al conectar con la base mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('config_json_2_pantalla', {
+                    title: 'Configuración Json',
+                    msm: 'error al conectar con la base mongodb',
+                    json: ''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                console.log(result);
+                res.render('config_json_2_pantalla', {
+                    title: 'Configuración Json',
+                    json: result[0].json,
+                    msm: 'OK'
+                });
+            } else {
+                res.render('config_json_2_pantalla', {
+                    title: 'Configuración Json',
+                    json: '',
+                    msm: 'OK'
+                });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
+});
 app.get('/config_json', function(req, res) {
     MongoClient.connect(url, function(err, db) {
         if (err) {
@@ -460,6 +616,7 @@ app.post('/upload', function(req, res) {
     var fs = require('fs')
     var json_con = req.body.output2;
     var title = req.body.Titulo;
+    console.log(req.files)
  var fileKeys = Object.keys(req.files);
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;

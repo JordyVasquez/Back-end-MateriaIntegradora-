@@ -1,0 +1,6 @@
+{
+  "GCLOUD_PROJECT": "materia-ingradora-back-end",
+  "DATA_BACKEND": "mongodb",
+  "MONGO_URL": "130.211.224.123",
+  "MONGO_COLLECTION": "data"
+}

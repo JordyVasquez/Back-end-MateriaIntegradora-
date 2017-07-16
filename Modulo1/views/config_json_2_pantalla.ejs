@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Configuracion de Archivo JSON Segunda Pantalla</title>
+    <link id="template-file" href="templates/template.ejs" rel="import" />
+ <link href="dist/jsoneditor.css" rel="stylesheet" type="text/css">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/dashboard.css" rel="stylesheet">
+       
+     <style>
+    html, body {
+      font: 11pt sans-serif;
+    }
+    #jsoneditor {
+      width: 500px;
+      height: 500px;
+    }
+  </style>
+</head>
+
+<body>
+    <script>
+        var getImport = document.querySelector('#template-file');
+        var getContent = getImport.import.querySelector('#template');
+        document.body.appendChild(document.importNode(getContent, true));
+    </script>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <h1 class="page-header" id="page-header">Configuracion de Archivo JSON Segunda Pantalla</h1>
+        <div class='row'>
+            <div class='span12 col-md-12 columns twelve large-12'>
+              <div id="error" class="alert alert-danger alert-dismissable fade in hidden">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Danger!</strong> This alert box could indicate a dangerous or potentially negative action.
+  </div>
+                <form action="/jsonConf2Pantalla" method="post">
+                 <p> <button class='btn btn-primary'  id='submit' type="submit">Actualizar</button></p>
+
+                    <div class="form-group">
+                        <label for="schema">Json De Configuración Segunda Pantalla</label>
+                        <div id="schema" name='schema' ></div>
+                         <input id='schema2' type='hidden' name='schema2' style='width: 100%; height: 450px; font-family: monospace;' class='form-control'></input>
+
+
+                    </div>
+                   
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="dist/jsoneditor.js"></script>
+         <script src='js/LZString.js'></script>
+    <script>
+        (function() {
+            var schema;
+            schema = JSON.parse(LZString.decompressFromBase64('<%= json%>'));
+   
+            // Default starting schema
+            if (!schema) {
+                schema = {
+                    IP_Servidor_Contenido_Transmedia: {
+                            type: "string",
+                            description: "Titulo del Contenido a Visualizar"
+                        },
+                    properties: {
+                        Titulo: {
+                            type: "string",
+                            description: "Titulo del Contenido a Visualizar",
+                            minLength: 4
+                        },
+                        Contenido_Trasmedia: {
+                            type: "object",
+                            title: "Contenido Trasmedia",
+                            properties: {
+                                
+                                Chats: {
+                                    type: "array",
+                                    format: "table",
+                                    title: "Chats",
+                                    uniqueItems: true,
+                                    items: {
+                                        type: "object",
+                                        title: "Chat",
+                                        properties: {
+                                            URL: {
+                                                type: "string"
+                                            },
+                                            Tiempo: {
+                                                type: "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+             var msm;
+            msm = '<%= msm%>';
+            // Default starting schema
+            if (msm.localeCompare("OK") == 0) {
+                var elDiv = document.getElementById('error');
+                elDiv.style.display = 'none';
+            } else {
+                var elDiv = document.getElementById('error');
+                elDiv.style.display = 'block';
+            }
+            // Divs/textareas on the page
+            var editor = new JSONEditor(document.getElementById('schema'));
+            editor.setText(JSON.stringify(schema, null, 2));
+
+            var $set_schema_button = document.getElementById('submit');
+                $set_schema_button.addEventListener('click',function() {
+                try {
+                    var $schema2 = document.getElementById('schema2');
+                    $schema2.value = LZString.compressToBase64(editor.getText());
+                }
+                catch(e) {
+                    alert('Invalid Schema: '+e.message);
+                    return;
+                }
+
+                
+            });
+
+        })();
+    </script>
+</body>
+
+</html>
