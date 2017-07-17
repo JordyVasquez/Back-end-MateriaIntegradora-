@@ -506,6 +506,17 @@ app.get('/login', function(req, res){
             });
 });
 
+app.get('/', function(req, res){
+  //res.render('login_admin', { title: 'Login Admin' });
+  res.render('login_admin', {
+    title: 'Login Admin',
+    band: 'false',
+    msm : 'OK',
+    username: ''
+
+            });
+});
+
 app.get('/subir_cont', function(req, res) {
     MongoClient.connect(url, function(err, db) {
         if (err) {
@@ -945,6 +956,10 @@ app.post('/config_json2',function(req,res){
       });
   });*/
   });
+
+app.get('/', function(req, res){
+  res.render('index', { title: '1 Pantalla DEMO' });
+});
 
 app.get('/qr', function (req,res) {
         res.render('QR', {

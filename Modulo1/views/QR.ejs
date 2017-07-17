@@ -59,34 +59,52 @@
     </head>
 
     <body>
-        <h1>QAraasdft.js</h1>
+        <h1>Demo</h1>
 
-        <h2>From</h2>
-        <input id="value" type="text">
+        <!--<h2>From</h2>-->
+        <p  align="center" id="value"></p>
         <label>
-            <input id="file" type="file">
+            <input style="display: none " id="file" type="file">
         </label>
-        <div class="group">
-            <div id="image"><img src="./example.png" width="171"></div>
+        <div style="display: none " class="group">
+            <div id="image"><img src="./wonder.jpg" width="171"></div>
         </div>
-        
-        <h2>To</h2>
-        <div class="group">
+        <!--<h2>To</h2>-->
+        <div align="center">
             <div id="combine"></div>
         </div>
-
+        <div align="center">
+         <button id="play">Reproducir video</button>
+            <video id="video_principal"  width="640" height="480">
+                HTML5 Video is required for this example
+            </video>
+       </div> 
         <script src="javascripts/qrcode.js"></script>
         <script src="javascripts/qart.js"></script>
         <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
         <script>
             var room = "<%= room %>";
             alert(room);
-            document.getElementById('value').value= room;
+            document.getElementById('value').innerHTML= room;
+
+            var url = 'http://' + window.location.host;
+            var dir_movies = '/movies/'
+            var btnplay = document.getElementById("play");
+            btnplay.addEventListener('click', function play(){
+                 var video = document.getElementById("video_principal");
+                 video.play();
+                });
+            var video = document.getElementById("video_principal");
+            //var inicio=searchInicio(videos_seq)
+            var fileURL = "/movies/inicial.mp4";
+            video.src = fileURL;
+            video.load();
+
             $(document).ready(function() {
                 var value = room;
                 var filter = 'color';
                 var version = 8;
-                var imagePath = './example.png';
+                var imagePath = './wonder.jpg';
                 var self = this;
 
                 
@@ -121,6 +139,7 @@
                     };
                 }
 
+                
                 $('#value').keyup(function() {
                     value = $(this).val();
                     makeQR();

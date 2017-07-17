@@ -10,6 +10,9 @@ var HashMap = require('hashmap');
 var cons= require('consolidate');
 var cookieParser = require('cookie-parser'); 
 var multipart = require('connect-multiparty');
+var id_session;
+var now = null;
+var expired = null;
 /*var redis = require("redis");
 
 var pub = redis.createClient();
@@ -21,6 +24,8 @@ var server = app.listen(3000, function() {
 var socket = require('socket.io')
 var io = socket(server);
 
+
+
 // Middlewares
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
@@ -30,15 +35,29 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multipart())
+//app.use(express.cookieParser());
+//app.use(express.bodyParser());
+app.use(cookieParser('my secret here'));
+const time = 20 * 1000;
 //app.use(express.static('public'));
 
 
 
-io.sockets.on('connection', function(socket) {  
-  console.log('Alguien se ha conectado con Sockets');
-   });
+io.sockets.on('connection', function (socket) {
+    console.log('Alguien se ha conectado con Sockets');
     
-app.get('/hello', function(req, res) {  
+    socket.on("session", function (data) {
+        id_session = data.session;
+        console.log("id session: "+id_session);
+        
+    });
+    socket.on('disconnect', function () {
+        console.log('User se ha desconectado');
+    });
+     
+  });
+    
+app.get('/hello', function(req, res) { 
   res.status(200).send("Hello World!");
 });
 
@@ -110,9 +129,13 @@ app.get('/2v', function(req, res) {
       db.close();
       });
   });*/
-
+var firstTime =false;
 app.get('/:name', function (req, res, next) {
-
+  if(firstTime == false){
+    expired = new Date(Date.now() + (20000));
+    res.cookie('session', id_session, { maxAge: time });
+    firstTime = true;
+  }
   var options = {
     root: __dirname + '/public/uploads/',
     dotfiles: 'deny',
@@ -122,14 +145,36 @@ app.get('/:name', function (req, res, next) {
     }
   };
 
-  var fileName = req.params.name;
-  res.sendFile(__dirname + '/uploads/'+fileName, function (err) {
-    if (err) {
-      next(err);
-    } else {
-      console.log('Sent:', fileName);
-    }
-  });
+
+  console.log("Session var INICIO: "+req.cookies.session);
+  now = new Date(Date.now());
+  console.log("Now: "+now);
+  if(now >= expired){
+      console.log("ENTER");    
+      res.clearCookie('session');
+      console.log("Session var: "+req.cookies.session);
+      res.send("Hello world!");
+
+      console.log("Ha finalizado la sesion");
+      firstTime = false;
+  }
+  else{
+    expired = new Date(Date.now() + 10000);
+    console.log(" Update session: "+expired);              
+    res.cookie('session', id_session, { maxAge: expired });
+    var fileName = req.params.name;
+    res.sendFile(__dirname + '/uploads/'+fileName, function (err) {
+      if (err) {
+        next(err);
+      } else {
+        console.log('Sent:', fileName);
+      }
+    });
+
+  }
+
+
+  
   
 
 });
