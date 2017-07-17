@@ -49,6 +49,9 @@
           <div id="expired" style=" display: none" class="alert alert-danger">
             <strong>Error!</strong> La sesión ha expirado. Por favor, ingrese de nuevo.
           </div> 
+          <div id="iniciar" style=" display: none" class="alert alert-danger">
+            <strong>Error!</strong> Por favor, inicie sesión.
+          </div> 
         </form>        
       </div>  
         
@@ -75,24 +78,34 @@
           //alert('<%= msm %>');
           var msm = "<%= msm %>";
           var elDiv = document.getElementById('error');
-          var elDiv2 = document.getElementById('expired');
               // Default starting schema
           if (msm.localeCompare("error") == 0) {
-             
+              //alert("ERROR");
               elDiv.style.display = 'block';
               document.getElementById('username').value = '<%= username %>';
+              document.getElementById('error').innerHTML = "El nombre de usuario o contrase&ntilde;a es incorrecto. Ingrese de nuevo.";
           } 
-          else
-              elDiv.style.display = 'none';
-                
-          if (msm.localeCompare("expired") == 0) {
-             
-              elDiv2.style.display = 'block';
+          else{
+            if (msm.localeCompare("expired") == 0) {
+              //alert("expired");
+              elDiv.style.display = 'block';
               document.getElementById('username').value = '<%= username %>';
-          } 
-          else 
-              elDiv2.style.display = 'none';
-          
+              document.getElementById('error').innerHTML = "La sesión ha expirado. Por favor, ingrese de nuevo.";
+            } 
+            else{
+              if (msm.localeCompare("iniciar") == 0) {
+                //alert("iniciar");
+                elDiv.style.display = 'block';
+                document.getElementById('error').innerHTML = "Por favor, inicie sesión.";
+              } 
+              else
+                 elDiv.style.display = 'none'; 
+
+            } 
+
+          }
+              
+         
       }
 
       function openWindowWithPost(something, additional, misc) {
