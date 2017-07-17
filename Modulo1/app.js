@@ -14,6 +14,7 @@ var cons= require('consolidate');
 var path = require("path");
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://root:1234@104.197.197.72:27017/admin";
+//var url = "mongodb://localhost:27017/data";
 var bodyParser = require('body-parser');
 var multipart = require('connect-multiparty');
 var cookieParser = require('cookie-parser'); 
@@ -54,7 +55,7 @@ app.use(express.bodyParser());
     
 }));*/
 app.use(cookieParser('my secret here'));
-const minute = 20 * 1000;
+const minute = 60 * 1000;
 
 //Express 4
 app.set('port', process.env.PORT || 3331);
@@ -365,7 +366,17 @@ app.get('/vista_json_2_pantalla', function(req, res) {
     });
 });
 app.get('/vista_json', function(req, res) {
-    MongoClient.connect(url, function(err, db) {
+    console.log("Session var INICIO: "+req.cookies.remember);
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    if(now >= expired){
+        verificarSesion(req, res, expired);
+    }
+    else{
+        expired = new Date(Date.now() + minute);
+        console.log("Expired: "+expired);              
+        res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });  
+        MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
             res.render('vista_json', {
@@ -406,7 +417,11 @@ app.get('/vista_json', function(req, res) {
             db.close();
         });
     });
+
+    }
+    
 });
+
 app.get('/contenido', function(req, res) {
     now = new Date(Date.now());
     console.log("Now: "+now);
@@ -427,7 +442,7 @@ app.get('/contenido', function(req, res) {
         //flagSession = false;
     }
     else{  
-          expired = new Date(Date.now() + 10000);
+          expired = new Date(Date.now() + minute);
           console.log("Expired: "+expired);              
           res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired }); 
           res.render('page_contenido', {
@@ -445,35 +460,17 @@ app.get('/ver', function(req, res) {
     });
 });
 
+    
+
 app.get('/contenidos_subidos', function(req, res) {
     console.log("Session var INICIO: "+req.cookies.remember);
     now = new Date(Date.now());
     console.log("Now: "+now);
-    //console.log("Expired: "+expired);
     if(now >= expired){
-        console.log("ENTER");    
-        //delete req.session.mivariable;
-        res.clearCookie('remember');
-        console.log("Session var: "+req.cookies.remember);
-        res.render('login_admin', {
-            title: 'Login Admin',
-            band: 'true',
-            msm : 'expired',
-            username: ''
-
-                    });
-
-        console.log("Ha finalizado la sesion");
-        //flagSession = false;
+        verificarSesion(req, res, expired);
     }
-    //}    
-
-    /*if(typeof req.session.mivariable == 'undefined'){
-            res.render('ver',{Titulo:'Ver variable', Nombre:'la variable no existe'});
-            //res.render('ver',{Titulo:'Ver variable', Nombre:req.session.mivariable});
-    }*/
     else{  
-          expired = new Date(Date.now() + 10000);
+          expired = new Date(Date.now() + minute);
           console.log("Expired: "+expired);              
           res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });
                 
@@ -488,8 +485,7 @@ app.get('/contenidos_subidos', function(req, res) {
             db.close();
           });
        
-        })
-             ;
+        });
            
        
     }
@@ -518,7 +514,17 @@ app.get('/', function(req, res){
 });
 
 app.get('/subir_cont', function(req, res) {
-    MongoClient.connect(url, function(err, db) {
+    console.log("Session var INICIO: "+req.cookies.remember);
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    if(now >= expired){
+        verificarSesion(req, res, expired);
+    }
+    else{
+        expired = new Date(Date.now() + minute);
+        console.log("Expired: "+expired);              
+        res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });
+        MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
             res.render('config_json', {
@@ -564,7 +570,13 @@ app.get('/subir_cont', function(req, res) {
         });
     });
 
+
+
+    }
+    
+
 });
+
 app.get('/config_json_2_pantalla', function(req, res) {
     MongoClient.connect(url, function(err, db) {
         if (err) {
@@ -609,7 +621,17 @@ app.get('/config_json_2_pantalla', function(req, res) {
     });
 });
 app.get('/config_json', function(req, res) {
-    MongoClient.connect(url, function(err, db) {
+    console.log("Session var INICIO: "+req.cookies.remember);
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    if(now >= expired){
+        verificarSesion(req, res, expired);
+    }
+    else{
+        expired = new Date(Date.now() + minute);
+        console.log("Expired: "+expired);              
+        res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });
+        MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
             res.render('config_json', {
@@ -650,6 +672,8 @@ app.get('/config_json', function(req, res) {
             db.close();
         });
     });
+    }
+    
 });
 
 io.set('log level', 1);
@@ -996,6 +1020,36 @@ app.get('/cerrar',function (req,res) {
         console.log("Ha finalizado la sesion");
         //flagSession = false;
 });
+
+function verificarSesion(req, res, expired){
+    console.log("Expired: "+expired);
+    console.log("ENTER");    
+    res.clearCookie('remember');
+    console.log("Session var: "+req.cookies.remember);
+    if(expired == null){
+        console.log("ENTER expire null"); 
+        res.render('login_admin', {
+        title: 'Login Admin',
+        band: 'true',
+        msm : 'iniciar',
+        username: ''
+
+                });
+
+    }else{
+        console.log("ENTER expired"); 
+        res.render('login_admin', {
+        title: 'Login Admin',
+        band: 'true',
+        msm : 'expired',
+        username: ''
+
+                });
+    }
+    
+
+    console.log("Ha finalizado la sesion");
+}
 
 function stringGen(len)
       {
