@@ -1,9 +1,6 @@
 //File: controllers/tvshows.js
 var mongoose = require('mongoose');
 var TVShow  = mongoose.model('TVShow');
-console.log("Hola");
-console.log(TVShow);
-
 //GET - Return all tvshows in the DB
 exports.findAllTVShows = function(req, res) {
 	TVShow.find(function(err, tvshows) {
