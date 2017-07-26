@@ -41,14 +41,9 @@
         var ssocket = new SonicSocket({
             alphabet: '0123456789abcdefghi'
         });
-        var emoticonEl = document.getElementById('ruido');
-        emoticonEl.addEventListener('click', onButton);
+       
 
-        function onButton() {
-            ssocket.send(id);
-        }
-
-        var url = 'http://' + window.location.host;
+        var url = 'http://' + '104.198.131.188:65080';
 
         var socket = io(url);
         socket.on('connect', function() {
@@ -66,15 +61,18 @@
                 option: namespaceName
             })
         }
-        socket.on('invitacion_Sala', function(e) {
-                id_sala = e.sala;
+
+          function enviarinvitacion() {
+                id_sala = document.getElementById("idpeli").value
+                alert(id_sala)
                 socket.emit('crearSala', {
                     sala: id_sala
                 }, function(data) {
                     alert('se unio al video :' + data.sala);
                 })
             
-        });
+        }
+        document.getElementById("bbt").addEventListener('click', enviarinvitacion);
         socket.on('op_second_screen', function(e) {
 
             var op = document.getElementById("opciones");

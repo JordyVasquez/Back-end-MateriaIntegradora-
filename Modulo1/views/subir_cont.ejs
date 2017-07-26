@@ -135,12 +135,8 @@ var schema;
         var inputs=rs[i].getElementsByTagName('input');
          for (var j = 0; j < inputs.length; j++) {
           if(inputs[j].type.localeCompare("file")==0){
-          var hermano=inputs[j].parentNode.parentNode.nextSibling;
-           var name=inputs[j].previousSibling.innerHTML;
-           var inp=hermano.getElementsByTagName('input')[0].name;
-           var cambio=inp.split("__");
-           var cm=cambio[cambio.length-1];
-          inputs[j].name=inp.replace(cm,name);
+
+          inputs[j].name='archivos';
           }  
         }
         }
@@ -186,7 +182,7 @@ var schema;
               cbs.updateProgress();
               window.setTimeout(tickFunction, 500)
             } else {
-              cbs.success('/contenidos/' + file.name);
+              cbs.success(file.name);
             }
           };
 
@@ -211,7 +207,7 @@ rename();
                       try {
                     var $schema2 = document.getElementById('output2');
                     var $schema = document.getElementById('output');
-                    $schema2.value = LZString.compressToBase64($schema.value);
+                    $schema2.value = $schema.value;
                 }
                 catch(e) {
                     alert('Invalid Schema: '+e.message);
