@@ -13,7 +13,7 @@ var HashMap = require('hashmap');
 var cons= require('consolidate');
 var path = require("path");
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://root:1234@104.197.197.72:27017/admin";
+var url = "mongodb://root:1234@104.155.160.16:27017/admin";
 //var url = "mongodb://localhost:27017/data";
 var bodyParser = require('body-parser');
 var multipart = require('connect-multiparty');
@@ -34,6 +34,7 @@ var server = http.createServer(app);
 io = io.listen(server);
 var map_ids_idsonido = new HashMap();
 var flagSession = false;
+var cerrar = false;
 var now = null;
 var expired = null;
 
@@ -55,7 +56,7 @@ app.use(express.bodyParser());
     
 }));*/
 app.use(cookieParser('my secret here'));
-const minute = 60 * 1000;
+const minute = 20 * 1000;
 
 //Express 4
 app.set('port', process.env.PORT || 3331);
@@ -70,6 +71,142 @@ app.use(multipart())
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
+
+app.get('/login', function(req, res){
+  //res.render('login_admin', { title: 'Login Admin' });
+  res.render('login_admin', {
+    title: 'Login Admin',
+    band: 'false',
+    msm : 'OK',
+    username: ''
+
+            });
+});
+
+app.get('/', function(req, res){
+  res.render('login_admin', {
+    title: 'Login Admin',
+    band: 'false',
+    msm : 'OK',
+    username: ''
+
+            });
+});
+
+app.get('/inicio', function(req, res){
+  res.render('login_admin', {
+    title: 'Login Admin',
+    band: 'false',
+    msm : 'OK',
+    username: ''
+
+            });
+});
+
+app.get('/escenas/*', function(req, res) {
+    var pathname = urlp.parse(req.url).pathname.split('escenas')[1].replace('/','');
+        console.log("Petición para " + pathname + " recibida.");
+    MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+   var query = { title:pathname};
+  db.collection("Contenidos").find(query).toArray(function(err, result) {
+    if (err) throw err;
+     else if (result.length > 0) {
+ console.log("json!" + result[0].json);
+        res.render('index', {
+                title: '1 Pantalla DEMO',
+                escenas:result[0].json
+            });
+         }
+    db.close();
+  });
+});
+   
+});
+
+app.get('/2v', function(req, res) {
+    res.render('test_secondScreen', {
+        title: '2 Pantalla DEMO'
+    });
+});
+
+app.get('/cerrar', function (req,res) {
+        cerrar = true;
+        res.clearCookie('remember');
+        res.render('login_admin', {
+            title: 'Login Admin',
+            band: 'true',
+            msm : 'iniciar',
+            username: ''
+
+                    });
+        console.log("Ha finalizado la sesion lll");
+        //flagSession = false;
+});
+
+app.post('/config_json2',function(req,res){
+  var params;
+  nombre=req.body.username;
+  console.log("User name = "+nombre);
+  //res.send(nombre);
+  passwordHash=req.body.password;
+  var salt=req.body.salt;
+  var bytes  = CryptoJS.AES.decrypt( salt.toString(), 'My Secret Passphrase');
+  var saltDecAes = bytes.toString(CryptoJS.enc.Utf8);
+  console.log('saldDecrypt AES: ', saltDecAes);
+  console.log("User name = "+nombre+", password is "+passwordHash+", salt is "+saltDecAes);
+  MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+       db.collection("users").find({username: nombre}).toArray(function(err, result) {
+        if (err) throw err;
+        //resultDB = result;
+        resultDB = result[1]; 
+        resultStr = JSON.stringify(resultDB)
+        console.log("dd: " +resultStr);
+        resultStr = resultStr.replace('[','')
+        resultStr = resultStr.replace(']','')
+        console.log("frase2: "+ resultStr);
+        finalPassDB = JSON.parse(resultStr); //password de la base
+        console.log("PassDB: "+ finalPassDB.password);
+
+        params = sha512f(finalPassDB.password, saltDecAes); 
+        console.log("Param HashPassDB: "+ params.passwordHash);
+        var compare = params.passwordHash.localeCompare(passwordHash);
+        if(compare == 0){
+            var id_session = Math.round(Date.now()*Math.random()/100000);
+            console.log("CORRECTO");
+            flagSession = true;
+            cerrar = false;
+            console.log("id: "+id_session);
+            expired = new Date(Date.now() + (20000));
+            console.log("now: "+new Date(Date.now())+" expired: "+expired);
+            //res.redirect('/contenido');
+            //req.session.mivariable=id_session;
+            res.cookie('remember', 1, { maxAge: minute });
+            res.render('page_contenido',{Titulo:'contenido', band: 'true', Nombre:id_session, Expire:expired});
+
+        }
+        else{
+          console.log("inCORRECTO");
+          //res.op_second_screen    ("error: "+nombre);
+          res.render('login_admin', {
+                 msm: 'error',
+                 band: 'true',
+                 username: nombre
+            });
+          
+        }
+        
+        db.close();
+       });
+  
+    }); 
+
+});
+
+
+app.all('*', verificarSesion2);
+
 app.post('/admin_cont_sub', function(req, res) {
     var actividad = req.body.actividad;
     var title = req.body.title;
@@ -296,33 +433,17 @@ app.post('/jsonConf', function(req, res) {
     // res.render('page_contenido', { title: 'Subir Contenido' });
     //res.render('index', { title: '1 Pantalla DEMO' });
 });
-app.get('/escenas/*', function(req, res) {
-    var pathname = urlp.parse(req.url).pathname.split('escenas')[1].replace('/','');
-        console.log("Petición para " + pathname + " recibida.");
-    MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-   var query = { title:pathname};
-  db.collection("Contenidos").find(query).toArray(function(err, result) {
-    if (err) throw err;
-     else if (result.length > 0) {
- console.log("json!" + result[0].json);
-        res.render('index', {
-                title: '1 Pantalla DEMO',
-                escenas:result[0].json
-            });
-         }
-    db.close();
-  });
-});
-   
-});
 
-app.get('/2v', function(req, res) {
-    res.render('test_secondScreen', {
-        title: '2 Pantalla DEMO'
-    });
-});
 app.get('/vista_json_2_pantalla', function(req, res) {
+    console.log("ENTER bien hp");
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    //console.log("Expired: "+expired);
+    
+    expired = new Date(Date.now() + minute);
+    console.log("Expired: "+expired);              
+    res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: minute }); 
+    
     MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
@@ -369,90 +490,166 @@ app.get('/vista_json', function(req, res) {
     console.log("Session var INICIO: "+req.cookies.remember);
     now = new Date(Date.now());
     console.log("Now: "+now);
-    if(now >= expired){
+    /*if(now >= expired){
         verificarSesion(req, res, expired);
     }
-    else{
-        expired = new Date(Date.now() + minute);
-        console.log("Expired: "+expired);              
-        res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });  
-        MongoClient.connect(url, function(err, db) {
+    else{*/
+    expired = new Date(Date.now() + minute);
+    console.log("Expired: "+expired);              
+    res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });  
+    MongoClient.connect(url, function(err, db) {
+    if (err) {
+        throw err;
+        res.render('vista_json', {
+            title: 'Vista Json',
+            json: '',
+            msm: 'error'
+        });
+
+    }
+    var query = {
+        name: "config"
+    };
+    db.collection("Json_Config").find(query).toArray(function(err, result) {
         if (err) {
-            throw err;
             res.render('vista_json', {
                 title: 'Vista Json',
                 json: '',
                 msm: 'error'
             });
+            throw err;
+
+        } else if (result.length > 0) {
+            console.log(result);
+            res.render('vista_json', {
+                title: 'Vista Json',
+                json: result[0].json,
+                msm: 'view'
+            });
+        } else {
+            res.render('vista_json', {
+                title: 'Vista Json',
+                json: '',
+                msm: 'view'
+            });
 
         }
-        var query = {
-            name: "config"
-        };
-        db.collection("Json_Config").find(query).toArray(function(err, result) {
-            if (err) {
-                res.render('vista_json', {
-                    title: 'Vista Json',
-                    json: '',
-                    msm: 'error'
-                });
-                throw err;
-
-            } else if (result.length > 0) {
-                console.log(result);
-                res.render('vista_json', {
-                    title: 'Vista Json',
-                    json: result[0].json,
-                    msm: 'view'
-                });
-            } else {
-                res.render('vista_json', {
-                    title: 'Vista Json',
-                    json: '',
-                    msm: 'view'
-                });
-
-            }
-            console.log(result.length);
-            db.close();
-        });
+        console.log(result.length);
+        db.close();
     });
+});
 
-    }
+    //}
     
 });
 
-app.get('/contenido', function(req, res) {
+function verificarSesion2(req, res, next){
+    //console.log("Expired: "+expired);
+    console.log("ENTER");    
+    //res.clearCookie('remember');
+    console.log("Session var: "+req.cookies.remember);
+    if(expired == null){
+        console.log("ENTER expire null"); 
+        res.render('login_admin', {
+        title: 'Login Admin',
+        band: 'true',
+        msm : 'iniciar',
+        username: ''
+
+                });
+    
+    }
+    else{
+        if (typeof(req.cookies.remember) == 'undefined') {
+            if(cerrar){
+                console.log("ENTER cerrar");
+                res.render('login_admin', {
+                title: 'Login Admin',
+                band: 'true',
+                msm : 'iniciar',
+                username: ''
+
+                        });
+
+            }
+            else{
+                console.log("ENTER undefined");    
+                res.clearCookie('remember');
+                console.log("Session var: "+req.cookies.remember);
+                res.render('login_admin', {
+                    title: 'Login Admin',
+                    band: 'true',
+                    msm : 'expired',
+                    username: ''
+
+                            });
+
+                console.log("Ha finalizado la sesion"); 
+
+            }
+             
+        }
+        else{
+            next();
+            console.log("ENTER sesion valida");
+    
+        }
+    
+    }
+    
+
+}
+
+app.get('/contenido', function(req, res, next) {
+    console.log("ENTER bien hp");
     now = new Date(Date.now());
     console.log("Now: "+now);
     //console.log("Expired: "+expired);
-    if(now >= expired){
-        console.log("ENTER");    
-        res.clearCookie('remember');
-        console.log("Session var: "+req.cookies.remember);
-        res.render('login_admin', {
-            title: 'Login Admin',
-            band: 'true',
-            msm : 'expired',
-            username: ''
-
-                    });
-
-        console.log("Ha finalizado la sesion");
-        //flagSession = false;
-    }
-    else{  
-          expired = new Date(Date.now() + minute);
-          console.log("Expired: "+expired);              
-          res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired }); 
-          res.render('page_contenido', {
-                title: 'Subir Contenido', Nombre:req.cookies.remember
-            });   
-    }        
-
     
+    expired = new Date(Date.now() + minute);
+    console.log("Expired: "+expired);              
+    res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: minute }); 
+    res.render('page_contenido', {
+        title: 'Subir Contenido', Nombre:req.cookies.remember
+    });   
+    
+        
 
 });
+
+/*app.get('/contenido', function(req, res) {
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    //console.log("Expired: "+expired);
+    
+    if (req.cookies.removeember) {
+        expired = new Date(Date.now() + minute);
+        //console.log("Expired: "+expired);              
+        res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: minute }); 
+        res.render('page_contenido', {
+            title: 'Subir Contenido', Nombre:req.cookies.remember
+        });   
+    }
+    else{
+            console.log("ENTER");    
+            res.clearCookie('remember');
+            console.log("Session var: "+req.cookies.remember);
+            res.render('login_admin', {
+                title: 'Login Admin',
+                band: 'true',
+                msm : 'expired',
+                username: ''
+
+                        });
+
+            console.log("Ha finalizado la sesion");
+      
+    }
+
+        
+
+});
+*/
 
 app.get('/ver', function(req, res) {
     res.render('ver', {
@@ -462,17 +659,13 @@ app.get('/ver', function(req, res) {
 
     
 
-app.get('/contenidos_subidos', function(req, res) {
+app.get('/contenidos_subidos', function(req, res, next) {
     console.log("Session var INICIO: "+req.cookies.remember);
     now = new Date(Date.now());
     console.log("Now: "+now);
-    if(now >= expired){
-        verificarSesion(req, res, expired);
-    }
-    else{  
           expired = new Date(Date.now() + minute);
           console.log("Expired: "+expired);              
-          res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });
+          res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: minute });
                 
           MongoClient.connect(url, function(err, db) {
           if (err) throw err;
@@ -488,96 +681,82 @@ app.get('/contenidos_subidos', function(req, res) {
         });
            
        
-    }
+    
 });
 
-app.get('/login', function(req, res){
-  //res.render('login_admin', { title: 'Login Admin' });
-  res.render('login_admin', {
-    title: 'Login Admin',
-    band: 'false',
-    msm : 'OK',
-    username: ''
 
-            });
-});
-
-app.get('/', function(req, res){
-  //res.render('login_admin', { title: 'Login Admin' });
-  res.render('login_admin', {
-    title: 'Login Admin',
-    band: 'false',
-    msm : 'OK',
-    username: ''
-
-            });
-});
 
 app.get('/subir_cont', function(req, res) {
     console.log("Session var INICIO: "+req.cookies.remember);
     now = new Date(Date.now());
     console.log("Now: "+now);
-    if(now >= expired){
+    /*if(now >= expired){
         verificarSesion(req, res, expired);
     }
-    else{
-        expired = new Date(Date.now() + minute);
-        console.log("Expired: "+expired);              
-        res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });
-        MongoClient.connect(url, function(err, db) {
+    else{*/
+    expired = new Date(Date.now() + minute);
+    console.log("Expired: "+expired);              
+    res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: minute });
+    MongoClient.connect(url, function(err, db) {
+    if (err) {
+        throw err;
+        res.render('config_json', {
+            title: 'Configuración Json',
+            msm: 'error al conectar con la bse mongodb',
+            json: ''
+        });
+
+    }
+    var query = {
+        name: "config"
+    };
+    db.collection("Json_Config").find(query).toArray(function(err, result) {
         if (err) {
-            throw err;
-            res.render('config_json', {
-                title: 'Configuración Json',
+            res.render('subir_cont', {
+                title: 'Subir Contenido',
                 msm: 'error al conectar con la bse mongodb',
-                json: ''
+                json: '',
+              escenas:''
+            });
+            throw err;
+
+        } else if (result.length > 0) {
+                  res.render('subir_cont', {
+                        title: 'Subir Contenido',
+                        json: result[0].json,
+                        escenas:''
+                    });
+                     
+                db.close();
+            
+
+        } else {
+            res.render('subir_cont', {
+                title: 'Subir Contenido',
+                json: '',
+              escenas:'' 
             });
 
         }
-        var query = {
-            name: "config"
-        };
-        db.collection("Json_Config").find(query).toArray(function(err, result) {
-            if (err) {
-                res.render('subir_cont', {
-                    title: 'Subir Contenido',
-                    msm: 'error al conectar con la bse mongodb',
-                    json: '',
-                  escenas:''
-                });
-                throw err;
-
-            } else if (result.length > 0) {
-                      res.render('subir_cont', {
-                            title: 'Subir Contenido',
-                            json: result[0].json,
-                            escenas:''
-                        });
-                         
-                    db.close();
-                
-
-            } else {
-                res.render('subir_cont', {
-                    title: 'Subir Contenido',
-                    json: '',
-                  escenas:'' 
-                });
-
-            }
-            console.log(result.length);
-            db.close();
-        });
+        console.log(result.length);
+        db.close();
     });
+});
 
 
 
-    }
+    
     
 
 });
 
 app.get('/config_json_2_pantalla', function(req, res) {
+    console.log("Session var INICIO: "+req.cookies.remember);
+    now = new Date(Date.now());
+    console.log("Now: "+now);
+    expired = new Date(Date.now() + minute);
+    console.log("Expired: "+expired);              
+    res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: minute });
     MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
@@ -624,55 +803,51 @@ app.get('/config_json', function(req, res) {
     console.log("Session var INICIO: "+req.cookies.remember);
     now = new Date(Date.now());
     console.log("Now: "+now);
-    if(now >= expired){
-        verificarSesion(req, res, expired);
+    expired = new Date(Date.now() + minute);
+    console.log("Expired: "+expired);              
+    res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: minute });
+    MongoClient.connect(url, function(err, db) {
+    if (err) {
+        throw err;
+        res.render('config_json', {
+            title: 'Configuración Json',
+            msm: 'error al conectar con la base mongodb',
+            json: ''
+        });
+
     }
-    else{
-        expired = new Date(Date.now() + minute);
-        console.log("Expired: "+expired);              
-        res.cookie('remember', Number(req.cookies.remember) + 1, { maxAge: expired });
-        MongoClient.connect(url, function(err, db) {
+    var query = {
+        name: "config"
+    };
+    db.collection("Json_Config").find(query).toArray(function(err, result) {
         if (err) {
-            throw err;
             res.render('config_json', {
                 title: 'Configuración Json',
                 msm: 'error al conectar con la base mongodb',
                 json: ''
             });
+            throw err;
+
+        } else if (result.length > 0) {
+            console.log(result);
+            res.render('config_json', {
+                title: 'Configuración Json',
+                json: result[0].json,
+                msm: 'OK'
+            });
+        } else {
+            res.render('config_json', {
+                title: 'Configuración Json',
+                json: '',
+                msm: 'OK'
+            });
 
         }
-        var query = {
-            name: "config"
-        };
-        db.collection("Json_Config").find(query).toArray(function(err, result) {
-            if (err) {
-                res.render('config_json', {
-                    title: 'Configuración Json',
-                    msm: 'error al conectar con la base mongodb',
-                    json: ''
-                });
-                throw err;
-
-            } else if (result.length > 0) {
-                console.log(result);
-                res.render('config_json', {
-                    title: 'Configuración Json',
-                    json: result[0].json,
-                    msm: 'OK'
-                });
-            } else {
-                res.render('config_json', {
-                    title: 'Configuración Json',
-                    json: '',
-                    msm: 'OK'
-                });
-
-            }
-            console.log(result.length);
-            db.close();
-        });
+        console.log(result.length);
+        db.close();
     });
-    }
+});
+    //}
     
 });
 
@@ -913,73 +1088,7 @@ MongoClient.connect(url, function(err, db) {
       });
   });*/
 
-app.post('/config_json2',function(req,res){
-  var params;
-  nombre=req.body.username;
-  console.log("User name = "+nombre);
-  //res.send(nombre);
-  passwordHash=req.body.password;
-  var salt=req.body.salt;
-  var bytes  = CryptoJS.AES.decrypt( salt.toString(), 'My Secret Passphrase');
-  var saltDecAes = bytes.toString(CryptoJS.enc.Utf8);
-  console.log('saldDecrypt AES: ', saltDecAes);
-  console.log("User name = "+nombre+", password is "+passwordHash+", salt is "+saltDecAes);
-  MongoClient.connect(url, function(err, db) {
-      if (err) throw err;
-       db.collection("users").find({username: nombre}).toArray(function(err, result) {
-        if (err) throw err;
-        resultDB = result; 
-        resultStr = JSON.stringify(resultDB)
-        console.log("dd: " +resultStr);
-        resultStr = resultStr.replace('[','')
-        resultStr = resultStr.replace(']','')
-        console.log("frase2: "+ resultStr);
-        finalPassDB = JSON.parse(resultStr); //password de la base
-        console.log("PassDB: "+ finalPassDB.password);
 
-        params = sha512f(finalPassDB.password, saltDecAes); 
-        console.log("Param HashPassDB: "+ params.passwordHash);
-        var compare = params.passwordHash.localeCompare(passwordHash);
-        if(compare == 0){
-            var id_session = Math.round(Date.now()*Math.random()/100000);
-            console.log("CORRECTO");
-            flagSession = true;
-            console.log("id: "+id_session);
-            expired = new Date(Date.now() + (20000));
-            console.log("now: "+new Date(Date.now())+" expired: "+expired);
-            //res.redirect('/contenido');
-            //req.session.mivariable=id_session;
-            res.cookie('remember', 1, { maxAge: minute });
-            res.render('page_contenido',{Titulo:'contenido', band: 'true', Nombre:id_session, Expire:expired});
-
-        }
-        else{
-          console.log("inCORRECTO");
-          //res.op_second_screen    ("error: "+nombre);
-          res.render('login_admin', {
-                 msm: 'error',
-                 band: 'true',
-                 username: nombre
-            });
-          
-        }
-        
-        db.close();
-       });
-  
-}); 
-
-
-  /*MongoClient.connect(url, function(err, db) {
-      if (err) throw err;
-      var myobj = { username: nombre, password: passwordHash};
-      db.collection("users").insertOne(myobj, function(err, res) {
-      if (err) throw err;
-      console.log("1 record inserted");
-      db.close();
-      });
-  });*/
-  });
 
 app.get('/', function(req, res){
   res.render('index', { title: '1 Pantalla DEMO' });
@@ -1008,19 +1117,22 @@ app.get('/cerrar2',function (req,res) {
         flagSession = false;
     });
 
-app.get('/cerrar',function (req,res) {
-        res.clearCookie('remember');
-        res.render('login_admin', {
-            title: 'Login Admin',
-            band: 'false',
-            msm : 'OK',
-            username: ''
 
-                    });
-        console.log("Ha finalizado la sesion");
-        //flagSession = false;
+app.get('*', function(req, res){
+  if(expired == null){
+    res.render('login_admin', {
+    title: 'Login Admin',
+    band: 'false',
+    msm : 'OK',
+    username: ''
+
+            });
+  }
+  else{
+    res.render('page_contenido',{Titulo:'contenido'});
+  }
+  
 });
-
 function verificarSesion(req, res, expired){
     console.log("Expired: "+expired);
     console.log("ENTER");    
@@ -1062,6 +1174,8 @@ function stringGen(len)
       
           return text;
       }
+
+
 
 server.listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));

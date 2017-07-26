@@ -86,7 +86,7 @@ var TVShowCtrl = require('./controllers/tvshows');
 // Example Route
 var router = express.Router();
 router.get('/', function(req, res) {
-  res.send("Hello world!");
+  res.send("Hello World!");
 });
 app.use(router);
 
@@ -153,7 +153,7 @@ app.get('/:name', function (req, res, next) {
       console.log("ENTER");    
       res.clearCookie('session');
       console.log("Session var: "+req.cookies.session);
-      res.send("Hello world!");
+      res.send("Ha finalizado la sesion");
 
       console.log("Ha finalizado la sesion");
       firstTime = false;
