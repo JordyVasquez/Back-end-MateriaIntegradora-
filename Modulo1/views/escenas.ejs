@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Escenas</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="../css/dashboard.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <h1>Lista de Escenas</h1>
+        <div id="renderList"></div>
+        <div id="lista" class="row"></div>
+        
+        
+
+        <script src='js/LZString.js'></script>
+        <script>
+            function agregarEventClick(divContenedor, titulo){
+                    divContenedor.addEventListener("click", function(){
+                    alert("titulo: "+titulo);
+                    window.location.href='/escenas/'+titulo;
+                    });
+            }
+            (function() {
+                var ul = document.createElement('ul');
+                ul.setAttribute('id','proList');
+                document.getElementById('renderList').appendChild(ul);
+                
+                var escenasJson = null;
+                var schema=<%- JSON.stringify(json) %>;
+                alert(JSON.stringify(schema));
+                /*escenasJson = JSON.parse(LZString.decompressFromBase64(schema[0].json));
+                alert(JSON.stringify(escenasJson));
+                escenasJson2 = JSON.parse(LZString.decompressFromBase64(schema[1].json));
+                alert(JSON.stringify(escenasJson2));*/
+                
+                for (var i = 0; i < schema.length; i++) {
+                    //alert(JSON.stringify(schema[i].json));
+                    escenasJson = JSON.parse(LZString.decompressFromBase64(schema[i].json));
+                    alert(JSON.stringify(escenasJson));
+                    titulo = JSON.stringify(escenasJson.Titulo)
+                    titulo = titulo.replace('"','');
+                    titulo = titulo.replace('"','');
+                    //alert("inicio")
+                    
+                    try {
+                        descripcion = JSON.stringify(escenasJson.Descripcion)
+                        descripcion = descripcion.replace('"','');
+                        descripcion = descripcion.replace('"','');
+                        alert("Descripcion: "+descripcion);
+                    }
+                    catch(err) {
+                        descripcion='';
+                    }
+                    
+                    var br = document.createElement("br");
+                    var divContenedor = document.createElement("div");
+                    divContenedor.setAttribute("class", "row");
+                    divContenedor.setAttribute("class", "row");
+                    divContenedor.setAttribute("style", "border: thick solid #000000");
+                    divContenedor.setAttribute("onmouseover", "style.color= 'blue'");
+                    divContenedor.setAttribute("onmouseout", "style.color= 'black'");
+
+                    var divPrincipal = document.getElementById('lista');///row
+                    var divPortada = document.createElement('div');//portada
+                    divPortada.divPortada = "Portada";
+                    divPortada.setAttribute("class", "col-md-3");
+                    var imagen = document.createElement("img");
+                    imagen.setAttribute("src", "https://i.ytimg.com/vi/3R2uvJqWeVg/maxresdefault.jpg");
+                    imagen.setAttribute("width","50%");
+                    imagen.setAttribute("height","30%");
+                    divPortada.appendChild(imagen);
+                    divContenedor.appendChild(divPortada);
+
+                    var divG2 = document.createElement('div');//DIV->2 FILAS
+                    divG2.setAttribute("class", "col-md-9 col-md-offset-3");
+                    divG2.setAttribute("style", "position: absolute");
+                    var divRow1 = document.createElement('div');
+                    divRow1.setAttribute("class", "row");
+                    var divTitulo = document.createElement('div');
+                    divTitulo.setAttribute("class", "col-md-12");
+                    divTitulo.innerHTML = "Titulo: "+titulo;
+                    divRow1.appendChild(divTitulo);
+
+                    var divRow2 = document.createElement('div');
+                    divRow2.setAttribute("class", "row");
+                    var divRowDescrip = document.createElement('div');
+                    divRowDescrip.setAttribute("class", "col-md-12");
+                    divRowDescrip.innerHTML = "Descripcion: "+descripcion;
+                    divRow2.appendChild(divRowDescrip);
+
+                    divG2.appendChild(divRow1);
+                    divG2.appendChild(divRow2);
+                    divContenedor.appendChild(divG2);
+                    divPrincipal.appendChild(divContenedor);
+                    divPrincipal.appendChild(br);
+                    agregarEventClick(divContenedor, titulo);
+
+
+                    
+
+                    /*var li = document.createElement('li');
+                    ul.appendChild(li);
+                    a = document.createElement('a');
+                    li.appendChild(a);
+                    a.href =  '/escenas/'+titulo; // Insted of calling setAttribute 
+                    a.innerHTML = titulo // <a>INNER_TEXT</a>*/
+                    
+                
+                }
+                
+                
+            })();
+        </script>
+    <body>
+</html>

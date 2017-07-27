@@ -56,7 +56,7 @@ app.use(express.bodyParser());
     
 }));*/
 app.use(cookieParser('my secret here'));
-const minute = 20 * 1000;
+const minute = 240 * 1000;
 
 //Express 4
 app.set('port', process.env.PORT || 3331);
@@ -93,6 +93,49 @@ app.get('/', function(req, res){
             });
 });
 
+app.get('/escenas', function(req, res){
+    MongoClient.connect(url, function(err, db) {
+        console.log("MongoDB");
+    if (err) {
+        throw err;
+        res.render('config_json', {
+            title: 'Configuración Json',
+            msm: 'error al conectar con la bse mongodb',
+            json: ''
+        });
+
+    }
+    var query = {
+            name: "config"
+    };
+    db.collection("Contenidos").find({}).toArray(function(err, result) {
+        console.log("db");
+        if (err) {
+            console.log("err");
+            res.render('config_json_2_pantalla', {
+                title: 'Configuración Json',
+                msm: 'error al conectar con la base mongodb',
+                json: ''
+            });
+            throw err;
+
+        } else if (result.length > 0) {
+            console.log("result");
+            console.log("escenas: "+JSON.stringify(result));
+            res.render('escenas', {
+                title: 'Escenas Json',
+                json: result,
+                msm: 'OK'
+            });
+
+             db.close();
+
+        }
+    });
+    });
+});
+
+
 app.get('/inicio', function(req, res){
   res.render('login_admin', {
     title: 'Login Admin',
@@ -101,6 +144,46 @@ app.get('/inicio', function(req, res){
     username: ''
 
             });
+});
+
+var schema = '[' + 
+    '{ "server1": [' +
+                '{"ip":"localhost",' +
+                '"port":"3331"' +
+    '}]},' +
+    '{"server2":[{' +
+                '"ip":"localhost",' +
+                '"port":"3000"' +
+    '}]},' +
+    '{"server3":[{'+
+                '"ip":"localhost",' +
+                '"port":"8088"' +
+    '}]}]';
+
+var ipsJson = {ips:[ 
+    {server1:[
+                {ip: 'localhost',
+                 port: 3331
+                
+                }
+    ]}, 
+    {server2:[
+                {ip:'localhost',
+                 port: 3000
+    
+                }
+    ]},
+    {server3:[
+                {ip:'localhost',
+                 port:8088
+                }
+    ]}]
+}
+var i=0;
+app.get('/ips', function(req, res){
+  res.send(ipsJson);
+  i++;
+  console.log("enviado :"+i);
 });
 
 app.get('/escenas/*', function(req, res) {
@@ -675,6 +758,7 @@ app.get('/contenidos_subidos', function(req, res, next) {
                 title: 'Escenas Guardadas',
                 resultado: result
             });
+             console.log("escenas: "+JSON.stringify(result));
             db.close();
           });
        
@@ -780,7 +864,7 @@ app.get('/config_json_2_pantalla', function(req, res) {
                 throw err;
 
             } else if (result.length > 0) {
-                console.log(result);
+                console.log(result[0].json);
                 res.render('config_json_2_pantalla', {
                     title: 'Configuración Json',
                     json: result[0].json,
@@ -902,6 +986,10 @@ io.sockets.on('connection', function(socket) {
             connections: connections
         });
     });
+    
+    //socket.emit('ips', ipsJson);
+
+        
 });
 app.get('/movies/:movieName', (req, res) => {
     const movieName = req.params.movieName;
