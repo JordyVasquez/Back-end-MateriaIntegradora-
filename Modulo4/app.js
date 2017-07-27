@@ -19,15 +19,93 @@ function handler(req,res){
     });
 }
 
-var socket = ioc.connect('http://localhost:3000');
+//var socket = ioc.connect('http://localhost:3000');
+var schema = null;
+var socket = ioc.connect('http://localhost:3331');
 socket.emit('session', {
                         'session': id_session
                     });
+/*for(var i = 0; i < 10; i++){
+var start = new Date();  
+socket.on("ips", function (data) {
+        schema = JSON.stringify(data.ips);
+        console.log("Res: "+schema);
+        var responseTime = new Date() - start;
+        console.log('responseTime: '+ responseTime);
+    });
 
 
-request('http://localhost:3000/wonder2.jpg', function (error, response, body) {
+}*/
+
+/*request('http://localhost:3331/wonder2.jpg', function (error, response, body) {
   console.log('error:', error); // Print the error if one occurred 
   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received 
   //console.log('body:', body); // Print the HTML for the Google homepage. 
 });
-   
+for(var i = 0; i < 5; i++){
+  request.get({
+    url : 'http://localhost:3000/wonder1.jpg',
+    time : true
+  },function(err, response){
+    console.log('Request time in ms', response.elapsedTime);
+  });
+}*/
+
+/*request('http://localhost:3331/ips', function (error, response, body) {
+  console.log('error:', error);
+  console.log("response: "+(response.body));
+  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received 
+  console.log("response time: "+(response.elapsedTime));
+});*/
+var promedio=0;
+var total=0;
+var elmt = [];
+var band = false;
+var i=0;
+for(i = 0; i < 10; i++){
+  request.get({
+    url : 'http://localhost:3331/ips',
+    time : true
+  },function(err, response){
+    //console.log("response: "+(response.body));
+    console.log('Request time in ms', response.elapsedTime);
+    elmt[i] = response.elapsedTime;
+  });
+  if(i==9){
+    console.log("9: ");
+    band = true;
+  }
+}
+while(1){
+  if(band == true){
+    console.log("enter: "+elmt.length);
+    for(var j = 0; j < elmt.length; j++) {
+      total += elmt[j];
+      console.log("j: "+elmt[j]);
+    }
+    console.log("long: "+elmt.length);
+    console.log("promedio: "+(total / elmt.length));
+    break;
+  }
+  
+
+}
+
+/*console.log("METODO 2");
+var promedio=0;
+var j=0;
+var responseTime=0
+for(var i = 0; i < 10; i++){
+  j++;
+  var start = new Date();
+  request('http://localhost:3331/ips', function(err, res, body) {
+    //console.log("response: "+(res.body));
+    responseTime = new Date() - start;
+    
+    console.log('responseTime: '+responseTime);
+    //next(err, res, body);
+  });
+
+  promedio = promedio+responseTime;
+}
+console.log("promedio: "+(promedio/j))*/
