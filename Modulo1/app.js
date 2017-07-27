@@ -35,7 +35,6 @@ var server = http.createServer(app);
 var app_chat = require('express')();
 var server1 = require('http').Server(app_chat);
 var io = require('socket.io')(server1);
-server1.listen(65080);
 var map_ids_idsonido = new HashMap();
 var flagSession = false;
 var cerrar = false;
@@ -75,7 +74,36 @@ app.use((req, res, next) => {
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            server1.listen(3000);
+                console.log("puerto para socket: 65080")
 
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+           
+                throw err;
+                server1.listen(3000);
+                console.log("puerto para socket: 65080")
+            } else if (result.length > 0) {
+                 server1.listen(JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Config.puertos.socket)
+            console.log("puerto para socket:"+JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Config.puertos.socket)
+
+
+            } else {
+               server1.listen(3000);
+             console.log("puerto para socket: 65080")
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
 app.get('/login', function(req, res){
   //res.render('login_admin', { title: 'Login Admin' });
   res.render('login_admin', {
@@ -804,7 +832,7 @@ app.get('/config_json_2_pantalla', function(req, res) {
                 throw err;
 
             } else if (result.length > 0) {
-                console.log(result[0].json)
+                console.log(JSON.stringify(result[0].json))
                     getExternalIp(function (externalIp) {
          res.render('config_json_2_pantalla', {
                     title: 'Configuración Json',
