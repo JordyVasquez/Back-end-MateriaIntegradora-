@@ -64,49 +64,17 @@
         (function() {
             var schema;
             schema = JSON.parse(LZString.decompressFromBase64('<%= json%>'));
-   
+            var ipt = '<%= ip%>';
             // Default starting schema
-            if (!schema) {
-                schema = {
-                    IP_Servidor_Contenido_Transmedia: {
-                            type: "string",
-                            description: "Titulo del Contenido a Visualizar"
-                        },
-                    properties: {
-                        Titulo: {
-                            type: "string",
-                            description: "Titulo del Contenido a Visualizar",
-                            minLength: 4
-                        },
-                        Contenido_Trasmedia: {
-                            type: "object",
-                            title: "Contenido Trasmedia",
-                            properties: {
-                                
-                                Chats: {
-                                    type: "array",
-                                    format: "table",
-                                    title: "Chats",
-                                    uniqueItems: true,
-                                    items: {
-                                        type: "object",
-                                        title: "Chat",
-                                        properties: {
-                                            URL: {
-                                                type: "string"
-                                            },
-                                            Tiempo: {
-                                                type: "string"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
 
+            if (!schema) {
+                schema =    {IP_Servidor_Config:{ip:ipt,url:"Titulo del Contenido a Visualizar",puertos:{socket:65080}},IP_Servidor_Contenido_Transmedia:{ip:"string",url:"Titulo del Contenido a Visualizar",puertos:{socket:65080}},IP_Servidor_Chat_Broadcast:{ip:"string",url:"Titulo del Contenido a Visualizar",puertos:{socket:65080,redis:65080}}}
+            }
+                else {
+                     alert(schema)
+schema.IP_Servidor_Config.ip=ipt;
+
+                }
              var msm;
             msm = '<%= msm%>';
             // Default starting schema

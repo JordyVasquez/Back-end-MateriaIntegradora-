@@ -1,0 +1,64 @@
+<!DOCTYPE html> 
+<html lang="es"> 
+  <head> 
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title align="center">testimagen</title> 
+    <link id="template-file" href="templates/template.ejs" rel="import" />
+
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+     <link href="css/dashboard.css" rel="stylesheet">
+	 <link href="css/login.css" rel="stylesheet">
+  </head> 
+  <body> 
+    
+
+
+	
+	<div class="container">
+        <div class="row">
+       <div class="col-md-6 col-md-offset-3">
+                <div>
+          <h1 align="center" class="page-header" id="page-header" >Contenidos Subidos al Servidor</h1>
+
+        </div>
+        <img   name='test' src="https://storage.googleapis.com/config-back-end/1500875949753Screenshot_2014-04-23-22-24-02.png" alt="..." class="img-circle center-block">
+
+        </div>
+      </div>
+      </br>
+  <div class="row">
+      <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1">
+          <div class="form-group input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            <input class="form-control" type="text" id='username' name='username' placeholder="username"/>          
+          </div>
+          <div class="form-group input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            <input class="form-control" type="password" id='password' name='password' placeholder="password"/>
+            <input type="hidden" name="salt" id="salt" value="">     
+          </div>
+
+          <div id="error" style=" display: none" class="alert alert-danger">
+            <strong>Error!</strong> El nombre de usuario o contrase&ntilde;a es incorrecto. Ingrese de nuevo.
+          </div>  
+          <div id="expired" style=" display: none" class="alert alert-danger">
+            <strong>Error!</strong> La sesión ha expirado. Por favor, ingrese de nuevo.
+          </div> 
+          <div id="iniciar" style=" display: none" class="alert alert-danger">
+            <strong>Error!</strong> Por favor, inicie sesión.
+          </div> 
+       
+      </div>  
+        
+ </div> 
+	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>  
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+  </body> 
+</html>

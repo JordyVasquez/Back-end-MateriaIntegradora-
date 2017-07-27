@@ -8,15 +8,16 @@ var CryptoJS = require("crypto-js");
 var sha512 = require('js-sha512');
 var http = require('http');
 var path = require('path');
-var io = require('socket.io');
 var HashMap = require('hashmap');
 var cons= require('consolidate');
 var path = require("path");
+var request = require('request');
+const storage = require('./storage');
+const lzstring = require('./public/js/LZString');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://root:1234@104.155.160.16:27017/admin";
 //var url = "mongodb://localhost:27017/data";
 var bodyParser = require('body-parser');
-var multipart = require('connect-multiparty');
 var cookieParser = require('cookie-parser'); 
 var urlp = require("url");
 var connections = 0;
@@ -24,14 +25,16 @@ var salt= '';
 var passwordData = '';
 var passwordHash = '';
 var nombre = '';
-var passAdminHash = '';
+var passAdminHash = ''; 
 var resultDB =   '';
 var resultStr = '';
 var finalJson = '';
 var finalPassDB = '';
 var app = express();
 var server = http.createServer(app);
-io = io.listen(server);
+var app_chat = require('express')();
+var server1 = require('http').Server(app_chat);
+var io = require('socket.io')(server1);
 var map_ids_idsonido = new HashMap();
 var flagSession = false;
 var cerrar = false;
@@ -42,12 +45,8 @@ app.engine('.html',cons.jade);
 app.set('view engine','html');
 // all environments
 app.use(bodyParser.json()); // support json encoded bodies
-app.use(multipart())
-app.use(bodyParser.urlencoded({
-    extended: true
-})); // support encoded bodies
+
 app.use(express.cookieParser());
-app.use(express.bodyParser());
 //app.use(express.session({secret: 'mi secreto'}));
 /*app.use(express.session({
     secret  : 'sdfsdSDFD5sf4rt4egrt4drgsdFSD4e5',
@@ -56,22 +55,57 @@ app.use(express.bodyParser());
     
 }));*/
 app.use(cookieParser('my secret here'));
-const minute = 240 * 1000;
+
+const minute = 1800 * 1000;
+
 
 //Express 4
-app.set('port', process.env.PORT || 3331);
+app.set('port', process.env.PORT || 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(multipart())
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// Set Content-Type for all responses for these routes
+app.use((req, res, next) => {
+  res.set('Content-Type', 'text/html');
+  next();
+});
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            server1.listen(3000);
+                console.log("puerto para socket: 3000")
 
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+           
+                throw err;
+                server1.listen(3000);
+                console.log("puerto para socket: 3000")
+            } else if (result.length > 0) {
+                 server1.listen(JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Config.puertos.socket)
+            console.log("puerto para socket:"+JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Config.puertos.socket)
+
+
+            } else {
+               server1.listen(3000);
+             console.log("puerto para socket: 3000")
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
 app.get('/login', function(req, res){
   //res.render('login_admin', { title: 'Login Admin' });
   res.render('login_admin', {
@@ -195,15 +229,18 @@ app.get('/escenas/*', function(req, res) {
   db.collection("Contenidos").find(query).toArray(function(err, result) {
     if (err) throw err;
      else if (result.length > 0) {
- console.log("json!" + result[0].json);
-        res.render('index', {
+      getExternalIp(function (externalIp) {
+             res.render('index', {
                 title: '1 Pantalla DEMO',
-                escenas:result[0].json
+                escenas:result[0].json,
+                externalIp: externalIp
             });
+      });
+   
          }
     db.close();
   });
-});
+}); 
    
 });
 
@@ -375,6 +412,13 @@ MongoClient.connect(url, function(err, db) {
     
    
 });
+   var path = { json:null};
+   MongoClient.connect(url, function(err, db) {
+  db.collection("Contenidos").deleteOne(path, function(err, obj) {
+    if (err) throw err;
+    console.log("1 document deleted");
+  });
+  });
 app.post('/jsonConf2Pantalla', function(req, res) {
     var json_confi = req.body.schema2;
     MongoClient.connect(url, function(err, db) {
@@ -516,6 +560,7 @@ app.post('/jsonConf', function(req, res) {
     // res.render('page_contenido', { title: 'Subir Contenido' });
     //res.render('index', { title: '1 Pantalla DEMO' });
 });
+
 
 app.get('/vista_json_2_pantalla', function(req, res) {
     console.log("ENTER bien hp");
@@ -770,6 +815,14 @@ app.get('/contenidos_subidos', function(req, res, next) {
 
 
 
+
+app.get('/tt', function(req, res){
+  //res.render('login_admin', { title: 'Login Admin' });
+  res.render('test', {
+    title: 'Login Admin'
+
+            });
+});
 app.get('/subir_cont', function(req, res) {
     console.log("Session var INICIO: "+req.cookies.remember);
     now = new Date(Date.now());
@@ -859,24 +912,34 @@ app.get('/config_json_2_pantalla', function(req, res) {
                 res.render('config_json_2_pantalla', {
                     title: 'Configuración Json',
                     msm: 'error al conectar con la base mongodb',
-                    json: ''
+                    json: '',
+                    ip:''
                 });
                 throw err;
 
             } else if (result.length > 0) {
-                console.log(result[0].json);
+
+                console.log(JSON.stringify(result[0].json))
+                getExternalIp(function (externalIp) {
                 res.render('config_json_2_pantalla', {
                     title: 'Configuración Json',
                     json: result[0].json,
-                    msm: 'OK'
+                    msm: 'OK',
+                    ip:externalIp
                 });
+      });
+
             } else {
-                res.render('config_json_2_pantalla', {
+                getExternalIp(function (externalIp) {
+         res.render('config_json_2_pantalla', {
                     title: 'Configuración Json',
                     json: '',
-                    msm: 'OK'
+                    msm: 'OK',
+                    ip:externalIp
                 });
 
+      });
+               
             }
             console.log(result.length);
             db.close();
@@ -997,14 +1060,20 @@ app.get('/movies/:movieName', (req, res) => {
 
     screen(movieFile, res, req);
 });
-app.post('/upload', function(req, res) {
+app.post('/upload', storage.multer.array('archivos', 50), (req, res, next) => {
     //El modulo 'fs' (File System) que provee Nodejs nos permite manejar los archivos
-    var fs = require('fs')
-    var json_con = req.body.output2;
+     var json_con = req.body.output2;
     var title = req.body.Titulo;
-    console.log(req.files)
- var fileKeys = Object.keys(req.files);
-    MongoClient.connect(url, function(err, db) {
+        console.log(json_con)
+           for(var x=0;x<req.files.length;x++) {
+       var dir= storage.sendUploadToGCS(req.files[x])
+       json_con=json_con.replace(req.files[x].originalname,dir)
+       console.log(dir)
+    } 
+       console.log(json_con)
+       json_con=lzstring.compressToBase64(json_con);
+             console.log(json_con)
+            MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var myobj = {
             title: title,
@@ -1068,22 +1137,6 @@ app.post('/upload', function(req, res) {
         });
 
     });
-fileKeys.forEach(function(key) {
- var file = req.files[key],
-        name = file.name,
-        type = file.type,
-        path = __dirname + "/public/contenidos/" + name;
-           fs.rename(file.path, path, function(err) {
-        if (err) res.send("Ocurrio un error al intentar subir la imagen");
-    });
-
-
-});
-
-      
- 
-   
-      
 
 })
 
@@ -1164,7 +1217,7 @@ function saltHashPassword(userpassword) {
     console.log('nSalt = '+passwordData.salt);
 }
 
-/*var passwordMD5 = md5("awesome6");
+var passwordMD5 = md5("awesome6");
 console.log("awesome6: "+passwordMD5);
 MongoClient.connect(url, function(err, db) {
       if (err) throw err;
@@ -1174,15 +1227,69 @@ MongoClient.connect(url, function(err, db) {
       console.log("1 record inserted");
       db.close();
       });
-  });*/
+  });
 
+app.post('/config_json2',function(req,res){
+  var params;
+  nombre=req.body.username;
+  console.log("User name = "+nombre);
+  //res.send(nombre);
+  passwordHash=req.body.password;
+  var salt=req.body.salt;
+  var bytes  = CryptoJS.AES.decrypt( salt.toString(), 'My Secret Passphrase');
+  var saltDecAes = bytes.toString(CryptoJS.enc.Utf8);
+  console.log('saldDecrypt AES: ', saltDecAes);
+  console.log("User name = "+nombre+", password is "+passwordHash+", salt is "+saltDecAes);
+  MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+       db.collection("users").find({username: nombre}).toArray(function(err, result) {
+        if (err) throw err;
+        resultDB = result[1]; 
+        resultStr = JSON.stringify(resultDB)
+        console.log("dd: " +resultStr);
+        resultStr = resultStr.replace('[','')
+        resultStr = resultStr.replace(']','')
+        console.log("frase2: "+ resultStr);
+        finalPassDB = JSON.parse(resultStr); //password de la base
+        console.log("PassDB: "+ finalPassDB.password);
 
+        params = sha512f(finalPassDB.password, saltDecAes); 
+        console.log("Param HashPassDB: "+ params.passwordHash);
+        var compare = params.passwordHash.localeCompare(passwordHash);
+        if(compare == 0){
+            var id_session = Math.round(Date.now()*Math.random()/100000);
+            console.log("CORRECTO");
+            flagSession = true;
+            console.log("id: "+id_session); 
+            expired = new Date(Date.now() + (200000));
+            console.log("now: "+new Date(Date.now())+" expired: "+expired);
+            //res.redirect('/contenido');
+            //req.session.mivariable=id_session;
+            res.cookie('remember', 1, { maxAge: minute });
+            res.render('page_contenido',{Titulo:'contenido', band: 'true', Nombre:id_session, Expire:expired});
 
+ }
+        else{
+          console.log("inCORRECTO");
+          //res.op_second_screen    ("error: "+nombre);
+          res.render('login_admin', {
+                 msm: 'error',
+                 band: 'true',
+                 username: nombre
+            });
+          
+        }
+        
+        db.close();
+       });
+  
+}); 
+  }); 
 app.get('/', function(req, res){
   res.render('index', { title: '1 Pantalla DEMO' });
 });
 
-app.get('/qr', function (req,res) {
+app.get('/qr', function (req,res) {  
         res.render('QR', {
             title: 'QR',
             room : Math.round(Date.now()*Math.random()/100000),
@@ -1262,8 +1369,27 @@ function stringGen(len)
       
           return text;
       }
+var METADATA_NETWORK_INTERFACE_URL = 'http://metadata/computeMetadata/v1/' +
+    '/instance/network-interfaces/0/access-configs/0/external-ip';
 
 
+
+function getExternalIp (cb) {
+  var options = {
+    url: METADATA_NETWORK_INTERFACE_URL,
+    headers: {
+      'Metadata-Flavor': 'Google'
+    }
+  };
+
+  request(options, function (err, resp, body) {
+    if (err || resp.statusCode !== 200) {
+      console.log('Error while talking to metadata server, assuming localhost');
+      return cb('localhost');
+    }
+    return cb(body);
+  });
+}
 
 server.listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));

@@ -8,5 +8,8 @@
     "io": "^0.1.10",
     "method-override": "^2.1.2",
     "socket.io": "^1.7.4"
+  },
+  "engines": {
+    "node": ">=4.4.5"
   }
 }

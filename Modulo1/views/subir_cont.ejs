@@ -27,8 +27,21 @@ document.body.appendChild(document.importNode(getContent, true));
             <p>La estructura es generada por el json de configuración.</p>
        <form action="/upload" method='POST' id='subir' name="subir" enctype='multipart/form-data'>
             <div id='editor' > </div>
-             <p> <button class='btn btn-primary'  id='enviar' type="button">Subir</button></p>
+               <div class="row" >
 
+        <div  class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-4 col-xs-offset-1 col-lg-4 col-lg-offset-1">
+
+ <button class='btn btn-primary'  id='cancelar' type="button">Cancelar</button>
+
+           </div>
+                 <div  class="col-md-4 col-sm-4 col-xs-4  col-lg-4">
+
+         <button class='btn btn-primary'  id='enviar' type="button">Subir</button>
+
+           </div>  
+             
+     
+        </div>
 <input id='output2' type='hidden' name='output2' style='width: 100%; height: 450px; font-family: monospace;' class='form-control'></input>
               </form>
         </div>
@@ -135,12 +148,8 @@ var schema;
         var inputs=rs[i].getElementsByTagName('input');
          for (var j = 0; j < inputs.length; j++) {
           if(inputs[j].type.localeCompare("file")==0){
-          var hermano=inputs[j].parentNode.parentNode.nextSibling;
-           var name=inputs[j].previousSibling.innerHTML;
-           var inp=hermano.getElementsByTagName('input')[0].name;
-           var cambio=inp.split("__");
-           var cm=cambio[cambio.length-1];
-          inputs[j].name=inp.replace(cm,name);
+
+          inputs[j].name='archivos';
           }  
         }
         }
@@ -182,11 +191,12 @@ var schema;
             if (tick < 100) {
               cbs.updateProgress(tick);
               window.setTimeout(tickFunction, 50)
-            } else if (tick == 100) {
+            } else if (tick == 60) {
               cbs.updateProgress();
               window.setTimeout(tickFunction, 500)
             } else {
-              cbs.success('/contenidos/' + file.name);
+              alert(file.name)
+              cbs.success(file.name);
             }
           };
 
@@ -201,6 +211,7 @@ var schema;
     reload();
 rename();
          var $set_schema_button = document.getElementById('enviar');
+             var $set_schema_button_cancelar = document.getElementById('cancelar');
                 $set_schema_button.addEventListener('click',function() {
                   var bolid=false;
                     rename();
@@ -211,7 +222,7 @@ rename();
                       try {
                     var $schema2 = document.getElementById('output2');
                     var $schema = document.getElementById('output');
-                    $schema2.value = LZString.compressToBase64($schema.value);
+                    $schema2.value = $schema.value;
                 }
                 catch(e) {
                     alert('Invalid Schema: '+e.message);
@@ -225,6 +236,10 @@ rename();
 
                   alert("Titulo esta vacio")
                  }
+            });
+                       $set_schema_button_cancelar.addEventListener('click',function() {
+  
+               location.href='contenidos_subidos'
             });
 })();
 </script>
