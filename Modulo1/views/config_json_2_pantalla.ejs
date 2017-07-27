@@ -64,7 +64,7 @@
         (function() {
             var schema;
             schema = JSON.parse(LZString.decompressFromBase64('<%= json%>'));
-   
+            var ip = '<%= ip%>';
             // Default starting schema
             if (!schema) {
                 schema = {
