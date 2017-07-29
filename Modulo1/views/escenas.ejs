@@ -7,10 +7,11 @@
     </head>
 
     <body>
-        <h1>Lista de Escenas</h1>
-        <div id="renderList"></div>
-        <div id="lista" class="row"></div>
         
+        <div id="renderList" class="container">
+            <h1>Lista de Escenas</h1>
+            <div id="lista" class="row"></div>
+        </div>
         
 
         <script src='js/LZString.js'></script>
@@ -22,9 +23,9 @@
                     });
             }
             (function() {
-                var ul = document.createElement('ul');
+                /*var ul = document.createElement('ul');
                 ul.setAttribute('id','proList');
-                document.getElementById('renderList').appendChild(ul);
+                document.getElementById('renderList').appendChild(ul);*/
                 
                 var escenasJson = null;
                 var schema=<%- JSON.stringify(json) %>;
@@ -53,6 +54,17 @@
                         descripcion='';
                     }
                     
+                    try{
+                        imagenP = JSON.stringify(escenasJson.Portada.Imagen);
+                        alert("imagen:Prueba "+imagenP);
+                        imagenP = imagenP.replace('"','');
+                        imagenP = imagenP.replace('"','');
+                        //alert("imagen fINAL: "+imagen);
+                    }
+                    catch(err){
+                        imagenP = "https://i.ytimg.com/vi/3R2uvJqWeVg/maxresdefault.jpg";
+                    }
+
                     var br = document.createElement("br");
                     var divContenedor = document.createElement("div");
                     divContenedor.setAttribute("class", "row");
@@ -66,9 +78,9 @@
                     divPortada.divPortada = "Portada";
                     divPortada.setAttribute("class", "col-md-3");
                     var imagen = document.createElement("img");
-                    imagen.setAttribute("src", "https://i.ytimg.com/vi/3R2uvJqWeVg/maxresdefault.jpg");
-                    imagen.setAttribute("width","50%");
-                    imagen.setAttribute("height","30%");
+                    imagen.setAttribute("src", imagenP);
+                    imagen.setAttribute("width","240px");
+                    imagen.setAttribute("height","160px");
                     divPortada.appendChild(imagen);
                     divContenedor.appendChild(divPortada);
 

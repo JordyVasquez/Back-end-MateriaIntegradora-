@@ -5890,7 +5890,7 @@ JSONEditor.defaults.editors.upload = JSONEditor.AbstractEditor.extend({
     }
 
     this.preview.innerHTML += '<br>';
-    var uploadButton = this.getButton('Upload', 'upload', 'Cargr Url a Json');
+    var uploadButton = this.getButton('Upload', 'upload', 'Cargar Url a Json');
     this.preview.appendChild(uploadButton);
     uploadButton.addEventListener('click',function(event) {
       event.preventDefault();
