@@ -413,12 +413,12 @@ MongoClient.connect(url, function(err, db) {
    
 });
    var path = { json:null};
-   MongoClient.connect(url, function(err, db) {
+ /*  MongoClient.connect(url, function(err, db) {
   db.collection("Contenidos").deleteOne(path, function(err, obj) {
     if (err) throw err;
     console.log("1 document deleted");
   });
-  });
+  });*/
 app.post('/jsonConf2Pantalla', function(req, res) {
     var json_confi = req.body.schema2;
     MongoClient.connect(url, function(err, db) {

@@ -1,103 +1,106 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Dibujemos</title>
-  <link rel="stylesheet" href="../stylesheets/style.css">
-   <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
-           <style>
+    <meta charset="UTF-8">
+    <title>Dibujemos</title>
+    <link rel="stylesheet" href="../stylesheets/style.css">
+    <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+        .group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-            .group {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .clear {
-                clear: both;
-            }
-            #qr {
-                margin: 5px;
-            }
-            #image {
-                margin: 5px;
-            }
-            #div_qr {
-   -webkit-transform: translateX(-50%) translateY(-50%);
-    -moz-transform: translateX(-50%) translateY(-50%);
-    -ms-transform: translateX(-50%) translateY(-50%);
-    -o-transform: translateX(-50%) translateY(-50%);
-    transform: translateX(-50%) translateY(-50%);
-    position: absolute;
-    top: 50%; 
-    left: 50%;
-    min-width: 90%;
-    min-height: 90%;
-    max-width: 90%;
-    max-height: 90%;     
-    z-index: -100;         
+        .clear {
+            clear: both;
+        }
 
-}
-        </style>
+        #qr {
+            margin: 5px;
+        }
+
+        #image {
+            margin: 5px;
+        }
+
+        #div_qr {
+            -webkit-transform: translateX(-50%) translateY(-50%);
+            -moz-transform: translateX(-50%) translateY(-50%);
+            -ms-transform: translateX(-50%) translateY(-50%);
+            -o-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 90%;
+            min-height: 90%;
+            max-width: 90%;
+            max-height: 90%;
+            z-index: -100;
+        }
+    </style>
 </head>
+
 <body style="text-align:center">
- <div class="container-fluid">
-     <div style="margin:0 0;"  class="row">
-       <!-- Mude o src dessa tag para o nome do video que você possuir -->
-	                <video id="video_principal" class="bg-video">
+    <div class="container-fluid">
+        <div style="margin:0 0;" class="row">
+            <!-- Mude o src dessa tag para o nome do video que você possuir -->
+            <video id="video_principal" class="bg-video">
                    HTML5 Video is required for this example
                  </video>
 
-      
+
+
+        </div>
+        <div class="row">
+            <div id="div_play" class="col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-4 col-xs-offset-4 col-lg-4 col-lg-offset-4">
+                <button id="play" class="btn btn-success btn-lg"> <span class="glyphicon glyphicon-play"></span> </button>
+            </div>
+        </div>
+        <input id='schema2' type='hidden' name='schema2'></input>
+
+
+
 
     </div>
-<div class="row" >
- <div id="div_play" class="col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-4 col-xs-offset-4 col-lg-4 col-lg-offset-4">
-       <button id="play" class="btn btn-success btn-lg"> <span class="glyphicon glyphicon-play"></span> </button>
-         </div> 
-       </div>  
-<input id='schema2' type='hidden' name='schema2'></input>
-
-            
-             
-     
-        </div> 
-            <div class="row" >
+    <div class="row">
 
         <div style="display: none " class="group">
             <div id="image"><img src="../logo.svg" width="140"></div>
         </div>
         <div id="div_qr" align="center">
             <div id="combine"></div>
-        </div> 
+        </div>
 
-           </div>
-   <div class="row" id="foo">
+    </div>
+    <div class="row" id="foo">
 
         <div id="content" class="col-md-1 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-2 col-xs-offset-1 col-lg-1 col-lg-offset-1">
 
-            <span class="glyphicon glyphicon-eye-open"></span>  <label id="con"></label>
+            <span class="glyphicon glyphicon-eye-open"></span> <label id="con"></label>
 
-           </div>
-            
-             
-     
         </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-        <script src="../javascripts/qrcode.js"></script>
-        <script src="../javascripts/qart.js"></script>
-        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="../javascripts/qrcode.js"></script>
+    <script src="../javascripts/qart.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
-         <script src='../js/LZString.js'></script>
+    <script src='../js/LZString.js'></script>
     <script>
-   
-            schema = JSON.parse(LZString.decompressFromBase64('<%= escenas%>'));
-          
-            var $schema2 = document.getElementById('schema2');
-                  
-                    $schema2.value = JSON.stringify(schema, null, 2);
-                   
-var contador=0;
+        schema = JSON.parse(LZString.decompressFromBase64('<%= escenas%>'));
+
+        var $schema2 = document.getElementById('schema2');
+
+        $schema2.value = JSON.stringify(schema, null, 2);
+
+        var contador = 0;
         $('#con').html(contador);
         /*sserver.on('message', function(message) {
             // Expect message to be '31415'.
@@ -109,24 +112,23 @@ var contador=0;
                 invitado: message
             })
         });*/
-         var webSocketHost = 'ws://';
+        var webSocketHost = 'ws://';
         var externalIp = '<%= externalIp%>';
         alert(externalIp)
-        var url =  webSocketHost + externalIp + ':65080';
-        var dir_movies = '/movies/'
+        var url = webSocketHost + externalIp + ':3000';
+
         alert('<%= externalIp%>')
-         var $schema2 = document.getElementById('schema2');
-         var text= JSON.parse($schema2.value);
-         text=JSON.stringify(text.Contenido_Live, null, 2);
-         alert(text);
+        var text = JSON.parse($schema2.value);
+        text = JSON.stringify(text.Contenido_Live, null, 2);
+        alert(text);
 
         var videos_seq = JSON.parse(text);
         var id = Math.round($.now() * Math.random() / 100000);
-      var value = id.toString();
-                var filter = 'color';
-                var version = 8;
-                var imagePath = '../logo.svg';
-                var self = this;
+        var value = id.toString();
+        var filter = 'color';
+        var version = 8;
+        var imagePath = '../logo.svg';
+        var self = this;
         // abrimos la conexion
         var socket = io(url);
 
@@ -135,122 +137,210 @@ var contador=0;
             socket.emit('crearSala', {
                 sala: id
             }, function(data) {
-              //  $('#identificador').html(data.sala);
-            }) 
+                //  $('#identificador').html(data.sala);
+            })
 
         });
-        socket.emit('chat_message',"por fin putos");
         var btnplay = document.getElementById("play");
         btnplay.addEventListener('click', play);
         var video = document.getElementById("video_principal");
-        var inicio=searchInicio(videos_seq)
+        var inicio = searchInicio(videos_seq)
         video.src = inicio.Escena;
         video.load(); // if HTML source element is used
+        if(isVideoInteraccion(inicio.Escena, videos_seq)){
+          video.addEventListener("timeupdate",sendVideoOnArrayInteraccion);
+           video.addEventListener("ended",endedConIteraccion);
+        }
+        else {
 
-        video.addEventListener("ended", function() {
-            var fileURL = "/movies/h3mBeVNzVeo.mp4"; // get input field                    
-            var escenas = searchVideoOnArray(inicio.Id_Escena, videos_seq);
-            socket.emit('opciones', {
-                sala: id,
-                opciones: {
-                    escenas
-                }
-            });
+          video.addEventListener("ended",endedSinIteraccion);
+        }
+     
+ 
+        var myMapOptions = new Map();
+        var ganador=''
+        socket.on('opcion_1c', function(e) {
+            if(myMapOptions.has(e)){
+            myMapOptions.set(e,myMapOptions.get(e)+1)
+
+            }
+            else {
+
+                myMapOptions.set(e,1)
+
+            }
+            var tem_value=0
+            var tem_ip=''
+            for (var [key, value] of myMapOptions) {
+              if(value>tem){
+            tem_value=value;
+            tem_ip=key
+
+              }
+            }
+                ganador=tem_ip
+                tem_ip=""
+                tem_value=0;
+        });
+        function endedSinIteraccion() {                    
+            var escenas = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+             video.src = escenas.Escena;
+             document.getElementById("video_principal").removeEventListener("ended", endedSinIteraccion);
+
+            video.play();
+            inicio=escenas
             //video.src = fileURL;
             //video.load();  // if HTML source elementj is used
             //video.play();
-        });
-        /*video.addEventListener("timeupdate", function () {
-                  
-             var vTime = video.currentTime;
-      if(vTime>=11 && vTime <=12){ 
-      video.pause();
+        }
+         function endedConIteraccion() {                    
+            var escenas = ganador;
+             video.src = escenas;
+           document.getElementById("video_principal").removeEventListener("ended", endedConIteraccion);
+
+            video.play();
+              inicio=sendEscena(escenas,videos_seq)
+            //video.src = fileURL;
+            //video.load();  // if HTML source elementj is used
+            //video.play();
+        }
+  function sendVideoOnArrayInteraccion() {
+    var time=searchVideoTimeInteraccion(video.src,videos_seq)
+      var vTime = video.currentTime;
+             var duraction=video.duration;
+             var resul=duraction-vTime;
+     if(time!=-1 &&resul <=time){ 
+      document.getElementById("video_principal").removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
         var escenas=searchVideoOnArray(video.src,videos_seq);
         socket.emit('opciones', {sala : id,opciones:{escenas}});
               }
-          });*/
-        socket.on('opcion_1c', function(e) {
 
-            var fileURL = e; // get input field                    
 
-            video.src = fileURL;
-            video.play();
-        });
-
-        function searchVideoOnArray(Key, myArray) {
-             var escs = [];
-             for (var i = 0; i < myArray.Escenas.length; i++) {
-                     if(Key.localeCompare(myArray.Escenas[i].Escena_Padre)==0){
-                    escs.push(myArray.Escenas[i]);
-
-                     }
-                }
-                return escs;
-               
-           
         }
-         function searchInicio(myArray) {
-             for (var i = 0; i < myArray.Escenas.length; i++) {
-                     if("".localeCompare(myArray.Escenas[i].Escena_Padre)==0){
+           function searchVideoDefaultOnArray(Key, myArray) {
+       
+            for (var i = 0; i < myArray.Escenas.length; i++) {
+                  for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
+                        if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0 && myArray.Escenas[i].Default) {
+                            return myArray.Escenas[i];
+                    }
+                }
+            }
+            return '';
+
+
+        }
+        function searchVideoOnArray(Key, myArray) {
+            var escs = [];
+            for (var i = 0; i < myArray.Escenas.length; i++) {
+                  for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
+                        if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0) {
+                            escs.push(myArray.Escenas[i]);
+                    }
+                }
+            }
+            return escs;
+
+
+        }
+             function searchVideoTimeInteraccion(Key, myArray) {
+            for (var i = 0; i < myArray.Escenas.length; i++) {
+                        if (Key.localeCompare(myArray.Escenas[i].Id_Escena) == 0) {
+                           return (myArray.Escenas[i].Tiempo);
+                    }
+                
+            }
+            return -1;
+
+
+        }
+           function sendEscena(Key, myArray) {
+            var escs = [];
+            for (var i = 0; i < myArray.Escenas.length; i++) {
+                        if (Key.localeCompare(myArray.Escenas[i].Escena) == 0) {
+                           return (myArray.Escenas[i]);
+                    }
+                
+            }
+            return escs;
+
+
+        }
+    function isVideoInteraccion(Key, myArray) {
+            for (var i = 0; i < myArray.Escenas.length; i++) {
+                  
+                        if (Key.localeCompare(myArray.Escenas[i].Escena) == 0 && myArray.Escenas[i].Interaccion) {
+                           return true
+                    
+                }
+            }
+            return false;
+
+
+        }
+        function searchInicio(myArray) {
+             var escs = [];
+            for (var i = 0; i < myArray.Escenas.length; i++) {
+                if ("".localeCompare(myArray.Escenas[i].Escena_Padre) == 0) {
                     return myArray.Escenas[i];
 
-                     }
                 }
-                return escs;
-               
-           
+            }
+            return escs;
+
+
         }
 
         function play() {
             var video = document.getElementById("video_principal");
-             this.style.display='none'
-               var qr = document.getElementById("div_qr");
-             qr.style.display='none'
+            this.style.display = 'none'
+            var qr = document.getElementById("div_qr");
+            qr.style.display = 'none'
             video.play();
         }
+
         function makeQR() {
-                    // console.log('Current version:', version)
-                    qrcode.qrcode.stringToBytes = qrcode.qrcode.stringToBytesFuncs['UTF-8']
-                    var qr = qrcode.qrcode(version, 'H');
-                    qr.addData(value);
-                    try {
-                      qr.make();
+            // console.log('Current version:', version)
+            qrcode.qrcode.stringToBytes = qrcode.qrcode.stringToBytesFuncs['UTF-8']
+            var qr = qrcode.qrcode(version, 'H');
+            qr.addData(value);
+            try {
+                qr.make();
 
-                    } catch (err) {
-                      console.log('Version is low:', version)
-                      console.log('Error:', err)
-                    }
-                    //document.getElementById('qr').innerHTML = qr.createImgTag(3);
-                }
+            } catch (err) {
+                console.log('Version is low:', version)
+                console.log('Error:', err)
+            }
+            //document.getElementById('qr').innerHTML = qr.createImgTag(3);
+        }
 
-                function makeQArt() {
-                  var tam=0;
-                  if(document.getElementById('div_qr').offsetHeight<=document.getElementById('div_qr').offsetWidth){
+        function makeQArt() {
+            var tam = 0;
+            if (document.getElementById('div_qr').offsetHeight <= document.getElementById('div_qr').offsetWidth) {
 
-                    tam=document.getElementById('div_qr').offsetHeight
-                  }
-             
-                  else {
-                   tam=document.getElementById('div_qr').offsetWidth 
-                  }
-                    new QArt({ 
-                        value: value,
-                        imagePath: imagePath,
-                        filter: filter,
-                  
-     size:tam,
-                        fillType:'scale_to_fit',
-                        background: 'red'
-                    }).make(document.getElementById('combine'));
-                }
+                tam = document.getElementById('div_qr').offsetHeight
+            } else {
+                tam = document.getElementById('div_qr').offsetWidth
+            }
+            new QArt({
+                value: value,
+                imagePath: imagePath,
+                filter: filter,
 
-                makeQR();
-                makeQArt();
-                $(window).resize(function() {
+                size: tam,
+                fillType: 'scale_to_fit',
+                background: 'red'
+            }).make(document.getElementById('combine'));
+        }
+
         makeQR();
-                makeQArt();  
- 
-});
+        makeQArt();
+        $(window).resize(function() {
+            makeQR();
+            makeQArt();
+
+        });
     </script>
 </body>
+
 </html>
