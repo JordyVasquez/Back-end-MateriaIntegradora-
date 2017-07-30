@@ -215,9 +215,41 @@ var ipsJson = {ips:[
 }
 var i=0;
 app.get('/ips', function(req, res){
-  res.send(ipsJson);
-  i++;
-  console.log("enviado :"+i);
+    console.log("user conectado");
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        
+        var query = {
+                name: "config"
+            };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('vista_json', {
+                    title: 'Vista Json',
+                    json: '',
+                    msm: 'error'
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                console.log(lzstring.decompressFromBase64(result[0].json));
+                res.send(JSON.parse(lzstring.decompressFromBase64(result[0].json)));
+            } 
+            
+            db.close();
+        });
+    });
+    /*var resp = {
+                    //ipJson: ipsJson,
+                    ipJson: JSON.parse(lzstring.decompressFromBase64(result[0].json))
+                   num_veces: req.query.num_veces
+                }; 
+    //console.log("req.num_veces: "+JSON.stringify(req.query.num_veces));
+    res.send(resp);
+    i++;  */  
+
+    
+  //console.log("enviado :"+i);
 });
 
 app.get('/escenas/*', function(req, res) {
@@ -1217,7 +1249,7 @@ function saltHashPassword(userpassword) {
     console.log('nSalt = '+passwordData.salt);
 }
 
-var passwordMD5 = md5("awesome6");
+/*var passwordMD5 = md5("awesome6");
 console.log("awesome6: "+passwordMD5);
 MongoClient.connect(url, function(err, db) {
       if (err) throw err;
@@ -1227,7 +1259,7 @@ MongoClient.connect(url, function(err, db) {
       console.log("1 record inserted");
       db.close();
       });
-  });
+  });*/
 
 app.post('/config_json2',function(req,res){
   var params;

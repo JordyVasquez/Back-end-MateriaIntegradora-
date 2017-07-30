@@ -21,7 +21,7 @@ function handler(req,res){
 
 //var socket = ioc.connect('http://localhost:3000');
 var schema = null;
-var socket = ioc.connect('http://localhost:3331');
+var socket = ioc.connect('http://192.168.74.1:3331');
 socket.emit('session', {
                         'session': id_session
                     });
@@ -62,21 +62,58 @@ var total=0;
 var elmt = [];
 var band = false;
 var i=0;
-for(i = 0; i < 10; i++){
-  request.get({
-    url : 'http://localhost:3331/ips',
-    time : true
-  },function(err, response){
-    //console.log("response: "+(response.body));
-    console.log('Request time in ms', response.elapsedTime);
-    elmt[i] = response.elapsedTime;
-  });
-  if(i==9){
-    console.log("9: ");
-    band = true;
-  }
+var throughput=0;
+var num_veces = 2;
+//var num_veces = 0;
+//var iteraciones = 10;
+/*for (j = 1; j <= iteraciones; j++) {
+  num_veces=num_veces+1000
+}*/
+/*for(i = 1; i <= num_veces; i++){
+  
+    request.get({
+    url : 'http://localhost:80/ips',
+    time : true, 
+    qs :  { num_veces: i, iteraciones: num_veces}
+    },function(err, response){
+      //console.log("response: "+JSON.stringify(JSON.parse(response.body).num_veces));
+      //console.log('Request time in ms', response.elapsedTime);
+      total=total+response.elapsedTime;
+      if((JSON.parse(response.body).num_veces)==num_veces){
+
+        throughput = total/num_veces;
+        console.log("prom: "+throughput)
+      }
+      //console.log("total: "+total);
+    });
+
+ 
+  
+  
+}*/
+
+
+for(i = 1; i <= num_veces; i++){
+  
+    request.get({
+    url : 'http://192.168.43.55:80/ips',
+    time : true, 
+    qs :  { num_veces: i, iteraciones: num_veces}
+    },function(err, response){
+      console.log("response: "+JSON.stringify(JSON.parse(response.body)));
+      //console.log('Request time in ms', response.elapsedTime);
+      
+        //console.log("prom: "+throughput)
+      }
+      //console.log("total: "+total);
+    );
+
+ 
+  
+  
 }
-while(1){
+
+/*while(1){
   if(band == true){
     console.log("enter: "+elmt.length);
     for(var j = 0; j < elmt.length; j++) {
@@ -89,7 +126,7 @@ while(1){
   }
   
 
-}
+}*/
 
 /*console.log("METODO 2");
 var promedio=0;
