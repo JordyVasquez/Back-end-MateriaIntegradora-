@@ -51,12 +51,14 @@ function sendUploadToGCS (req_files) {
   });
   stream.on('error', (err) => {
     req_files.cloudStorageError = err;
+    console.log(err)
   });
 
   stream.on('finish', () => {
     req_files.cloudStorageObject = gcsname;
     file.makePublic().then(() => {
      req_files.cloudStoragePublicUrl = getPublicUrl(gcsname);
+      console.log(req_files.cloudStoragePublicUrl)
     });
   });
 

@@ -79,7 +79,7 @@ if ('development' == app.get('env')) {
     MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
-            server1.listen(65080);
+            server1.listen(3000);
                 console.log("puerto para socket: 3000")
 
         }
@@ -90,7 +90,7 @@ if ('development' == app.get('env')) {
             if (err) {
            
                 throw err;
-                server1.listen(65080);
+                server1.listen(3000);
                 console.log("puerto para socket: 3000")
             } else if (result.length > 0) {
                  server1.listen(JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Config.puertos.socket)
@@ -98,7 +98,7 @@ if ('development' == app.get('env')) {
 
 
             } else {
-               server1.listen(65080);
+               server1.listen(3000);
              console.log("puerto para socket: 3000")
 
             }
@@ -261,13 +261,51 @@ app.get('/escenas/*', function(req, res) {
   db.collection("Contenidos").find(query).toArray(function(err, result) {
     if (err) throw err;
      else if (result.length > 0) {
-      getExternalIp(function (externalIp) {
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result2) {
+            if (err) {
+           
+                throw err;
+                console.log("puerto para socket: 3000")
+                    getExternalIp(function (externalIp) {
              res.render('index', {
                 title: '1 Pantalla DEMO',
                 escenas:result[0].json,
-                externalIp: externalIp
+                externalIp: externalIp,
+                puerto:3000
             });
       });
+            } else if (result2.length > 0) {
+                                 getExternalIp(function (externalIp) {
+             res.render('index', {
+                title: '1 Pantalla DEMO',
+                escenas:result[0].json,
+                externalIp: externalIp,
+                puerto:JSON.parse(lzstring.decompressFromBase64(result2[0].json)).IP_Servidor_Config.puertos.socket
+            });
+      });
+         
+            console.log("puerto para socket:"+JSON.parse(lzstring.decompressFromBase64(result2[0].json)).IP_Servidor_Config.puertos.socket)
+
+
+            } else {
+ console.log("puerto para socket: 3000")
+                    getExternalIp(function (externalIp) {
+             res.render('index', {
+                title: '1 Pantalla DEMO',
+                escenas:result[0].json,
+                externalIp: externalIp,
+                puerto:3000
+            });
+      });
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+  
    
          }
     db.close();
@@ -445,12 +483,12 @@ MongoClient.connect(url, function(err, db) {
    
 });
    var path = { json:null};
- /*  MongoClient.connect(url, function(err, db) {
+  MongoClient.connect(url, function(err, db) {
   db.collection("Contenidos").deleteOne(path, function(err, obj) {
     if (err) throw err;
     console.log("1 document deleted");
   });
-  });*/
+  });
 app.post('/jsonConf2Pantalla', function(req, res) {
     var json_confi = req.body.schema2;
     MongoClient.connect(url, function(err, db) {
@@ -1057,26 +1095,11 @@ io.sockets.on('connection', function(socket) {
             sala: data.sala
         });
     });
-    socket.on('registrar_id_socket', function(data) {
-        // transmitimos el movimiento a todos los clientes conectados
-        console.log('is socket:', data.id_s);
-        map_ids_idsonido.set(data.id_audio, data.id_s);
 
-    });
-    socket.on('unir_Sala', function(data) {
-        // transmitimos el movimiento a todos los clientes conectados
-        console.log('unir_Sala:', data.sala);
-        console.log('Invitado:', data.invitado);
-        var ids = map_ids_idsonido.get(data.invitado)
-        socket.broadcast.to(ids).emit('invitacion_Sala', {
-            sala: data.sala,
-            invitado: data.invitado
-        });
-    });
+ 
     socket.on('disconnect', function() {
         connections--;
         console.log('connected', connections);
-        map_ids_idsonido.remove(socket.id)
         socket.broadcast.emit('connections', {
             connections: connections
         });

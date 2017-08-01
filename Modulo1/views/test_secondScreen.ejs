@@ -14,7 +14,64 @@
 	<h2>Opciones a Escoger</h2>
 
      </div>
-  <script src="/socket.io/socket.io.js"></script>
-<script src="javascripts/all2.js"></script>
+<iframe src="https://player.vimeo.com/video/3873878" width="320" height="240" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        <script src="../javascripts/qart.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ <script>
+ var id_sala = "";
+        
+       
+
+        var url = 'ws://' + '35.194.10.210:3000';
+
+        var socket = io(url);
+        socket.on('connect', function() {
+        });
+
+        function enviarAccion() {
+            var namespaceName = this.value ;
+            socket.emit('opcion_2c', {
+                sala: id_sala,
+                option: namespaceName
+            })
+        }
+
+          function enviarinvitacion() {
+                id_sala = document.getElementById("idpeli").value
+                alert(id_sala)
+                socket.emit('crearSala', {
+                    sala: id_sala
+                }, function(data) {
+                    alert('se unio al video :' + data.sala);
+                })
+            
+        }
+        document.getElementById("bbt").addEventListener('click', enviarinvitacion);
+        socket.on('op_second_screen', function(e) {
+
+            var op = document.getElementById("opciones");
+            var padre = op.parentNode;
+            padre.removeChild(op);
+            op = document.createElement('div');
+            op.id = 'opciones';
+            op.style.margin = '0 auto';
+            var h = document.createElement('h2');
+            h.innerHTML = 'Opciones a Escoger';
+            op.appendChild(h);
+            for (i = 0; i < e.escenas.length; i++) {
+                var nuevoBoton = document.createElement('button');
+                nuevoBoton.type = 'button';
+                nuevoBoton.value = e.escenas[i].Escena;
+                 nuevoBoton.textContent = e.escenas[i].Name_Escena;
+                nuevoBoton.addEventListener('click', enviarAccion);
+                op.appendChild(nuevoBoton);
+            }
+            padre.appendChild(op);
+
+        });
+    </script>
 </body>
 </html>

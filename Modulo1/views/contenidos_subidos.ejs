@@ -72,6 +72,7 @@ document.body.appendChild(document.importNode(getContent, true));
     var cell1 = row.insertCell(0);
     
     cell1.innerHTML = schema[i].title;
+    alert(schema[i].json)
    var json_con= JSON.parse(LZString.decompressFromBase64(schema[i].json)); 
 var cell2 = row.insertCell(1);
     

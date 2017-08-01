@@ -112,12 +112,10 @@
                 invitado: message
             })
         });*/
-        var webSocketHost = 'ws://';
+         var webSocketHost = 'ws://';
         var externalIp = '<%= externalIp%>';
-        alert(externalIp)
-        var url = webSocketHost + externalIp + ':3000';
-
-        alert('<%= externalIp%>')
+        var puerto='<%= puerto%>'
+        var url = webSocketHost + externalIp + ':'+puerto;
         var text = JSON.parse($schema2.value);
         text = JSON.stringify(text.Contenido_Live, null, 2);
         alert(text);
@@ -130,6 +128,7 @@
         var imagePath = '../logo.svg';
         var self = this;
         // abrimos la conexion
+        alert(url)
         var socket = io(url);
 
         socket.on('connect', function() {
@@ -145,9 +144,59 @@
         btnplay.addEventListener('click', play);
         var video = document.getElementById("video_principal");
         var inicio = searchInicio(videos_seq)
-        video.src = inicio.Escena;
+       // video.src = inicio.Escena;
+      video.src = inicio.Escena
         video.load(); // if HTML source element is used
-        if(isVideoInteraccion(inicio.Escena, videos_seq)){
+        seteaMetodos(inicio,videos_seq)
+     
+ 
+        var myMapOptions = new Map();
+        var ganador=''
+          var video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+        socket.on('opcion_1c', function(e) {
+            if(myMapOptions.has(e)){
+                myMapOptions.set(e,myMapOptions.get(e)+1)
+            }
+            else {
+                myMapOptions.set(e,1)
+            }
+            var tem_value=0
+            var tem_ip=''
+            for (var [key, value] of myMapOptions) {
+                alert(value)
+              if(value>tem_value){
+            tem_value=value;
+            tem_ip=key
+
+              }
+            }
+                ganador=tem_ip
+                alert(ganador)
+                tem_ip=""
+                tem_value=0;
+        });
+        function endedSinIteraccion() {                    
+            var escenas = video_default;                       
+            if(escenas.length!=0){
+            video.src = escenas.Escena;
+             video.play();
+            inicio=escenas
+             seteaMetodos(inicio,videos_seq);
+             myMapOptions = new Map(); 
+             ganador=''
+             video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+            
+            }
+             
+             document.getElementById("video_principal").removeEventListener("ended", endedSinIteraccion);
+
+           
+            //video.src = fileURL;
+            //video.load();  // if HTML source elementj is used
+            //video.play();
+        }
+         function seteaMetodos(inici,videos_se) {                    
+               if(isVideoInteraccion(inici.Escena, videos_se)){
           video.addEventListener("timeupdate",sendVideoOnArrayInteraccion);
            video.addEventListener("ended",endedConIteraccion);
         }
@@ -155,85 +204,71 @@
 
           video.addEventListener("ended",endedSinIteraccion);
         }
-     
- 
-        var myMapOptions = new Map();
-        var ganador=''
-        socket.on('opcion_1c', function(e) {
-            if(myMapOptions.has(e)){
-            myMapOptions.set(e,myMapOptions.get(e)+1)
-
-            }
-            else {
-
-                myMapOptions.set(e,1)
-
-            }
-            var tem_value=0
-            var tem_ip=''
-            for (var [key, value] of myMapOptions) {
-              if(value>tem){
-            tem_value=value;
-            tem_ip=key
-
-              }
-            }
-                ganador=tem_ip
-                tem_ip=""
-                tem_value=0;
-        });
-        function endedSinIteraccion() {                    
-            var escenas = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
-             video.src = escenas.Escena;
-             document.getElementById("video_principal").removeEventListener("ended", endedSinIteraccion);
-
-            video.play();
-            inicio=escenas
-            //video.src = fileURL;
-            //video.load();  // if HTML source elementj is used
-            //video.play();
         }
-         function endedConIteraccion() {                    
-            var escenas = ganador;
-             video.src = escenas;
-           document.getElementById("video_principal").removeEventListener("ended", endedConIteraccion);
+         function endedConIteraccion() {  
+            if(ganador.localeCompare('')==0){
 
-            video.play();
-              inicio=sendEscena(escenas,videos_seq)
+             var escenas = video_default;
+             if(escenas.length!=0){
+                  video.src = escenas.Escena;
+             video.load() 
+             video.play();
+              inicio=sendEscena(video.src,videos_seq)
+              ganador=''
+             video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+                  seteaMetodos(inicio,videos_seq);
+                  myMapOptions = new Map();
+}
+          
+           
+            }      
+            else{
+             var escenas = ganador;
+             video.src = escenas;
+             video.load()
+              video.play();
+              inicio=sendEscena(video.src,videos_seq)
+              ganador=''
+             video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+                  seteaMetodos(inicio,videos_seq);
+myMapOptions = new Map();
+            }        
+             document.getElementById("video_principal").removeEventListener("ended", endedConIteraccion);
+            
             //video.src = fileURL;
             //video.load();  // if HTML source elementj is used
             //video.play();
         }
   function sendVideoOnArrayInteraccion() {
     var time=searchVideoTimeInteraccion(video.src,videos_seq)
-      var vTime = video.currentTime;
+  
+            var vTime = video.currentTime;
              var duraction=video.duration;
              var resul=duraction-vTime;
-     if(time!=-1 &&resul <=time){ 
+     
+     if(time!=-1 &&resul <=(time+280)){ 
       document.getElementById("video_principal").removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
-        var escenas=searchVideoOnArray(video.src,videos_seq);
+        var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
         socket.emit('opciones', {sala : id,opciones:{escenas}});
               }
-
-
         }
            function searchVideoDefaultOnArray(Key, myArray) {
-       
+              var escs = [];
             for (var i = 0; i < myArray.Escenas.length; i++) {
                   for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
-                        if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0 && myArray.Escenas[i].Default) {
+                        if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0 && myArray.Escenas[i].Default_Escena) {
                             return myArray.Escenas[i];
                     }
                 }
             }
-            return '';
-
+            return escs;
 
         }
         function searchVideoOnArray(Key, myArray) {
             var escs = [];
             for (var i = 0; i < myArray.Escenas.length; i++) {
                   for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
+
                         if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0) {
                             escs.push(myArray.Escenas[i]);
                     }
@@ -245,7 +280,7 @@
         }
              function searchVideoTimeInteraccion(Key, myArray) {
             for (var i = 0; i < myArray.Escenas.length; i++) {
-                        if (Key.localeCompare(myArray.Escenas[i].Id_Escena) == 0) {
+                        if (Key.localeCompare(myArray.Escenas[i].Escena) == 0) {
                            return (myArray.Escenas[i].Tiempo);
                     }
                 
