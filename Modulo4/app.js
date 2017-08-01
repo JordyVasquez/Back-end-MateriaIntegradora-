@@ -63,26 +63,67 @@ var elmt = [];
 var band = false;
 var i=0;
 var throughput=0;
-var num_veces = 2;
+var num_veces = 1000;
+var iter=0;
 //var num_veces = 0;
 //var iteraciones = 10;
 /*for (j = 1; j <= iteraciones; j++) {
   num_veces=num_veces+1000
 }*/
-/*for(i = 1; i <= num_veces; i++){
-  
+
+var begin = new Date();
+
+for(i = 1; i <= num_veces; i++){
+      
     request.get({
     url : 'http://localhost:80/ips',
     time : true, 
     qs :  { num_veces: i, iteraciones: num_veces}
     },function(err, response){
+      iter++;
+      //console.log("response: "+JSON.stringify(JSON.parse(response.body)));
       //console.log("response: "+JSON.stringify(JSON.parse(response.body).num_veces));
       //console.log('Request time in ms', response.elapsedTime);
       total=total+response.elapsedTime;
-      if((JSON.parse(response.body).num_veces)==num_veces){
-
+      //if((JSON.parse(response.body).num_veces)==num_veces){
+      if(iter==num_veces){  
+        console.log("num_veces: "+num_veces);
         throughput = total/num_veces;
-        console.log("prom: "+throughput)
+        console.log("prom: "+throughput);
+        var end = new Date()
+        var reqPerSec = i / (( end - begin)/1000 );
+        console.log("reqPerSec: "+reqPerSec);
+        
+      }
+      //console.log("total: "+total);
+    });
+
+   
+}
+
+
+// Then, you need a simple calculation
+
+
+/*function peticiones(num_veces){
+  for(i = 1; i <= num_veces; i++){
+      
+    request.get({
+    url : 'http://localhost:80/ips',
+    time : true, 
+    qs :  { num_veces: i, iteraciones: num_veces}
+    },function(err, response){
+      iter++;
+      //console.log("response: "+JSON.stringify(JSON.parse(response.body)));
+      //console.log("response: "+JSON.stringify(JSON.parse(response.body).num_veces));
+      //console.log('Request time in ms', response.elapsedTime);
+      total=total+response.elapsedTime;
+      //if((JSON.parse(response.body).num_veces)==num_veces){
+      if(iter==num_veces){  
+        console.log("num_veces: "+num_veces);
+        throughput = total/num_veces;
+        console.log("prom: "+throughput);
+        
       }
       //console.log("total: "+total);
     });
@@ -90,20 +131,31 @@ var num_veces = 2;
  
   
   
+  }
+
+}
+
+//var num_veces = 1;
+//var j=0;
+for(var j =1; j<=10; j++){
+  peticiones(10*j);
+
 }*/
 
-
-for(i = 1; i <= num_veces; i++){
+/*for(i = 1; i <= num_veces; i++){
   
     request.get({
-    url : 'http://192.168.43.55:80/ips',
+    url : 'http://localhost:80/ips',
     time : true, 
     qs :  { num_veces: i, iteraciones: num_veces}
     },function(err, response){
-      console.log("response: "+JSON.stringify(JSON.parse(response.body)));
-      //console.log('Request time in ms', response.elapsedTime);
-      
-        //console.log("prom: "+throughput)
+      console.log("response: "+JSON.stringify(JSON.parse(response.body).num_veces));
+      total=total+response.elapsedTime;
+      if((JSON.parse(response.body).num_veces)==num_veces){
+
+        hroughput = total/num_veces;
+        console.log("prom: "+throughput)
+      }
       }
       //console.log("total: "+total);
     );
@@ -111,38 +163,5 @@ for(i = 1; i <= num_veces; i++){
  
   
   
-}
-
-/*while(1){
-  if(band == true){
-    console.log("enter: "+elmt.length);
-    for(var j = 0; j < elmt.length; j++) {
-      total += elmt[j];
-      console.log("j: "+elmt[j]);
-    }
-    console.log("long: "+elmt.length);
-    console.log("promedio: "+(total / elmt.length));
-    break;
-  }
-  
-
 }*/
 
-/*console.log("METODO 2");
-var promedio=0;
-var j=0;
-var responseTime=0
-for(var i = 0; i < 10; i++){
-  j++;
-  var start = new Date();
-  request('http://localhost:3331/ips', function(err, res, body) {
-    //console.log("response: "+(res.body));
-    responseTime = new Date() - start;
-    
-    console.log('responseTime: '+responseTime);
-    //next(err, res, body);
-  });
-
-  promedio = promedio+responseTime;
-}
-console.log("promedio: "+(promedio/j))*/
