@@ -215,7 +215,7 @@ var ipsJson = {ips:[
 }
 var i=0;
 app.get('/ips', function(req, res){
-    console.log("user conectado");
+    //console.log("user conectado");
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         
@@ -232,8 +232,16 @@ app.get('/ips', function(req, res){
                 throw err;
 
             } else if (result.length > 0) {
-                console.log(lzstring.decompressFromBase64(result[0].json));
+                //console.log(lzstring.decompressFromBase64(result[0].json));
+                /*var resp = {
+                   ipJson: JSON.parse(lzstring.decompressFromBase64(result[0].json)),
+                   num_veces: req.query.num_veces
+                }; */
                 res.send(JSON.parse(lzstring.decompressFromBase64(result[0].json)));
+                //console.log("req.num_veces: "+JSON.stringify(req.query.num_veces));
+                //res.send(resp);
+                i++;  
+
             } 
             
             db.close();
