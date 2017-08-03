@@ -265,7 +265,7 @@ app.get('/escenas/*', function(req, res) {
         console.log("Petición para " + pathname + " recibida.");
     MongoClient.connect(url, function(err, db) {
   if (err) throw err;
-   var query = { title:pathname};
+   var query = { ID:pathname};
   db.collection("Contenidos").find(query).toArray(function(err, result) {
     if (err) throw err;
      else if (result.length > 0) {
@@ -407,11 +407,12 @@ app.all('*', verificarSesion2);
 
 app.post('/admin_cont_sub', function(req, res) {
     var actividad = req.body.actividad;
-    var title = req.body.title;
+    var ID = req.body.ID;
+    console.log("ID: "+ID);
  if('delete'.localeCompare(actividad)==0){
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
-   var path = { title:title};
+   var path = { ID:ID};
   db.collection("Contenidos").deleteOne(path, function(err, obj) {
     if (err) throw err;
     else{
@@ -459,7 +460,7 @@ MongoClient.connect(url, function(err, db) {
                 throw err;
 
             } else if (result.length > 0) {
-                var path = { title:title};
+                var path = { ID:ID};
                   db.collection("Contenidos").find(path).toArray(function(err, result2) {
                     if (err) throw err;
                      else if (result2.length > 0) {
@@ -1126,7 +1127,7 @@ app.get('/movies/:movieName', (req, res) => {
 app.post('/upload', storage.multer.array('archivos', 50), (req, res, next) => {
     //El modulo 'fs' (File System) que provee Nodejs nos permite manejar los archivos
      var json_con = req.body.output2;
-    var title = req.body.Titulo;
+    var ID = req.body.ID;
         console.log(json_con)
            for(var x=0;x<req.files.length;x++) {
        var dir= storage.sendUploadToGCS(req.files[x])
@@ -1139,11 +1140,11 @@ app.post('/upload', storage.multer.array('archivos', 50), (req, res, next) => {
             MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var myobj = {
-            title: title,
+            ID: ID,
             json: json_con
         };
         var query = {
-            title: title
+            ID: ID
         };
         db.collection("Contenidos").find(query).toArray(function(err, result) {
             if (err) {
@@ -1168,6 +1169,7 @@ app.post('/upload', storage.multer.array('archivos', 50), (req, res, next) => {
                                     title: 'Escenas Guardadas',
                                     resultado: result
                                 });
+                                 console.log("result: "+JSON.stringify(result));
                                 db.close();
                               });
                                
