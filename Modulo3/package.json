@@ -9,12 +9,12 @@
     "after": "^0.8.2",
     "body-parser": "^1.5.1",
     "cookie-parser": "^1.4.3",
-    "express": "^4.13.4",
+    "express": ">=3.0",
     "io": "^0.1.10",
     "method-override": "^2.1.2",
     "mongoose": "^3.6.20",
     "redis": "^2.7.1",
-    "socket.io": "^1.7.4"
+    "socket.io": "^1.0.6"
   },
   "engines": {
     "node": ">=4.4.5"
