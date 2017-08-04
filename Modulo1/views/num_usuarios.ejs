@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Usuarios</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="../css/dashboard.css" rel="stylesheet">
+        <link id="template-file" href="templates/template.ejs" rel="import" />
+        <link href="css/dashboard.css" rel="stylesheet">
+    </head>
+
+	<body>
+	`
+		 
+		 <script>
+	        var getImport = document.querySelector('#template-file');
+	        var getContent = getImport.import.querySelector('#template');
+	        document.body.appendChild(document.importNode(getContent, true));
+	    </script>
+            
+        
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+	        <h1 class="page-header" id="page-header">Numero de usuarios conectados</h1>
+	        <div id="numUsers" class="container"></div>
+	        
+	    </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+		<script>
+            var url = 'ws://' + 'localhost:3000';
+	        var socket = io(url);
+	        socket.on('connect', function() {
+	        });
+            (function() {
+            	socket.on('connections', function(data) {
+            		//alert("numUsers: "+data);
+            		document.getElementById('numUsers').innerHTML = data.connections ;
+	       		});
+
+            })();	
+        </script>    
+	</body>
+</html>

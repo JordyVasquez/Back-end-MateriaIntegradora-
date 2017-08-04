@@ -127,6 +127,8 @@ app.get('/', function(req, res){
             });
 });
 
+
+
 app.get('/escenas', function(req, res){
     MongoClient.connect(url, function(err, db) {
         console.log("MongoDB");
@@ -404,6 +406,13 @@ app.post('/config_json2',function(req,res){
 
 
 app.all('*', verificarSesion2);
+
+app.get('/num_usuarios', function(req, res){
+  res.render('num_usuarios', {
+    title: 'Usuarios'
+    
+            });
+});
 
 app.post('/admin_cont_sub', function(req, res) {
     var actividad = req.body.actividad;
@@ -1083,6 +1092,9 @@ io.set('log level', 1);
 io.sockets.on('connection', function(socket) {
     connections++;
     console.log('connected', connections);
+    io.sockets.emit('connections', {
+            connections: connections
+        });
 
     // socket.broadcast.emit('move', data);
 
