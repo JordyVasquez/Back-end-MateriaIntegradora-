@@ -277,37 +277,36 @@ app.get('/escenas/*', function(req, res) {
            
                 throw err;
                 console.log("puerto para socket: 3000")
-                    getExternalIp(function (externalIp) {
+       
              res.render('index', {
                 title: '1 Pantalla DEMO',
                 escenas:result[0].json,
-                externalIp: externalIp,
+                externalIp: 'localhost',
                 puerto:3000
             });
-      });
             } else if (result2.length > 0) {
-                                 getExternalIp(function (externalIp) {
+         
              res.render('index', {
                 title: '1 Pantalla DEMO',
                 escenas:result[0].json,
-                externalIp: externalIp,
+                externalIp: JSON.parse(lzstring.decompressFromBase64(result2[0].json)).IP_Servidor_Config.ip,
                 puerto:JSON.parse(lzstring.decompressFromBase64(result2[0].json)).IP_Servidor_Config.puertos.socket
             });
-      });
+
          
             console.log("puerto para socket:"+JSON.parse(lzstring.decompressFromBase64(result2[0].json)).IP_Servidor_Config.puertos.socket)
 
 
             } else {
  console.log("puerto para socket: 3000")
-                    getExternalIp(function (externalIp) {
+
              res.render('index', {
                 title: '1 Pantalla DEMO',
                 escenas:result[0].json,
-                externalIp: externalIp,
+                externalIp: 'localhost',
                 puerto:3000
             });
-      });
+
 
             }
             console.log(result.length);
@@ -1100,7 +1099,7 @@ io.sockets.on('connection', function(socket) {
         console.log('Sala:', data.sala);
         socket.join(data.sala);
         callback({
-            sala: data.sala
+            sala: "te has conectado a la sala" + data.sala
         });
     });
 
