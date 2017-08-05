@@ -15,28 +15,82 @@
 
      </div>
 <iframe src="https://player.vimeo.com/video/3873878" width="320" height="240" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+	<div id="username">
+	    <input type="text" name="usernameTxt" /> <input type="button" name="setUsername" value="Set Username" />
+	</div>
+	<div id="sendChat" style="display:none;">
+	    <input type="text" name="chatTxt" /> <input type="button" name="sendBtn" value="Send" />
+	</div>
+	<br />
+	<div id="content"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-        <script src="../javascripts/qart.js"></script>
+    <script src="../javascripts/qart.js"></script>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
  <script>
- var id_sala = "";
+ 		var id_sala = "";
         
-       
 
-        var url = 'http://104.155.160.16:3000';
-
+        var url = 'ws://' + 'localhost:3000';
         var socket = io(url);
         socket.on('connect', function() {
         });
 
+        var url2 = 'ws://' + 'localhost:3001';///SERVIDOR SOCKET MODULO2
+	    var socket2 = io(url2);
+	    socket2.on('connect', function() {
+	        console.log("Connected");
+	    });    
+
+        $(document).ready(function() {
+	        var username = "anonymous";
+
+
+	        $('input[name=setUsername]').click(function(){
+	            if($('input[name=usernameTxt]').val() != ""){
+	                username = $('input[name=usernameTxt]').val();
+	                msg = "A new user is connected: " +username;
+	                socket2.emit('message', {mensaje : msg, canal: id_sala}, function() {
+		            	//alert("mensaje: "+msg);
+		            	content.append(msg + '<br />');
+			        });
+	            }
+	            $('#username').slideUp("slow",function(){
+	                $('#sendChat').slideDown("slow");
+	            });
+	        });
+
+	        var content = $('#content');
+	 		
+	        socket2.on('disconnect', function() {
+	            console.log('disconnected');
+	            content.html("<b>Disconnected!</b>");
+	        });
+
+	 
+	        $("input[name=sendBtn]").click(function(){
+	            var msg = ""+username + " : " +  $("input[name=chatTxt]").val();
+	            socket2.emit('message', {mensaje : msg, canal: id_sala}, function() {
+	            	//alert("mensaje: "+msg);
+	            	content.append(msg + '<br />');
+		        });
+	            $("input[name=chatTxt]").val("");
+	        });
+	        socket2.on('broadcast', function(msg) {
+	          //alert("broadcast: "+msg);
+	          content.append(msg + '<br />');
+	        });
+	    });
+
+        
         function enviarAccion() {
             var namespaceName = this.value ;
             socket.emit('opcion_2c', {
                 sala: id_sala,
                 option: namespaceName
-            })
+            });
+            
         }
 
           function enviarinvitacion() {
@@ -46,7 +100,21 @@
                     sala: id_sala
                 }, function(data) {
                     alert('se unio al video :' + data.sala);
-                })
+                });
+
+                
+	           var channel = id_sala;
+	           socket2.emit('join', channel, function() {
+	           	content.append('joined: ' + channel + '<br />');
+	            
+	           });
+	       
+
+                /*socket2.emit('session', {
+	                sala: id_sala
+	            }, function(data) {
+	                //  $('#identificador').html(data.sala);
+	            });*/
             
         }
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
@@ -73,5 +141,6 @@
 
         });
     </script>
+    
 </body>
 </html>

@@ -1,6 +1,6 @@
 var app = require('http').createServer(handler);
 app.listen(8088);
-var io = require('socket.io').listen(app);;
+var io = require('socket.io').listen(app);
 var fs = require('fs');
 var request = require('request');
 var id_session = Math.round(Date.now()*Math.random()/100000);

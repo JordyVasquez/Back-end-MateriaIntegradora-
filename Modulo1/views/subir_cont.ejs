@@ -79,7 +79,7 @@ var schema;
     var $output = document.getElementById('output');
     var $editor = document.getElementById('editor');
     var $validate = document.getElementById('validate');
-
+    var estadoEscena = false;
     // Buttons
 
     var $set_value_button = document.getElementById('setvalue');
@@ -101,20 +101,45 @@ var schema;
         // When the value of the editor changes, update the JSON output and validation message
         jsoneditor.on('change',function() {
             var json = jsoneditor.getValue();
-
+            //alert("json: "+json.ID);
+            //alert("escena: "+ escena);
+            var id = Math.round($.now() * Math.random() / 100000); 
             if(escena!=null){
               if(escena.localeCompare('')==0){
-
-                $output.value = JSON.stringify(json,null,2); 
+                 //alert("a"); 
+                 json.ID = id; 
+                 $output.value = JSON.stringify(json,null,2);
               }
 
               else {
-                $output.value = escena; 
+                if(estadoEscena==false){
+                  //alert("b");   
+                  estadoEscena = true;
+                  $output.value = escena;
+                }
+                else{
+                  //alert("c"); 
+                  $output.value = JSON.stringify(json,null,2);
+                }
+                 
               }
   
             }
             else{
-             $output.value = JSON.stringify(json,null,2); 
+                    //alert("ovejuno"); 
+              if(estadoEscena==false){
+                  //alert("d"); 
+                  estadoEscena = true;
+                  json.ID = id;
+                  $output.value = JSON.stringify(json,null,2); 
+                }
+                else {
+
+
+                   $output.value = JSON.stringify(json,null,2); 
+
+                }
+              
             }
 
       jsoneditor.setValue(JSON.parse($output.value));

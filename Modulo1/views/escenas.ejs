@@ -18,7 +18,7 @@
         <script>
             function agregarEventClick(divContenedor, titulo){
                     divContenedor.addEventListener("click", function(){
-                    alert("titulo: "+titulo);
+                    //alert("titulo: "+titulo);
                     window.location.href='/escenas/'+titulo;
                     });
             }
@@ -29,7 +29,7 @@
                 
                 var escenasJson = null;
                 var schema=<%- JSON.stringify(json) %>;
-                alert(JSON.stringify(schema));
+                //alert(JSON.stringify(schema));
                 /*escenasJson = JSON.parse(LZString.decompressFromBase64(schema[0].json));
                 alert(JSON.stringify(escenasJson));
                 escenasJson2 = JSON.parse(LZString.decompressFromBase64(schema[1].json));
@@ -38,7 +38,7 @@
                 for (var i = 0; i < schema.length; i++) {
                     //alert(JSON.stringify(schema[i].json));
                     escenasJson = JSON.parse(LZString.decompressFromBase64(schema[i].json));
-                    alert(JSON.stringify(escenasJson));
+                    //alert(JSON.stringify(escenasJson));
                     titulo = JSON.stringify(escenasJson.Titulo)
                     titulo = titulo.replace('"','');
                     titulo = titulo.replace('"','');
@@ -48,7 +48,7 @@
                         descripcion = JSON.stringify(escenasJson.Descripcion)
                         descripcion = descripcion.replace('"','');
                         descripcion = descripcion.replace('"','');
-                        alert("Descripcion: "+descripcion);
+                        //alert("Descripcion: "+descripcion);
                     }
                     catch(err) {
                         descripcion='';
@@ -56,7 +56,7 @@
                     
                     try{
                         imagenP = JSON.stringify(escenasJson.Portada.Imagen);
-                        alert("imagen:Prueba "+imagenP);
+                        //alert("imagen:Prueba "+imagenP);
                         imagenP = imagenP.replace('"','');
                         imagenP = imagenP.replace('"','');
                         //alert("imagen fINAL: "+imagen);
@@ -106,7 +106,8 @@
                     divContenedor.appendChild(divG2);
                     divPrincipal.appendChild(divContenedor);
                     divPrincipal.appendChild(br);
-                    agregarEventClick(divContenedor, titulo);
+
+                    agregarEventClick(divContenedor, schema[i].ID);
 
 
                     
@@ -124,5 +125,5 @@
                 
             })();
         </script>
-    <body>
+    </body>
 </html>
