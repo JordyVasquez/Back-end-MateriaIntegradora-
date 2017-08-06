@@ -340,9 +340,66 @@ app.get('/escenas/*', function(req, res) {
 });
 
 app.get('/2v', function(req, res) {
-    res.render('test_secondScreen', {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('num_usuarios', {
+                title: 'Usuarios Json',
+                msm: 'error al conectar con la base mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('test_secondScreen', {
+                    title: '2 Pantalla DEMO',
+                    msm: 'error al conectar con la base mongodb',
+                    json: '',
+                    ip:''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                var json = (result[0].json);
+                var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
+                var ip = jsonDecomp.IP_Servidor_Config.ip;
+                var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
+                console.log("result: "+json);
+                console.log("jsonDecomp: "+JSON.stringify(jsonDecomp));
+                console.log("ip: "+JSON.stringify(ip));
+                console.log("ip: "+JSON.stringify(socket));
+                getExternalIp(function (externalIp) {
+                res.render('test_secondScreen', {
+                    title: '2 Pantalla DEMO',
+                    ipS1: ip,
+                    puertoS1: socket
+                    //ip:externalIp
+                });
+      });
+
+            } else {
+                getExternalIp(function (externalIp) {
+                 res.render('test_secondScreen', {
+                            title: '2 Pantalla DEMO',
+                            json: '',
+                            msm: 'OK',
+                            ip:externalIp
+                        });
+
+      });
+               
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });  
+    /*res.render('test_secondScreen', {
         title: '2 Pantalla DEMO'
-    });
+    });*/
 });
 
 app.get('/cerrar', function(req, res) {
@@ -435,6 +492,70 @@ app.get('/num_usuarios', function(req, res) {
         title: 'Usuarios'
 
     });
+
+app.get('/num_usuarios', function(req, res){
+  MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('num_usuarios', {
+                title: 'Usuarios Json',
+                msm: 'error al conectar con la base mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('num_usuarios', {
+                    title: 'Usuarios',
+                    msm: 'error al conectar con la base mongodb',
+                    json: '',
+                    ip:''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                var json = (result[0].json);
+                var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
+                var ip = jsonDecomp.IP_Servidor_Config.ip;
+                var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
+                console.log("result: "+json);
+                console.log("jsonDecomp: "+JSON.stringify(jsonDecomp));
+                console.log("ip: "+JSON.stringify(ip));
+                console.log("ip: "+JSON.stringify(socket));
+                getExternalIp(function (externalIp) {
+                res.render('num_usuarios', {
+                    title: 'Usuarios',
+                    ip: ip,
+                    puerto: socket
+                    //ip:externalIp
+                });
+      });
+
+            } else {
+                getExternalIp(function (externalIp) {
+                 res.render('num_usuarios', {
+                            title: 'Usuarios',
+                            json: '',
+                            msm: 'OK',
+                            ip:externalIp
+                        });
+
+      });
+               
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });  
+  /*res.render('num_usuarios', {
+    title: 'Usuarios'
+    
+            });*/
+>>>>>>> e3b9a4974a3f7523249c7b290346f97e1aeaff9a
 });
 
 app.post('/admin_cont_sub', function(req, res) {
