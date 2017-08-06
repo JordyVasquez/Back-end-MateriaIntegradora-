@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app2.js"
   },
   "dependencies": {
     "after": "^0.8.2",

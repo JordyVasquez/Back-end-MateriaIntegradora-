@@ -372,17 +372,17 @@ app.get('/2v', function(req, res) {
                 console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
                 console.log("ip: " + JSON.stringify(ip));
                 console.log("ip: " + JSON.stringify(socket));
-                getExternalIp(function(externalIp) {
+       
                     res.render('test_secondScreen', {
                         title: '2 Pantalla DEMO',
                         ipS1: ip,
                         puertoS1: socket
                         //ip:externalIp
                     });
-                });
+           
 
             } else {
-                getExternalIp(function(externalIp) {
+            
                     res.render('test_secondScreen', {
                         title: '2 Pantalla DEMO',
                         json: '',
@@ -390,7 +390,7 @@ app.get('/2v', function(req, res) {
                         ip: externalIp
                     });
 
-                });
+            
 
             }
             console.log(result.length);
@@ -1271,7 +1271,9 @@ io.sockets.on('connection', function(socket) {
         // transmitimos el movimiento a todos los clienftes conectados
         console.log('Sala:', data.sala);
         socket.join(data.sala);
-         io.to(data.sala).emit('confirmacion_join', {sala: "te has conectado a la sala" + data.sala});
+        var msm="te has conectado a la sala" + data.sala;
+        console.log(msm)
+         io.to(data.sala).emit('confirmacion_join', msm);
     });
 
 

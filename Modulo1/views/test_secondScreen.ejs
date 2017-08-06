@@ -38,7 +38,7 @@
         alert("urlFinal: "+urlFinal);
 
         var url = 'ws://' + 'localhost:3000'; //PONER URL FINAL
-        var socket = io(urlFinal);
+        var socket = io(url);
         socket.on('connect', function() {
         });
 
@@ -121,7 +121,7 @@
             
         }
         socket.on('confirmacion_join', function(data) {
-            	          alert('se unio al video :' + data.sala);
+            	          alert(data);
 	       		});
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
         socket.on('op_second_screen', function(e) {
