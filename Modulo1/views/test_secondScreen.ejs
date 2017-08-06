@@ -38,7 +38,7 @@
         alert("urlFinal: "+urlFinal);
 
         var url = 'ws://' + 'localhost:3000'; //PONER URL FINAL
-        var socket = io(url);
+        var socket = io(urlFinal);
         socket.on('connect', function() {
         });
 
