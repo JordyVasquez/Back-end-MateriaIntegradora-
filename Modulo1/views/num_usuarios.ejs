@@ -21,7 +21,7 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 	        <h1 class="page-header" id="page-header">Numero de usuarios conectados</h1>
 	        <div id="numUsers" class="container"></div>
-	        
+	           <div id="content"></div>
 	    </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 		<script>
@@ -31,20 +31,25 @@
             var puerto = <%- JSON.stringify(puerto) %>;
             var urlFinal = 'ws://'+ip+':'+puerto;
             alert("urlFinal: "+urlFinal);
-
+            var content = $('#content');
             var url = 'ws://' + 'localhost:3000';///PONER URLFINAL
-	        var socket = io(url);
+	        var socket = io(urlFinal);
 	        socket.on('connect', function() {
 	        });
-            (function() {
+          
 
 
             	socket.on('connections', function(data) {
             		//alert("numUsers: "+data);
             		document.getElementById('numUsers').innerHTML = data.connections ;
 	       		});
+                 socket.on('mensaje2',  function(data) {
 
-            })();	
+                        content.append(data.data.data + '<br />');
+                });
+                  socket.emit('mensaje', {data:"sixto y chiluiza"});
+
+           
         </script>    
 	</body>
 </html>

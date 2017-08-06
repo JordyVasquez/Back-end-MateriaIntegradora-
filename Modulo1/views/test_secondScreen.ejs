@@ -38,7 +38,7 @@
         alert("urlFinal: "+urlFinal);
 
         var url = 'ws://' + 'localhost:3000'; //PONER URL FINAL
-        var socket = io(url);
+        var socket = io(urlFinal);
         socket.on('connect', function() {
         });
 
@@ -103,8 +103,6 @@
                 alert(id_sala)
                 socket.emit('crearSala', {
                     sala: id_sala
-                }, function(data) {
-                    alert('se unio al video :' + data.sala);
                 });
 
                 
@@ -122,6 +120,9 @@
 	            });*/
             
         }
+        socket.on('confirmacion_join', function(data) {
+            	          alert('se unio al video :' + data.sala);
+	       		});
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
         socket.on('op_second_screen', function(e) {
 

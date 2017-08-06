@@ -359,7 +359,7 @@ app.get('/2v', function(req, res) {
                     title: '2 Pantalla DEMO',
                     msm: 'error al conectar con la base mongodb',
                     json: '',
-                    ip:''
+                    ip: ''
                 });
                 throw err;
 
@@ -368,35 +368,35 @@ app.get('/2v', function(req, res) {
                 var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
                 var ip = jsonDecomp.IP_Servidor_Config.ip;
                 var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
-                console.log("result: "+json);
-                console.log("jsonDecomp: "+JSON.stringify(jsonDecomp));
-                console.log("ip: "+JSON.stringify(ip));
-                console.log("ip: "+JSON.stringify(socket));
-                getExternalIp(function (externalIp) {
-                res.render('test_secondScreen', {
-                    title: '2 Pantalla DEMO',
-                    ipS1: ip,
-                    puertoS1: socket
-                    //ip:externalIp
+                console.log("result: " + json);
+                console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
+                console.log("ip: " + JSON.stringify(ip));
+                console.log("ip: " + JSON.stringify(socket));
+                getExternalIp(function(externalIp) {
+                    res.render('test_secondScreen', {
+                        title: '2 Pantalla DEMO',
+                        ipS1: ip,
+                        puertoS1: socket
+                        //ip:externalIp
+                    });
                 });
-      });
 
             } else {
-                getExternalIp(function (externalIp) {
-                 res.render('test_secondScreen', {
-                            title: '2 Pantalla DEMO',
-                            json: '',
-                            msm: 'OK',
-                            ip:externalIp
-                        });
+                getExternalIp(function(externalIp) {
+                    res.render('test_secondScreen', {
+                        title: '2 Pantalla DEMO',
+                        json: '',
+                        msm: 'OK',
+                        ip: externalIp
+                    });
 
-      });
-               
+                });
+
             }
             console.log(result.length);
             db.close();
         });
-    });  
+    });
     /*res.render('test_secondScreen', {
         title: '2 Pantalla DEMO'
     });*/
@@ -488,13 +488,7 @@ app.post('/config_json2', function(req, res) {
 app.all('*', verificarSesion2);
 
 app.get('/num_usuarios', function(req, res) {
-    res.render('num_usuarios', {
-        title: 'Usuarios'
-
-    });
-
-app.get('/num_usuarios', function(req, res){
-  MongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
             res.render('num_usuarios', {
@@ -513,7 +507,7 @@ app.get('/num_usuarios', function(req, res){
                     title: 'Usuarios',
                     msm: 'error al conectar con la base mongodb',
                     json: '',
-                    ip:''
+                    ip: ''
                 });
                 throw err;
 
@@ -522,40 +516,38 @@ app.get('/num_usuarios', function(req, res){
                 var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
                 var ip = jsonDecomp.IP_Servidor_Config.ip;
                 var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
-                console.log("result: "+json);
-                console.log("jsonDecomp: "+JSON.stringify(jsonDecomp));
-                console.log("ip: "+JSON.stringify(ip));
-                console.log("ip: "+JSON.stringify(socket));
-                getExternalIp(function (externalIp) {
-                res.render('num_usuarios', {
-                    title: 'Usuarios',
-                    ip: ip,
-                    puerto: socket
-                    //ip:externalIp
-                });
-      });
+                console.log("result: " + json);
+                console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
+                console.log("ip: " + JSON.stringify(ip));
+                console.log("ip: " + JSON.stringify(socket));
+ 
+                    res.render('num_usuarios', {
+                        title: 'Usuarios',
+                        ip: ip,
+                        puerto: socket
+                        //ip:externalIp
+                    });
+            
 
             } else {
-                getExternalIp(function (externalIp) {
-                 res.render('num_usuarios', {
-                            title: 'Usuarios',
-                            json: '',
-                            msm: 'OK',
-                            ip:externalIp
-                        });
 
-      });
-               
+                    res.render('num_usuarios', {
+                        title: 'Usuarios',
+                        json: '',
+                        msm: 'OK',
+                        ip: externalIp
+                    });
+
+
             }
             console.log(result.length);
             db.close();
         });
-    });  
-  /*res.render('num_usuarios', {
-    title: 'Usuarios'
-    
-            });*/
->>>>>>> e3b9a4974a3f7523249c7b290346f97e1aeaff9a
+    });
+    /*res.render('num_usuarios', {
+      title: 'Usuarios'
+      
+              });*/
 });
 
 app.post('/admin_cont_sub', function(req, res) {
@@ -652,10 +644,10 @@ var path = {
     json: null
 };
 MongoClient.connect(url, function(err, db) {
-db.collection("Contenidos").deleteOne(path, function(err, obj) {
-  if (err) throw err;
-  console.log("1 document deleted");
-});
+    db.collection("Contenidos").deleteOne(path, function(err, obj) {
+        if (err) throw err;
+        console.log("1 document deleted");
+    });
 });
 app.post('/jsonConf2Pantalla', function(req, res) {
     var json_confi = req.body.schema2;
@@ -1269,13 +1261,17 @@ io.sockets.on('connection', function(socket) {
         console.log('Opciones:', data.opciones);
         io.to(data.sala).emit('op_second_screen', data.opciones);
     });
-    socket.on('crearSala', function(data, callback) {
+        socket.on('mensaje', function(data) {
+        // transmitimos el movimiento a todos los clienntes conectados
+        io.sockets.emit('mensaje2', {
+            data: data
+        });
+    });
+    socket.on('crearSala', function(data) {
         // transmitimos el movimiento a todos los clienftes conectados
         console.log('Sala:', data.sala);
         socket.join(data.sala);
-        callback({
-            sala: "te has conectado a la sala" + data.sala
-        });
+         io.to(data.sala).emit('confirmacion_join', {sala: "te has conectado a la sala" + data.sala});
     });
 
 
