@@ -25,11 +25,20 @@
 	    </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 		<script>
-            var url = 'ws://' + 'localhost:3000';
+
+            var escenasJson = null;
+            var ip = <%- JSON.stringify(ip) %>;
+            var puerto = <%- JSON.stringify(puerto) %>;
+            var urlFinal = 'ws://'+ip+':'+puerto;
+            alert("urlFinal: "+urlFinal);
+
+            var url = 'ws://' + 'localhost:3000';///PONER URLFINAL
 	        var socket = io(url);
 	        socket.on('connect', function() {
 	        });
             (function() {
+
+
             	socket.on('connections', function(data) {
             		//alert("numUsers: "+data);
             		document.getElementById('numUsers').innerHTML = data.connections ;
