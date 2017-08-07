@@ -12,7 +12,6 @@ var HashMap = require('hashmap');
 var cons = require('consolidate');
 var path = require("path");
 var request = require('request');
-const storage = require('./storage');
 const lzstring = require('./public/js/LZString');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://root:1234@104.155.160.16:27017/admin";
@@ -40,7 +39,7 @@ var flagSession = false;
 var cerrar = false;
 var now = null;
 var expired = null;
-
+var map_ids_contenido_sala = new HashMap();
 app.engine('.html', cons.jade);
 app.set('view engine', 'html');
 // all environments
@@ -641,7 +640,7 @@ app.post('/admin_cont_sub', function(req, res) {
 
 });
 var path = {
-    json: null
+    ID: null
 };
 MongoClient.connect(url, function(err, db) {
     db.collection("Contenidos").deleteOne(path, function(err, obj) {
@@ -1269,11 +1268,24 @@ io.sockets.on('connection', function(socket) {
     });
     socket.on('crearSala', function(data) {
         // transmitimos el movimiento a todos los clienftes conectados
-        console.log('Sala:', data.sala);
+        console.log('Sala:-------------------', data.sala.toString());
+        console.log('Sala:', data);
         socket.join(data.sala);
+        if(data.admin!=null && data.admin){
+             console.log('entro if');
+        map_ids_contenido_sala.set(data.sala.toString(), data.ctm);
+         var contm=map_ids_contenido_sala.get(data.sala.toString())
+        console.log(contm)
+        }
+        else{
+             console.log('entro else:', data);
         var msm="te has conectado a la sala" + data.sala;
+        var contm=map_ids_contenido_sala.get(data.sala)
         console.log(msm)
-         io.to(data.sala).emit('confirmacion_join', msm);
+        console.log(contm)
+        socket.emit('confirmacion_join', {msm:msm, contenido_transmedia:contm});   
+        }
+
     });
 
 
@@ -1295,13 +1307,13 @@ app.get('/movies/:movieName', (req, res) => {
 
     screen(movieFile, res, req);
 });
-app.post('/upload', (req, res, next) => {
+app.post('/upload', function(req, res){
     //El modulo 'fs' (File System) que provee Nodejs nos permite manejar los archivos
     var json_con = req.body.output2;
-    var ID = req.body.ID;
+    var ID = req.body.IDescena;
+      console.log(ID)
     console.log(json_con)
     json_con = lzstring.compressToBase64(json_con);
-    console.log(json_con)
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var myobj = {

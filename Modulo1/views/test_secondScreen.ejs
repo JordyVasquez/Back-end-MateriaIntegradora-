@@ -7,14 +7,12 @@
 </head>
 <body style="text-align:center">
 
-<button id="ruido">Sincronizar Por audio</button>
-<button id="bbt">Sincronizar Por audio</button>
+<button id="bbt">Sincronizar manualmente</button>
 <input id="idpeli" type="text"></input>
      <div id='opciones'style="margin:0 auto;">
 	<h2>Opciones a Escoger</h2>
 
      </div>
-<iframe src="https://player.vimeo.com/video/3873878" width="320" height="240" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 	<div id="username">
 	    <input type="text" name="usernameTxt" /> <input type="button" name="setUsername" value="Set Username" />
 	</div>
@@ -38,7 +36,7 @@
         alert("urlFinal: "+urlFinal);
 
         var url = 'ws://' + 'localhost:3000'; //PONER URL FINAL
-        var socket = io(urlFinal);
+        var socket = io(url);
         socket.on('connect', function() {
         });
 
@@ -121,7 +119,8 @@
             
         }
         socket.on('confirmacion_join', function(data) {
-            	          alert(data);
+            	          alert(data.msm);
+            	          alert(data.contenido_transmedia);
 	       		});
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
         socket.on('op_second_screen', function(e) {

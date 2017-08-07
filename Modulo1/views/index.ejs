@@ -116,10 +116,16 @@
          var webSocketHost = 'ws://';
         var externalIp = '<%= externalIp%>';
         var puerto='<%= puerto%>'
-        var url = webSocketHost + externalIp + ':'+puerto;
-        var text = JSON.parse($schema2.value);
-        text = JSON.stringify(text.Contenido_Live, null, 2);
+        var urlf = 'ws://' + 'localhost:3000'; //PONER URL FINAL
+
+        //var url = webSocketHost + externalIp + ':'+puerto;
+        var textt = JSON.parse($schema2.value);
+         var  Contenido_Trasmedia = JSON.stringify(textt.Contenido_Trasmedia, null, 2);
+       var  text = JSON.stringify(textt.Contenido_Live, null, 2);
+           
         alert(text);
+        alert(Contenido_Trasmedia);
+  
 
         var videos_seq = JSON.parse(text);
         var id = Math.round($.now() * Math.random() / 100000);
@@ -129,16 +135,16 @@
         var imagePath = '../logo.svg';
         var self = this;
         // abrimos la conexion
-        alert(url)
-        var socket = io(url);
+       // alert(url)
+        var socket = io(urlf);
 
         socket.on('connect', function() {
 
             socket.emit('crearSala', {
-                sala: id
-            }, function(data) {
-                //  $('#identificador').html(data.sala);
-            })
+                sala: id,
+                ctm:Contenido_Trasmedia,
+                admin:true
+            });
 
         });
         var btnplay = document.getElementById("play");
@@ -150,7 +156,23 @@
         video.load(); // if HTML source element is used
         seteaMetodos(inicio,videos_seq)
      
- 
+     socket.on('conectando_users', function(e) {
+            
+            var tem_value=0
+            var tem_ip=''
+            for (var [key, value] of myMapOptions) {
+                alert(value)
+              if(value>tem_value){
+            tem_value=value;
+            tem_ip=key
+
+              }
+            }
+                ganador=tem_ip
+                alert(ganador)
+                tem_ip=""
+                tem_value=0;
+        });
         var myMapOptions = new Map();
         var ganador=''
           var video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
@@ -247,7 +269,7 @@ myMapOptions = new Map();
              var duraction=video.duration;
              var resul=duraction-vTime;
      
-     if(time!=-1 &&resul <=(time+280)){ 
+     if(time!=-1 &&resul <=(time)){ 
       document.getElementById("video_principal").removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
         var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
         socket.emit('opciones', {sala : id,opciones:{escenas}});

@@ -73,9 +73,9 @@ document.body.appendChild(document.importNode(getContent, true));
     var cell1 = row.insertCell(0);
     
     var json_con= JSON.parse(LZString.decompressFromBase64(schema[i].json));
-    alert("transmedia: "+JSON.stringify(json_con)); 
+  //  alert("transmedia: "+JSON.stringify(json_con)); 
     cell1.innerHTML = json_con.Titulo;
-    alert(JSON.stringify(schema[i]));
+  //  alert(JSON.stringify(schema[i]));
     
 
     var cell2 = row.insertCell(1);
