@@ -353,7 +353,7 @@
                 if (type === 'root.upload_fail') cbs.failure('Upload failed');
                 else {
                     var tick = 0;
-
+ cbs.success(file.name);
                     var tickFunction = function() {
                         tick += 20;
                         console.log('progress: ' + tick);

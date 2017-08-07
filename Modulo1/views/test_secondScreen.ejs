@@ -20,7 +20,7 @@
 	    <input type="text" name="chatTxt" /> <input type="button" name="sendBtn" value="Send" />
 	</div>
 	<br />
-	<div id="content"></div>
+	<div id="content" style="color: red;background: #D3D3D3"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="../javascripts/qart.js"></script>
@@ -33,15 +33,18 @@
         var ip = <%- JSON.stringify(ipS1) %>;
         var puerto = <%- JSON.stringify(puertoS1) %>;
         var urlFinal = 'ws://'+ip+':'+puerto;
+            var ip_chat = <%- JSON.stringify(ip_chat) %>;
+        var puerto_chat = <%- JSON.stringify(puerto_chat) %>;
+                var urlFinal_chat = 'ws://'+ip_chat+':'+puerto_chat;
         alert("urlFinal: "+urlFinal);
-
+ alert("urlFinal_chat: "+urlFinal_chat);
         var url = 'ws://' + 'localhost:3000'; //PONER URL FINAL
-        var socket = io(url);
+        var socket = io(urlFinal);
         socket.on('connect', function() {
         });
 
         var url2 = 'ws://' + 'localhost:3001';///SERVIDOR SOCKET MODULO2 ....PONER EN EL JSON PUERTO 3001 MAS LA IP
-	    var socket2 = io(url2);
+	    var socket2 = io(urlFinal_chat);
 	    socket2.on('connect', function() {
 	        console.log("Connected");
 	    });    

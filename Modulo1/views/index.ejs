@@ -68,7 +68,7 @@
     <div class="row">
 
         <div style="display: none " class="group">
-            <div id="image"><img src="../logo.svg" width="140"></div>
+            <div id="image"><img src="../logo.jpg" width="140"></div>
         </div>
         <div id="div_qr" align="center">
             <div id="combine"></div>
@@ -116,9 +116,9 @@
          var webSocketHost = 'ws://';
         var externalIp = '<%= externalIp%>';
         var puerto='<%= puerto%>'
-        var urlf = 'ws://' + 'localhost:3000'; //PONER URL FINAL
+        //var urlf = 'ws://' + 'localhost:3000'; //PONER URL FINAL
 
-        //var url = webSocketHost + externalIp + ':'+puerto;
+        var url = webSocketHost + externalIp + ':'+puerto;
         var textt = JSON.parse($schema2.value);
          var  Contenido_Trasmedia = JSON.stringify(textt.Contenido_Trasmedia, null, 2);
        var  text = JSON.stringify(textt.Contenido_Live, null, 2);
@@ -132,11 +132,11 @@
         var value = id.toString();
         var filter = 'color';
         var version = 8;
-        var imagePath = '../logo.svg';
+        var imagePath = '../logo.jpg';
         var self = this;
         // abrimos la conexion
        // alert(url)
-        var socket = io(urlf);
+        var socket = io(url);
 
         socket.on('connect', function() {
 

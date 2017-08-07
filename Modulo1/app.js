@@ -55,7 +55,7 @@ app.use(express.cookieParser());
 }));*/
 app.use(cookieParser('my secret here'));
 
-const minute = 1800 * 1000;
+const minute = 10000 * 1000;
 const firebaseConfig = {
     apiKey: 'AIzaSyDy6C7E3ftZNQyUsLbjzAlpFAi0WSVdQs0',
     authDomain: 'config-back-end.firebaseapp.com',
@@ -115,6 +115,73 @@ MongoClient.connect(url, function(err, db) {
         db.close();
     });
 });
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+
+            } else if (result.length > 0) {
+      
+                var url2 = JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Chat_Broadcast.url
+
+                   request.get({
+                    url : url2+'/ips'
+                    },function(err, response){
+                      var ip3m=total=response.body;
+                      getExternalIp(function(externalIp) {
+    console.log(externalIp)
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+        }
+        console.log(externalIp)
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+
+            } else if (result.length > 0) {
+
+                var temp = JSON.parse(lzstring.decompressFromBase64(result[0].json))
+                temp.IP_Servidor_Config.ip = externalIp
+                    temp.IP_Servidor_Chat_Broadcast.ip = ip3m
+                var query2 = {
+                    _id: result[0]._id
+                };
+                  var newvalues = {
+                    $set: {
+                    json: lzstring.compressToBase64(JSON.stringify(temp))
+                    }
+                };
+
+                db.collection("Json_Config_2_Pantalla").update(query2, newvalues, function(err, result) {
+                    if (err) {
+
+                    } else {
+
+                    }
+                });
+            } else {
+            }
+            db.close();
+        });
+    });
+});
+                    });
+            } else {
+            }
+            db.close();
+        });
+    });
+
+
 app.get('/login', function(req, res) {
     //res.render('login_admin', { title: 'Login Admin' });
     res.render('login_admin', {
@@ -356,9 +423,10 @@ app.get('/2v', function(req, res) {
             if (err) {
                 res.render('test_secondScreen', {
                     title: '2 Pantalla DEMO',
-                    msm: 'error al conectar con la base mongodb',
-                    json: '',
-                    ip: ''
+                     ipS1: '',
+                    puertoS1: '',
+                    ip_chat:'',
+                    puerto_chat:''
                 });
                 throw err;
 
@@ -367,30 +435,32 @@ app.get('/2v', function(req, res) {
                 var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
                 var ip = jsonDecomp.IP_Servidor_Config.ip;
                 var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
+                    var ip_chat = jsonDecomp.IP_Servidor_Chat_Broadcast.ip;
+                var socket_chat = jsonDecomp.IP_Servidor_Chat_Broadcast.puertos.socket;
                 console.log("result: " + json);
                 console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
                 console.log("ip: " + JSON.stringify(ip));
                 console.log("ip: " + JSON.stringify(socket));
-       
-                    res.render('test_secondScreen', {
-                        title: '2 Pantalla DEMO',
-                        ipS1: ip,
-                        puertoS1: socket
-                        //ip:externalIp
-                    });
-           
+
+                res.render('test_secondScreen', {
+                    title: '2 Pantalla DEMO',
+                    ipS1: ip,
+                    puertoS1: socket,
+                    ip_chat:ip_chat,
+                    puerto_chat:socket_chat
+                    //ip:externalIp
+                });
+
 
             } else {
-            
-                    res.render('test_secondScreen', {
-                        title: '2 Pantalla DEMO',
-                        json: '',
-                        msm: 'OK',
-                        ip: externalIp
-                    });
 
-            
-
+                res.render('test_secondScreen', {
+                    title: '2 Pantalla DEMO',
+                    ipS1: '',
+                    puertoS1: '',
+                    ip_chat:'',
+                    puerto_chat:''
+                        });
             }
             console.log(result.length);
             db.close();
@@ -519,23 +589,23 @@ app.get('/num_usuarios', function(req, res) {
                 console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
                 console.log("ip: " + JSON.stringify(ip));
                 console.log("ip: " + JSON.stringify(socket));
- 
-                    res.render('num_usuarios', {
-                        title: 'Usuarios',
-                        ip: ip,
-                        puerto: socket
-                        //ip:externalIp
-                    });
-            
+
+                res.render('num_usuarios', {
+                    title: 'Usuarios',
+                    ip: ip,
+                    puerto: socket
+                    //ip:externalIp
+                });
+
 
             } else {
 
-                    res.render('num_usuarios', {
-                        title: 'Usuarios',
-                        json: '',
-                        msm: 'OK',
-                        ip: externalIp
-                    });
+                res.render('num_usuarios', {
+                    title: 'Usuarios',
+                    json: '',
+                    msm: 'OK',
+                    ip: externalIp
+                });
 
 
             }
@@ -1150,30 +1220,26 @@ app.get('/config_json_2_pantalla', function(req, res) {
                 res.render('config_json_2_pantalla', {
                     title: 'Configuración Json',
                     msm: 'error al conectar con la base mongodb',
-                    json: '',
-                    ip: ''
+                    json: ''
                 });
                 throw err;
 
             } else if (result.length > 0) {
 
                 console.log(JSON.stringify(result[0].json))
-                getExternalIp(function(externalIp) {
                     res.render('config_json_2_pantalla', {
                         title: 'Configuración Json',
                         json: result[0].json,
-                        msm: 'OK',
-                        ip: externalIp
+                        msm: 'OK'
                     });
-                });
+                
 
             } else {
                 getExternalIp(function(externalIp) {
                     res.render('config_json_2_pantalla', {
                         title: 'Configuración Json',
                         json: '',
-                        msm: 'OK',
-                        ip: externalIp
+                        msm: 'OK'
                     });
 
                 });
@@ -1260,7 +1326,7 @@ io.sockets.on('connection', function(socket) {
         console.log('Opciones:', data.opciones);
         io.to(data.sala).emit('op_second_screen', data.opciones);
     });
-        socket.on('mensaje', function(data) {
+    socket.on('mensaje', function(data) {
         // transmitimos el movimiento a todos los clienntes conectados
         io.sockets.emit('mensaje2', {
             data: data
@@ -1271,19 +1337,21 @@ io.sockets.on('connection', function(socket) {
         console.log('Sala:-------------------', data.sala.toString());
         console.log('Sala:', data);
         socket.join(data.sala);
-        if(data.admin!=null && data.admin){
-             console.log('entro if');
-        map_ids_contenido_sala.set(data.sala.toString(), data.ctm);
-         var contm=map_ids_contenido_sala.get(data.sala.toString())
-        console.log(contm)
-        }
-        else{
-             console.log('entro else:', data);
-        var msm="te has conectado a la sala" + data.sala;
-        var contm=map_ids_contenido_sala.get(data.sala)
-        console.log(msm)
-        console.log(contm)
-        socket.emit('confirmacion_join', {msm:msm, contenido_transmedia:contm});   
+        if (data.admin != null && data.admin) {
+            console.log('entro if');
+            map_ids_contenido_sala.set(data.sala.toString(), data.ctm);
+            var contm = map_ids_contenido_sala.get(data.sala.toString())
+            console.log(contm)
+        } else {
+            console.log('entro else:', data);
+            var msm = "te has conectado a la sala" + data.sala;
+            var contm = map_ids_contenido_sala.get(data.sala)
+            console.log(msm)
+            console.log(contm)
+            socket.emit('confirmacion_join', {
+                msm: msm,
+                contenido_transmedia: contm
+            });
         }
 
     });
@@ -1307,11 +1375,11 @@ app.get('/movies/:movieName', (req, res) => {
 
     screen(movieFile, res, req);
 });
-app.post('/upload', function(req, res){
+app.post('/upload', function(req, res) {
     //El modulo 'fs' (File System) que provee Nodejs nos permite manejar los archivos
     var json_con = req.body.output2;
     var ID = req.body.IDescena;
-      console.log(ID)
+    console.log(ID)
     console.log(json_con)
     json_con = lzstring.compressToBase64(json_con);
     MongoClient.connect(url, function(err, db) {
