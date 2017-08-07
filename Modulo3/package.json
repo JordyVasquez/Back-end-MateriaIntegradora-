@@ -13,7 +13,6 @@
     "io": "^0.1.10",
     "method-override": "^2.1.2",
     "mongoose": "^3.6.20",
-    "redis": "^2.7.1",
     "socket.io": "^1.0.6"
   },
   "engines": {
