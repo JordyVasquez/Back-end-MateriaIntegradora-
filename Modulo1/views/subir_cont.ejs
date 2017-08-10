@@ -54,6 +54,7 @@
             </form>
             <form action="/upload" method='POST' id='subir2' name="subir2">
                 <input id='output2' type='hidden' name='output2' style='width: 100%; height: 450px; font-family: monospace;' class='form-control'></input>
+                <input id='outputbefore' type='hidden' name='outputbefore' style='width: 100%; height: 450px; font-family: monospace;' class='form-control'></input>
                 <input id='IDescena' type='hidden' name='IDescena' class='form-control'></input>
             </form>
  
@@ -114,12 +115,74 @@
                 upload.resume();
             });
 
+            function deletefiles(names,z) {
+
+// Create a reference to the file to delete
+alert("voy a borar")
+alert(names[z])
+                var desertRef = storageRef.child(names[z]);
+
+                // Delete the file
+                desertRef.delete().then(function() {
+                  if(names.length<(z+1)){
+                    deletefiles(names,z+1)
+
+                  }
+                  else{
+                      document.subir2.submit();
+                  }
+                }).catch(function(error) {
+                    alert("errro al borra el archivo :"+ name + "  causa :"+ error)
+                    if(names.length<(z+1)){
+                    deletefiles(names,z+1)
+
+                  }
+                  else{
+                      document.subir2.submit();
+                  }
+                  // Uh-oh, an error occurred!
+                });
+
+            }
+            function filesDeletes(str, after){
+                var myRe = /\bhttps:\/\/[^"\s]+/;
+                var myArray = str.match(myRe);
+                var listUrls=[]
+                var listUrlsre=[]
+                while(myArray!=null && myArray[0].localeCompare("")!=0){
+                listUrls.push(myArray[0])
+                str=str.replace(myArray,"")
+                myArray = str.match(myRe);
+                }
+                alert(listUrls)
+                for (var i = 0; i < listUrls.length; i++) {
+                    if(!after.includes(listUrls[i])){
+                        var myRe2 = /\bo\/[^?]+/;
+                        var name = listUrls[i].match(myRe2);
+                     listUrlsre.push(name[0].replace("o/",""))
+                    }
+                }
+                return listUrlsre;
+            }
             function veificaNull() {
 
 
                 if ($("input:file").length == index) {
                     $('#div_barra').hide();
-                    document.subir2.submit();
+                    var $schemabefore = document.getElementById('outputbefore');
+                    var $schemaafter = document.getElementById('output2');
+                    alert($schemabefore.value)
+                    alert($schemaafter.value)
+                    var fls=filesDeletes($schemabefore.value,$schemaafter.value)
+                    alert(fls)
+                    if(fls!=null && fls.length>0){
+                        deletefiles(fls,0);
+                    }
+                    else {
+                          document.subir2.submit();
+                    }
+                    
+                  
                 }
                 if ($("input:file").length > index) {
                     var file = $("input:file")[index].files[0];
@@ -227,6 +290,7 @@
             JSONEditor.defaults.options.form_name_root = false;
             // Divs/textareas on the page
             var $output = document.getElementById('output');
+            var $outputbefor = document.getElementById('outputbefore');
             var $editor = document.getElementById('editor');
             var $validate = document.getElementById('validate');
             var estadoEscena = false;
@@ -264,6 +328,7 @@
                                 //alert("b");   
                                 estadoEscena = true;
                                 $output.value = escena;
+                                $outputbefor.value = escena;
                             } else {
                                 //alert("c"); 
                                 $output.value = JSON.stringify(json, null, 2);
@@ -353,7 +418,6 @@
                 if (type === 'root.upload_fail') cbs.failure('Upload failed');
                 else {
                     var tick = 0;
- cbs.success(file.name);
                     var tickFunction = function() {
                         tick += 20;
                         console.log('progress: ' + tick);
