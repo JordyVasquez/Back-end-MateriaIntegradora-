@@ -63,10 +63,30 @@ document.body.appendChild(document.importNode(getContent, true));
     <script src="js/bootstrap.min.js"></script>
         <script src="js/dataTable.js"></script>
              <script src='js/LZString.js'></script>
+             <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
      <script> 
      var schema;
             schema =  <%- JSON.stringify(resultado) %>;
               var table = document.getElementById("table_con").getElementsByTagName("tbody")[0];
+               firebase.initializeApp(<%- JSON.stringify(firebaseConfig, null, 2) %>);
+
+
+
+            var upload;
+            var index = 0;
+            // reference to the root of the storage bucket
+            var storageRef = firebase.storage().ref();
+
+            $("#pause-upload").click(function(e) {
+                upload.pause();
+            });
+
+            $("#resume-upload").click(function(e) {
+                upload.resume();
+            });
             for (var i = 0; i < schema.length; i++) {
              
     var row = table.insertRow(0);
@@ -111,13 +131,74 @@ document.body.appendChild(document.importNode(getContent, true));
              $('#delete').click( function () {
                   $("#actividad").val('delete');
                   $("#ID").val($("tr.selected").find("td").eq(1).html());
-                  document.subir.submit();
+                     for (var i = 0; i < schema.length; i++) {
+                          if(schema[i].ID.localeCompare($("tr.selected").find("td").eq(1).html())==0){
+                              var fls=filesDeletes(LZString.decompressFromBase64(schema[i].json));
+                              alert("jsona borarr")
+                              alert(fls)
+                            if(fls!=null && fls.length>0){
+                        deletefiles(fls,0);
+                    }
+                     else {
+                          document.subir.submit();
+                    }
+                          }
+
+                     }
+                 
     } );
                     $('#new').click( function () {
                              window.location.href = "subir_cont"
     } );      
 });
+               function filesDeletes(str){
+                var myRe = /\bhttps:\/\/[^"\s]+/;
+                var myArray = str.match(myRe);
+                var listUrls=[]
+                var listUrlsre=[]
+                while(myArray!=null && myArray[0].localeCompare("")!=0){
+                listUrls.push(myArray[0])
+                str=str.replace(myArray,"")
+                myArray = str.match(myRe);
+                }
+                for (var i = 0; i < listUrls.length; i++) {
+                        var myRe2 = /\bo\/[^?]+/;
+                        var name = listUrls[i].match(myRe2);
+                     listUrlsre.push(name[0].replace("o/",""))
+                    
+                }
+                return listUrlsre;
+            }
+            function deletefiles(names,z) {
 
+// Create a reference to the file to delete
+alert("voy a borar")
+alert(names)
+alert(names[z])
+                var desertRef = storageRef.child(names[z]);
+
+                // Delete the file
+                desertRef.delete().then(function() {
+                  if(names.length<(z+1)){
+                    deletefiles(names,z+1)
+
+                  }
+                  else{
+                      document.subir.submit();
+                  }
+                }).catch(function(error) {
+                    alert("errro al borra el archivo :"+ name + "  causa :"+ error)
+                    if(names.length<(z+1)){
+                    deletefiles(names,z+1)
+
+                  }
+                  else{
+                      document.subir.submit();
+                  }
+                  // Uh-oh, an error occurred!
+                });
+
+            }
             </script>
   </body> 
 </html>

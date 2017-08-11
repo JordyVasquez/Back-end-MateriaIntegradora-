@@ -88,8 +88,8 @@ if ('development' == app.get('env')) {
 MongoClient.connect(url, function(err, db) {
     if (err) {
         throw err;
-        server1.listen(3000);
-        console.log("puerto para socket: 3000")
+        server1.listen(9999);
+        console.log("puerto para socket: 9999")
 
     }
     var query = {
@@ -99,16 +99,16 @@ MongoClient.connect(url, function(err, db) {
         if (err) {
 
             throw err;
-            server1.listen(3000);
-            console.log("puerto para socket: 3000")
+            server1.listen(9999);
+            console.log("puerto para socket: 9999")
         } else if (result.length > 0) {
             server1.listen(JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Config.puertos.socket)
             console.log("puerto para socket:" + JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Config.puertos.socket)
 
 
         } else {
-            server1.listen(3000);
-            console.log("puerto para socket: 3000")
+            server1.listen(9999);
+            console.log("puerto para socket: 9999")
 
         }
         console.log(result.length);
@@ -116,70 +116,71 @@ MongoClient.connect(url, function(err, db) {
     });
 });
 
-    MongoClient.connect(url, function(err, db) {
+MongoClient.connect(url, function(err, db) {
+    if (err) {
+        throw err;
+    }
+    var query = {
+        name: "config"
+    };
+    db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
         if (err) {
-            throw err;
-        }
-        var query = {
-            name: "config"
-        };
-        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
-            if (err) {
 
-            } else if (result.length > 0) {
-      
-                var url2 = JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Chat_Broadcast.url
+        } else if (result.length > 0) {
 
-                   request.get({
-                    url : url2+'/ips'
-                    },function(err, response){
-                      var ip3m=total=response.body;
-                      getExternalIp(function(externalIp) {
-    console.log(externalIp)
-    MongoClient.connect(url, function(err, db) {
-        if (err) {
-            throw err;
-        }
-        console.log(externalIp)
-        var query = {
-            name: "config"
-        };
-        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
-            if (err) {
+            var url2 = JSON.parse(lzstring.decompressFromBase64(result[0].json)).IP_Servidor_Chat_Broadcast.url
 
-            } else if (result.length > 0) {
+            request.get({
+                url: url2 + '/ips'
+            }, function(err, response) {
+                var ip3m = total = response.body;
+                getExternalIp(function(externalIp) {
+                    console.log(externalIp)
+                    if(externalIp.localeCompare("localhost")!=0)
+                    {
+                    MongoClient.connect(url, function(err, db) {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log(externalIp)
+                        var query = {
+                            name: "config"
+                        };
+                        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result2) {
+                            if (err) {
 
-                var temp = JSON.parse(lzstring.decompressFromBase64(result[0].json))
-                temp.IP_Servidor_Config.ip = externalIp
-                    temp.IP_Servidor_Chat_Broadcast.ip = ip3m
-                var query2 = {
-                    _id: result[0]._id
-                };
-                  var newvalues = {
-                    $set: {
-                    json: lzstring.compressToBase64(JSON.stringify(temp))
-                    }
-                };
+                            } else if (result2.length > 0) {
 
-                db.collection("Json_Config_2_Pantalla").update(query2, newvalues, function(err, result) {
-                    if (err) {
+                                var temp = JSON.parse(lzstring.decompressFromBase64(result2[0].json))
+                                temp.IP_Servidor_Config.ip = externalIp
+                                temp.IP_Servidor_Chat_Broadcast.ip = ip3m
+                                var query2 = {
+                                    _id: result2[0]._id
+                                };
+                                var newvalues = {
+                                    $set: {
+                                        json: lzstring.compressToBase64(JSON.stringify(temp))
+                                    }
+                                };
 
-                    } else {
+                                db.collection("Json_Config_2_Pantalla").update(query2, newvalues, function(err, result3) {
+                                    if (err) {
 
-                    }
-                });
-            } else {
+                                    } else {
+
+                                    }
+                                });
+                            } else {}
+                            db.close();
+                        });
+                    });
             }
-            db.close();
-        });
+                });
+            });
+        } else {}
+        db.close();
     });
 });
-                    });
-            } else {
-            }
-            db.close();
-        });
-    });
 
 
 app.get('/login', function(req, res) {
@@ -265,7 +266,7 @@ var schema = '[' +
     '}]},' +
     '{"server2":[{' +
     '"ip":"localhost",' +
-    '"port":"3000"' +
+    '"port":"9999"' +
     '}]},' +
     '{"server3":[{' +
     '"ip":"localhost",' +
@@ -360,13 +361,13 @@ app.get('/escenas/*', function(req, res) {
                     if (err) {
 
                         throw err;
-                        console.log("puerto para socket: 3000")
+                        console.log("puerto para socket: 9999")
 
                         res.render('index', {
                             title: '1 Pantalla DEMO',
                             escenas: result[0].json,
                             externalIp: 'localhost',
-                            puerto: 3000
+                            puerto: 9999
                         });
                     } else if (result2.length > 0) {
 
@@ -382,13 +383,13 @@ app.get('/escenas/*', function(req, res) {
 
 
                     } else {
-                        console.log("puerto para socket: 3000")
+                        console.log("puerto para socket: 9999")
 
                         res.render('index', {
                             title: '1 Pantalla DEMO',
                             escenas: result[0].json,
                             externalIp: 'localhost',
-                            puerto: 3000
+                            puerto: 9999
                         });
 
 
@@ -423,10 +424,10 @@ app.get('/2v', function(req, res) {
             if (err) {
                 res.render('test_secondScreen', {
                     title: '2 Pantalla DEMO',
-                     ipS1: '',
+                    ipS1: '',
                     puertoS1: '',
-                    ip_chat:'',
-                    puerto_chat:''
+                    ip_chat: '',
+                    puerto_chat: ''
                 });
                 throw err;
 
@@ -435,7 +436,7 @@ app.get('/2v', function(req, res) {
                 var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
                 var ip = jsonDecomp.IP_Servidor_Config.ip;
                 var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
-                    var ip_chat = jsonDecomp.IP_Servidor_Chat_Broadcast.ip;
+                var ip_chat = jsonDecomp.IP_Servidor_Chat_Broadcast.ip;
                 var socket_chat = jsonDecomp.IP_Servidor_Chat_Broadcast.puertos.socket;
                 console.log("result: " + json);
                 console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
@@ -446,8 +447,8 @@ app.get('/2v', function(req, res) {
                     title: '2 Pantalla DEMO',
                     ipS1: ip,
                     puertoS1: socket,
-                    ip_chat:ip_chat,
-                    puerto_chat:socket_chat
+                    ip_chat: ip_chat,
+                    puerto_chat: socket_chat
                     //ip:externalIp
                 });
 
@@ -458,9 +459,9 @@ app.get('/2v', function(req, res) {
                     title: '2 Pantalla DEMO',
                     ipS1: '',
                     puertoS1: '',
-                    ip_chat:'',
-                    puerto_chat:''
-                        });
+                    ip_chat: '',
+                    puerto_chat: ''
+                });
             }
             console.log(result.length);
             db.close();
@@ -638,7 +639,8 @@ app.post('/admin_cont_sub', function(req, res) {
                             if (err) throw err;
                             res.render('contenidos_subidos', {
                                 title: 'Escenas Guardadas',
-                                resultado: result
+                                resultado: result,
+                    firebaseConfig: firebaseConfig
                             });
                             db.close();
                         });
@@ -1106,7 +1108,8 @@ app.get('/contenidos_subidos', function(req, res, next) {
             if (err) throw err;
             res.render('contenidos_subidos', {
                 title: 'Escenas Guardadas',
-                resultado: result
+                resultado: result,
+                firebaseConfig: firebaseConfig
             });
             console.log("escenas: " + JSON.stringify(result));
             db.close();
@@ -1227,22 +1230,21 @@ app.get('/config_json_2_pantalla', function(req, res) {
             } else if (result.length > 0) {
 
                 console.log(JSON.stringify(result[0].json))
-                    res.render('config_json_2_pantalla', {
-                        title: 'Configuración Json',
-                        json: result[0].json,
-                        msm: 'OK'
-                    });
-                
+                res.render('config_json_2_pantalla', {
+                    title: 'Configuración Json',
+                    json: result[0].json,
+                    msm: 'OK'
+                });
+
 
             } else {
-                getExternalIp(function(externalIp) {
                     res.render('config_json_2_pantalla', {
                         title: 'Configuración Json',
                         json: '',
                         msm: 'OK'
                     });
 
-                });
+          
 
             }
             console.log(result.length);
@@ -1412,7 +1414,8 @@ app.post('/upload', function(req, res) {
                                 if (err) throw err;
                                 res.render('contenidos_subidos', {
                                     title: 'Escenas Guardadas',
-                                    resultado: result
+                                    resultado: result,
+                    firebaseConfig: firebaseConfig
                                 });
                                 console.log("result: " + JSON.stringify(result));
                                 db.close();
@@ -1433,7 +1436,8 @@ app.post('/upload', function(req, res) {
                                 if (err) throw err;
                                 res.render('contenidos_subidos', {
                                     title: 'Escenas Guardadas',
-                                    resultado: result
+                                    resultado: result,
+                    firebaseConfig: firebaseConfig
                                 });
                                 db.close();
                             });
