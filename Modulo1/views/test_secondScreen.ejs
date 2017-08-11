@@ -37,9 +37,10 @@
         var puerto_chat = <%- JSON.stringify(puerto_chat) %>;
                 var urlFinal_chat = 'ws://'+ip_chat+':'+puerto_chat;
         alert("urlFinal: "+urlFinal);
- alert("urlFinal_chat: "+urlFinal_chat);
+ 		alert("urlFinal_chat: "+urlFinal_chat);
         var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
-        var socket = io(urlFinal);
+        //var socket = io(urlFinal);
+        var socket = io(url);
         socket.on('connect', function() {
         });
 

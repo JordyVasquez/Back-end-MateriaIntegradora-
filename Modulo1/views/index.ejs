@@ -169,7 +169,7 @@
         $schema2.value = JSON.stringify(schema, null, 2);
 
         var contador = 0;
-        $('#con').html(contador);
+        //$('#con').html(contador);
         /*sserver.on('message', function(message) {
             // Expect message to be '31415'.
           contador=contador+1;
@@ -215,6 +215,17 @@
             });
 
         });
+        
+        socket.on('connections', function(data) {
+           $('#con').html(data.connections);
+
+        });
+        socket.on('disconnect', function(data) {
+           $('#con').html(data.connections);
+
+        });
+        
+
         var btnplay = document.getElementById("play");
         btnplay.addEventListener('click', play);
         var video = document.getElementById("video_principal");
