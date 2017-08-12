@@ -39,9 +39,9 @@
         alert("urlFinal: "+urlFinal);
 
  		alert("urlFinal_chat: "+urlFinal_chat);
-       // var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
+        var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
         //var socket = io(urlFinal);
-        var socket = io(urlFinal);
+        var socket = io(url);
         socket.on('connect', function() {
         });
 

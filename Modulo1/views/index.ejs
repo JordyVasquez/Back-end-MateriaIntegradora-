@@ -183,7 +183,7 @@
         var webSocketHost = 'ws://';
         var externalIp = '<%= externalIp%>';
         var puerto='<%= puerto%>'
-        //var urlf = 'ws://' + 'localhost:9999'; //PONER URL FINAL
+        var urlf = 'ws://' + 'localhost:9999'; //PONER URL FINAL
 
         var url = webSocketHost + externalIp + ':'+puerto;
         var textt = JSON.parse($schema2.value);
@@ -203,9 +203,9 @@
         var self = this;
         // abrimos la conexion
 
-        // alert(url)
-        var socket = io(url);
-        //var socket = io(urlf);  
+        
+        //var socket = io(url);
+        var socket = io(urlf); ///CAMBIAR POR URL 
 
         socket.on('connect', function() {
 
