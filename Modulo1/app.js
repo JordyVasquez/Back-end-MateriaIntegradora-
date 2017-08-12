@@ -35,10 +35,12 @@ var app_chat = require('express')();
 var server1 = require('http').Server(app_chat);
 var io = require('socket.io')(server1);
 var map_ids_idsonido = new HashMap();
+var hash_cont_conectados = new HashMap();
 var flagSession = false;
 var cerrar = false;
 var now = null;
 var expired = null;
+var usuarios_sincronizados = 0;
 var map_ids_contenido_sala = new HashMap();
 app.engine('.html', cons.jade);
 app.set('view engine', 'html');
@@ -1357,11 +1359,27 @@ io.sockets.on('connection', function(socket) {
             var contm = map_ids_contenido_sala.get(data.sala.toString())
             console.log(contm)
         } else {
+            if(hash_cont_conectados.get(data.sala)){
+                
+                var cont = (hash_cont_conectados.get(data.sala)) + 1;
+                hash_cont_conectados.set(data.sala, cont);  
+                console.log("Get conectados: "+hash_cont_conectados.get(data.sala));  
+
+            }
+            else{
+                console.log("cont 1 -> sala nueva");
+                hash_cont_conectados.set(data.sala, 1);
+            }
+            socket.broadcast.to(data.sala).emit('usuarios_sincronizados', {
+                    connections: (io.sockets.adapter.rooms[data.sala].length)-1
+            });
+            
+
             console.log('entro else:', data);
             var msm = "te has conectado a la sala" + data.sala;
             var contm = map_ids_contenido_sala.get(data.sala)
-            console.log(msm)
-            console.log(contm)
+            console.log("msm: "+msm);
+            console.log("contm: "+contm);
             socket.emit('confirmacion_join', {
                 msm: msm,
                 contenido_transmedia: contm
@@ -1374,12 +1392,37 @@ io.sockets.on('connection', function(socket) {
     socket.on('disconnect', function() {
         connections--;
         console.log('connected', connections);
+        var rooms = io.sockets.adapter.rooms;
+        console.log("keys: "+hash_cont_conectados.keys());
+        var keys = hash_cont_conectados.keys();
+        for (var i=0; i< hash_cont_conectados.keys().length; i++) {
+            
+            var sala = keys[i];
+            console.log("Meth Disconnect salaID: "+sala);
+            try{
+                var cont = io.sockets.adapter.rooms[sala].length-1;
+                console.log("disconnect "+sala+"-> "+(cont));
+                socket.broadcast.to(sala).emit('usuarios_sincronizados', {
+                        connections: (io.sockets.adapter.rooms[sala].length)-1
+                 });
+            }
+            catch(err){
+                console.log("sala "+ sala+" conectados: 0");
+                break;
+            }
+            
+           
+          
+        }
+
+
+    
         socket.broadcast.emit('connections', {
             connections: connections
         });
     });
 
-    //socket.emit('ips', ipsJson);
+    
 
 
 });

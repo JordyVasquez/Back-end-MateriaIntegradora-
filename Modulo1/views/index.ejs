@@ -7,6 +7,67 @@
     <link rel="stylesheet" href="../stylesheets/style.css">
     <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
+        .loader {
+          font-size: 10px;
+          margin: 30% auto;
+          text-indent: -9999em;
+          width: 11em;
+          height: 11em;
+          border-radius: 50%;
+          background: #ffffff;
+          background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+          background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+          background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+          background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+          background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+          position: relative;
+          -webkit-animation: load3 1.4s infinite linear;
+          animation: load3 1.4s infinite linear;
+        }
+        .loader:before {
+          width: 50%;
+          height: 50%;
+          background: #FFF;
+          border-radius: 100% 0 0 0;
+          position: absolute;
+          top: 0;
+          left: 0;
+          content: '';
+        }
+        .loader:after {
+          background: #0dcecb;
+          width: 75%;
+          height: 75%;
+          border-radius: 50%;
+          content: '';
+          margin: auto;
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+        }
+        @-webkit-keyframes load3 {
+          0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+          }
+          100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes load3 {
+          0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+          }
+          100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+        
         .group {
             display: flex;
             align-items: center;
@@ -45,11 +106,17 @@
 
 <body style="text-align:center">
     <div class="container-fluid">
-        <div style="margin:0 0;" class="row">
-            <!-- Mude o src dessa tag para o nome do video que você possuir -->
-            <video id="video_principal" class="bg-video">
+        <div id="div_principal" style="margin:0 0;" class="row">
+            <!-- Mude o src dessa tag para o nome do video que você possuir 
+            <video id="video_principal" class="bg-video" controls="controls">
                    HTML5 Video is required for this example
-                 </video>
+            </video>-->
+            <!--<video style="display: none" id="generico1" class="bg-video">
+                   HTML5 Video is required for this example
+            </video>
+            <video style="display: none" id="generico2" class="bg-video">
+                   HTML5 Video is required for this example
+            </video>-->
 
 
 
@@ -102,7 +169,7 @@
         $schema2.value = JSON.stringify(schema, null, 2);
 
         var contador = 0;
-        $('#con').html(contador);
+        //$('#con').html(contador);
         /*sserver.on('message', function(message) {
             // Expect message to be '31415'.
           contador=contador+1;
@@ -113,15 +180,15 @@
                 invitado: message
             })
         });*/
-         var webSocketHost = 'ws://';
+        var webSocketHost = 'ws://';
         var externalIp = '<%= externalIp%>';
         var puerto='<%= puerto%>'
         var urlf = 'ws://' + 'localhost:9999'; //PONER URL FINAL
 
-        var url = webSocketHost + externalIp + ':'+puerto;
+        //var url = webSocketHost + externalIp + ':'+puerto;
         var textt = JSON.parse($schema2.value);
-         var  Contenido_Trasmedia = JSON.stringify(textt.Contenido_Trasmedia, null, 2);
-       var  text = JSON.stringify(textt.Contenido_Live, null, 2);
+        var  Contenido_Trasmedia = JSON.stringify(textt.Contenido_Trasmedia, null, 2);
+        var  text = JSON.stringify(textt.Contenido_Live, null, 2);
            
         alert(text);
         alert(Contenido_Trasmedia);
@@ -135,8 +202,10 @@
         var imagePath = '../logo.png';
         var self = this;
         // abrimos la conexion
-       // alert(url)
-        var socket = io(urlf);
+
+        // alert(url)
+        var socket = io(url);
+        //var socket = io(urlf);  
 
         socket.on('connect', function() {
 
@@ -147,35 +216,99 @@
             });
 
         });
+        
+        socket.on('usuarios_sincronizados', function(data) {
+           $('#con').html(data.connections);
+
+        });
+        socket.on('disconnect', function(data) {
+           $('#con').html(data.connections);
+
+        });
+        
+
+        
+        /*var video = document.getElementById("video_principal");
+        var inicio = searchInicio(videos_seq)
+        alert("videos_seq: "+JSON.stringify(videos_seq));
+        video.src = inicio.Escena;
+        video.controls = true;*/
+               
+        //video.setAttribute("preload", "auto");
+        //var video = document.getElementById("generico1");
+
+        
+        
+        var map_videos = new Map();
+        var escenas_all = videos_seq.Escenas[0];
+        //alert("escena 0: "+videos_seq.Escenas.length);
+        for(var i=0; i<videos_seq.Escenas.length; i++){
+            var videoE = document.createElement('video');
+            videoE.setAttribute("id", videos_seq.Escenas[i].Name_Escena);
+            //alert("escena: "+videos_seq.Escenas[i].Escena);
+            videoE.src = videos_seq.Escenas[i].Escena;
+            videoE.setAttribute("preload", "auto");
+            //alert("nombre: "+videos_seq.Escenas[i].Name_Escena);
+            videoE.style.display = "none";
+            divPrincipal = document.getElementById("div_principal");
+            divPrincipal.appendChild(videoE);
+            map_videos.set(videos_seq.Escenas[i].Name_Escena, videos_seq.Escenas[i].Escena);
+
+        }
+        var inicio = searchInicio(videos_seq);
+        alert("inicio: "+inicio.Name_Escena);
+        var video = document.getElementById(inicio.Name_Escena);
+        video.src = inicio.Escena;
+        video.controls = true;
+        video.setAttribute("preload", "auto"); // if HTML source element is used
+        var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
+        var current_video = inicio.Name_Escena;
+        document.getElementById(current_video).style.display = "block";
         var btnplay = document.getElementById("play");
         btnplay.addEventListener('click', play);
-        var video = document.getElementById("video_principal");
-        var inicio = searchInicio(videos_seq)
-       // video.src = inicio.Escena;
-      video.src = inicio.Escena
-        video.load(); // if HTML source element is used
+       
+
+        /*for(var i=0; i<escenas.length; i++){
+            var videoE = document.createElement('video');
+            videoE.setAttribute("id", escenas[i].Name_Escena);
+            alert("escena: "+escenas[i].Escena);
+            videoE.src = escenas[i].Escena;
+            videoE.setAttribute("preload", "auto");
+            alert("nombre: "+escenas[i].Name_Escena);
+            videoE.style.display = "none";
+            divPrincipal = document.getElementById("div_principal");
+            divPrincipal.appendChild(videoE);
+            map_videos.set(escenas[i].Name_Escena, escenas[i].Escena);
+
+        }*/
+
+
+             
+        
         seteaMetodos(inicio,videos_seq)
      
-     socket.on('conectando_users', function(e) {
+        socket.on('conectando_users', function(e) {
             
             var tem_value=0
             var tem_ip=''
             for (var [key, value] of myMapOptions) {
-                alert(value)
+              alert(value)
               if(value>tem_value){
-            tem_value=value;
-            tem_ip=key
+                tem_value=value;
+                tem_ip=key
 
               }
             }
-                ganador=tem_ip
-                alert(ganador)
-                tem_ip=""
-                tem_value=0;
+            ganador=tem_ip
+            alert(ganador)
+            tem_ip=""
+            tem_value=0;
         });
+        
         var myMapOptions = new Map();
         var ganador=''
-          var video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+        var video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+        
         socket.on('opcion_1c', function(e) {
             if(myMapOptions.has(e)){
                 myMapOptions.set(e,myMapOptions.get(e)+1)
@@ -188,105 +321,162 @@
             for (var [key, value] of myMapOptions) {
                 alert(value)
               if(value>tem_value){
-            tem_value=value;
-            tem_ip=key
+                tem_value=value;
+                tem_ip=key
 
               }
             }
-                ganador=tem_ip
-                alert(ganador)
-                tem_ip=""
-                tem_value=0;
+            ganador=tem_ip
+            alert(ganador)
+            tem_ip=""
+            tem_value=0;
         });
+
+
         function endedSinIteraccion() {                    
-            var escenas = video_default;                       
+            var escenas = video_default;  
             if(escenas.length!=0){
-            video.src = escenas.Escena;
-             video.play();
-            inicio=escenas
-             seteaMetodos(inicio,videos_seq);
-             myMapOptions = new Map(); 
-             ganador=''
-             video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
-            
+              if(map_videos.get(escenas.Name_Escena)){
+                       video =document.getElementById(escenas.Name_Escena); 
+                       video.src = map_videos.get(escenas.Name_Escena);  
+                       alert("enter2" + video.src); 
+                       document.getElementById(current_video).style.display = "none";
+                       document.getElementById(escenas.Name_Escena).style.display = "block";
+                       video.controls = true;
+                       //video.load() 
+                       video.play();
+                       document.getElementById(current_video).removeEventListener("ended", endedSinIteraccion); 
+                       current_video = escenas.Name_Escena;
+                       inicio=escenas;
+                       ganador=''
+                       video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+                       seteaMetodos(inicio,videos_seq);
+                       myMapOptions = new Map();
             }
+          }
              
-             document.getElementById("video_principal").removeEventListener("ended", endedSinIteraccion);
+          
 
-           
-            //video.src = fileURL;
-            //video.load();  // if HTML source elementj is used
-            //video.play();
         }
-         function seteaMetodos(inici,videos_se) {                    
+
+        function seteaMetodos(inici,videos_se) {  
+                //alert("ENTER seteaMetodos: "+inici.Escena);                  
                if(isVideoInteraccion(inici.Escena, videos_se)){
-          video.addEventListener("timeupdate",sendVideoOnArrayInteraccion);
-           video.addEventListener("ended",endedConIteraccion);
+                  //alert("SM con Interaccion: "+inici.Escena);
+                  video.addEventListener("timeupdate",sendVideoOnArrayInteraccion);
+                   video.addEventListener("ended",endedConIteraccion);
+                }
+                else {
+                  //alert("SM sin Interaccion: "+inici.Escena);  
+                  video.addEventListener("ended",endedSinIteraccion);
+                }
         }
-        else {
 
-          video.addEventListener("ended",endedSinIteraccion);
-        }
-        }
-         function endedConIteraccion() {  
+        function endedConIteraccion() {  
             if(ganador.localeCompare('')==0){
 
-             var escenas = video_default;
-             if(escenas.length!=0){
-                  video.src = escenas.Escena;
-             video.load() 
-             video.play();
-              inicio=sendEscena(video.src,videos_seq)
-              ganador=''
-             video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
-                  seteaMetodos(inicio,videos_seq);
-                  myMapOptions = new Map();
-}
+                 var escenas = video_default;
+                 alert("video default: "+escenas.Name_Escena);
+                 if(escenas.length!=0){
+                      //alert("enter1: "+escenas.Name_Escena);                    
+                     if(map_videos.get(escenas.Name_Escena)){
+                       video =document.getElementById(escenas.Name_Escena); 
+                       video.src = map_videos.get(escenas.Name_Escena);  
+                       //alert("enter2" + video.src); 
+                       document.getElementById(current_video).style.display = "none";
+                       document.getElementById(escenas.Name_Escena).style.display = "block";
+                       video.controls = true;
+                       video.play();
+                       
+                       document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
+                       current_video = escenas.Name_Escena;
+                       inicio=sendEscena(video.src,videos_seq)
+                       //alert("inicio Interaccion: "+JSON.stringify(inicio));
+                       ganador=''
+                       video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+                       seteaMetodos(inicio,videos_seq);
+                       myMapOptions = new Map();
+                     }
+                }
           
            
             }      
             else{
-             var escenas = ganador;
-             video.src = escenas;
-             video.load()
-              video.play();
-              inicio=sendEscena(video.src,videos_seq)
-              ganador=''
-             video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
-                  seteaMetodos(inicio,videos_seq);
-myMapOptions = new Map();
+                var escenas = ganador;
+                var ganadorID = null;
+                //alert("ganador: "+ganador);
+                for (var [key, value] of map_videos) {
+                  if (map_videos.get(key) == (ganador)) {
+                    ganadorID = key;
+                    alert("ganadorID: "+ganadorID);
+                    break;
+                  }
+                }
+                if(map_videos.get(ganadorID)){
+                    //alert("map_videos.get(ganadorID): "+map_videos.get(ganadorID))
+                    video =document.getElementById(ganadorID);
+                    video.src = map_videos.get(ganadorID);
+                    document.getElementById(current_video).style.display = "none";
+                    document.getElementById(ganadorID).style.display = "block";
+                    video.controls = true;
+                    video.play();
+                    document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
+                    current_video = ganadorID;
+                    
+                    inicio=sendEscena(video.src,videos_seq)
+                    ganador=''
+                    video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+                    seteaMetodos(inicio,videos_seq);
+                    myMapOptions = new Map();
+                }
+                
             }        
-             document.getElementById("video_principal").removeEventListener("ended", endedConIteraccion);
+             //document.getElementById("video_principal").removeEventListener("ended", endedConIteraccion);
             
-            //video.src = fileURL;
-            //video.load();  // if HTML source elementj is used
-            //video.play();
+            
         }
   function sendVideoOnArrayInteraccion() {
-    var time=searchVideoTimeInteraccion(video.src,videos_seq)
+        var time=searchVideoTimeInteraccion(video.src,videos_seq)
   
-            var vTime = video.currentTime;
-             var duraction=video.duration;
-             var resul=duraction-vTime;
-     
-     if(time!=-1 &&resul <=(time)){ 
-      document.getElementById("video_principal").removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
-        var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
-        socket.emit('opciones', {sala : id,opciones:{escenas}});
-              }
-        }
-           function searchVideoDefaultOnArray(Key, myArray) {
-              var escs = [];
-            for (var i = 0; i < myArray.Escenas.length; i++) {
-                  for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
-                        if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0 && myArray.Escenas[i].Default_Escena) {
-                            return myArray.Escenas[i];
-                    }
-                }
+        var vTime = video.currentTime;
+        var duraction=video.duration;
+        var resul=duraction-vTime;
+        
+        if(time!=-1 && resul <=(time)){ 
+            document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
+            var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
+            socket.emit('opciones', {sala : id,opciones:{escenas}});
+            alert("escenas: "+JSON.stringify(escenas));
+            if(resul>=15  && resul<=20){
+                alert("quedan 20");
+                /*for(var i=0; i<escenas.length; i++){
+                  alert("escena: "+escenas[i].Escena);
+                  var escenaDF = document.getElementById("generico"+[i+1]);
+                  escenaDF.src = escenas[i].Escena;
+                  escenaDF.setAttribute("preload", "auto");
+                  alert("nombre: "+escenas[i].Name_Escena);
+
+              }*/
+
             }
-            return escs;
+              
 
         }
+    }
+
+
+   function searchVideoDefaultOnArray(Key, myArray) {
+        var escs = [];
+        for (var i = 0; i < myArray.Escenas.length; i++) {
+              for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
+                    if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0 && myArray.Escenas[i].Default_Escena) {
+                        return myArray.Escenas[i];
+                }
+            }
+        }
+        return escs;
+
+    }
         function searchVideoOnArray(Key, myArray) {
             var escs = [];
             for (var i = 0; i < myArray.Escenas.length; i++) {
@@ -349,7 +539,11 @@ myMapOptions = new Map();
         }
 
         function play() {
-            var video = document.getElementById("video_principal");
+            alert("play: "+current_video);
+            var video = document.getElementById(current_video);
+            alert("Start: " + video.buffered.start(0)
+          + " End: " + video.buffered.end(0));
+     
             this.style.display = 'none'
             var qr = document.getElementById("div_qr");
             qr.style.display = 'none'
