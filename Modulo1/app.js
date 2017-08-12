@@ -567,7 +567,7 @@ app.post('/config_json2', function(req, res) {
 
 app.all('*', verificarSesion2);
 
-app.get('/num_usuarios', function(req, res) {
+app.get('/total_usuarios', function(req, res) {
     MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
@@ -624,10 +624,67 @@ app.get('/num_usuarios', function(req, res) {
             db.close();
         });
     });
-    /*res.render('num_usuarios', {
-      title: 'Usuarios'
-      
-              });*/
+    
+});
+
+app.get('/usuarios_sala', function(req, res) {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
+            throw err;
+            res.render('por_contenido', {
+                title: 'Usuarios total',
+                msm: 'error al conectar con la base mongodb',
+                json: ''
+            });
+
+        }
+        var query = {
+            name: "config"
+        };
+        db.collection("Json_Config_2_Pantalla").find(query).toArray(function(err, result) {
+            if (err) {
+                res.render('por_contenido', {
+                    title: 'Usuarios total',
+                    msm: 'error al conectar con la base mongodb',
+                    json: '',
+                    ip: ''
+                });
+                throw err;
+
+            } else if (result.length > 0) {
+                var json = (result[0].json);
+                var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
+                var ip = jsonDecomp.IP_Servidor_Config.ip;
+                var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
+                console.log("result: " + json);
+                console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
+                console.log("ip: " + JSON.stringify(ip));
+                console.log("ip: " + JSON.stringify(socket));
+
+                res.render('por_contenido', {
+                    title: 'Usuarios total',
+                    ip: ip,
+                    puerto: socket
+                   
+                });
+
+
+            } else {
+
+                res.render('por_contenido', {
+                    title: 'Usuarios total',
+                    json: '',
+                    msm: 'OK',
+                    ip: externalIp
+                });
+
+
+            }
+            console.log(result.length);
+            db.close();
+        });
+    });
+    
 });
 
 app.post('/admin_cont_sub', function(req, res) {
