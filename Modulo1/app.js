@@ -1051,9 +1051,19 @@ app.get('/contenido', function(req, res, next) {
     res.cookie('remember', Number(req.cookies.remember) + 1, {
         maxAge: minute
     });
-    res.render('page_contenido', {
-        title: 'Subir Contenido',
-        Nombre: req.cookies.remember
+       MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        db.collection("Contenidos").find({}).toArray(function(err, result) {
+            if (err) throw err;
+            res.render('contenidos_subidos', {
+                title: 'Escenas Guardadas',
+                resultado: result,
+                firebaseConfig: firebaseConfig
+            });
+            console.log("escenas: " + JSON.stringify(result));
+            db.close();
+        });
+
     });
 
 
@@ -1639,12 +1649,20 @@ app.post('/config_json2', function(req, res) {
                 res.cookie('remember', 1, {
                     maxAge: minute
                 });
-                res.render('contenidos_subidos', {
-                    Titulo: 'contenido',
-                    band: 'true',
-                    Nombre: id_session,
-                    Expire: expired
-                });
+                   MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        db.collection("Contenidos").find({}).toArray(function(err, result) {
+            if (err) throw err;
+            res.render('contenidos_subidos', {
+                title: 'Escenas Guardadas',
+                resultado: result,
+                firebaseConfig: firebaseConfig
+            });
+            console.log("escenas: " + JSON.stringify(result));
+            db.close();
+        });
+
+    });
 
             } else {
                 console.log("inCORRECTO");
@@ -1702,9 +1720,20 @@ app.get('*', function(req, res) {
 
         });
     } else {
-        res.render('page_contenido', {
-            Titulo: 'contenido'
+     MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        db.collection("Contenidos").find({}).toArray(function(err, result) {
+            if (err) throw err;
+            res.render('contenidos_subidos', {
+                title: 'Escenas Guardadas',
+                resultado: result,
+                firebaseConfig: firebaseConfig
+            });
+            console.log("escenas: " + JSON.stringify(result));
+            db.close();
         });
+
+    });
     }
 
 });

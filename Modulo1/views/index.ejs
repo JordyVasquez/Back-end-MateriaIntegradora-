@@ -183,9 +183,9 @@
         var webSocketHost = 'ws://';
         var externalIp = '<%= externalIp%>';
         var puerto='<%= puerto%>'
-        var urlf = 'ws://' + 'localhost:9999'; //PONER URL FINAL
+        //var urlf = 'ws://' + 'localhost:9999'; //PONER URL FINAL
 
-        //var url = webSocketHost + externalIp + ':'+puerto;
+        var url = webSocketHost + externalIp + ':'+puerto;
         var textt = JSON.parse($schema2.value);
         var  Contenido_Trasmedia = JSON.stringify(textt.Contenido_Trasmedia, null, 2);
         var  text = JSON.stringify(textt.Contenido_Live, null, 2);
