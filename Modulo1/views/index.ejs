@@ -107,10 +107,10 @@
 <body style="text-align:center">
     <div class="container-fluid">
         <div id="div_principal" style="margin:0 0;" class="row">
-            <!-- Mude o src dessa tag para o nome do video que você possuir -->
+            <!-- Mude o src dessa tag para o nome do video que você possuir 
             <video id="video_principal" class="bg-video" controls="controls">
                    HTML5 Video is required for this example
-            </video>
+            </video>-->
             <!--<video style="display: none" id="generico1" class="bg-video">
                    HTML5 Video is required for this example
             </video>
@@ -226,21 +226,48 @@
         });
         
 
-        var btnplay = document.getElementById("play");
-        btnplay.addEventListener('click', play);
-        var video = document.getElementById("video_principal");
+        
+        /*var video = document.getElementById("video_principal");
         var inicio = searchInicio(videos_seq)
-        // video.src = inicio.Escena;
+        alert("videos_seq: "+JSON.stringify(videos_seq));
         video.src = inicio.Escena;
-        video.controls = true;
+        video.controls = true;*/
                
         //video.setAttribute("preload", "auto");
         //var video = document.getElementById("generico1");
 
+        
+        
+        var map_videos = new Map();
+        var escenas_all = videos_seq.Escenas[0];
+        alert("escena 0: "+videos_seq.Escenas.length);
+        for(var i=0; i<videos_seq.Escenas.length; i++){
+            var videoE = document.createElement('video');
+            videoE.setAttribute("id", videos_seq.Escenas[i].Name_Escena);
+            alert("escena: "+videos_seq.Escenas[i].Escena);
+            videoE.src = videos_seq.Escenas[i].Escena;
+            videoE.setAttribute("preload", "auto");
+            alert("nombre: "+videos_seq.Escenas[i].Name_Escena);
+            videoE.style.display = "none";
+            divPrincipal = document.getElementById("div_principal");
+            divPrincipal.appendChild(videoE);
+            map_videos.set(videos_seq.Escenas[i].Name_Escena, videos_seq.Escenas[i].Escena);
+
+        }
+        var inicio = searchInicio(videos_seq);
+        alert("inicio: "+inicio.Name_Escena);
+        var video = document.getElementById(inicio.Name_Escena);
+        video.src = inicio.Escena;
+        video.controls = true;
         video.setAttribute("preload", "auto"); // if HTML source element is used
         var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
-        var map_videos = new Map();
-        for(var i=0; i<escenas.length; i++){
+        var current_video = inicio.Name_Escena;
+        document.getElementById(current_video).style.display = "block";
+        var btnplay = document.getElementById("play");
+        btnplay.addEventListener('click', play);
+       
+
+        /*for(var i=0; i<escenas.length; i++){
             var videoE = document.createElement('video');
             videoE.setAttribute("id", escenas[i].Name_Escena);
             alert("escena: "+escenas[i].Escena);
@@ -252,11 +279,8 @@
             divPrincipal.appendChild(videoE);
             map_videos.set(escenas[i].Name_Escena, escenas[i].Escena);
 
-        }
-        /*var escenaG1 = document.getElementById("generico1");
-        escenaG1.src = escenas[0].Escena;
-        escenaG1.setAttribute("preload", "auto");
-        alert("nombre: "+escenas[0].Name_Escena);*/
+        }*/
+
 
              
         
@@ -320,6 +344,8 @@
                        video.controls = true;
                        //video.load() 
                        video.play();
+                       document.getElementById(current_video).removeEventListener("ended", endedSinIteraccion); 
+                       current_video = escenas.Name_Escena;
                        inicio=escenas;
                        ganador=''
                        video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
@@ -328,15 +354,14 @@
             }
           }
              
-          document.getElementById("video_principal").removeEventListener("ended", endedSinIteraccion);
+          
 
-           
-            //video.src = fileURL;
-            //video.load();  // if HTML source elementj is used
-            //video.play();
         }
-         function seteaMetodos(inici,videos_se) {                    
+
+        function seteaMetodos(inici,videos_se) {  
+                alert("ENTER seteaMetodos: "+inici.Escena);                  
                if(isVideoInteraccion(inici.Escena, videos_se)){
+                  alert("IniEscena: "+inici.Escena);
                   video.addEventListener("timeupdate",sendVideoOnArrayInteraccion);
                    video.addEventListener("ended",endedConIteraccion);
                 }
@@ -346,27 +371,26 @@
                 }
         }
 
-         function endedConIteraccion() {  
+        function endedConIteraccion() {  
             if(ganador.localeCompare('')==0){
 
                  var escenas = video_default;
                  alert("video_default: "+video_default);
                  if(escenas.length!=0){
                       alert("enter1: "+escenas.Name_Escena);                    
-                     //var video =document.getElementById("generico1");
-                     //alert("map: "+map_videos.get(escenas.Name_Escena));
                      if(map_videos.get(escenas.Name_Escena)){
                        video =document.getElementById(escenas.Name_Escena); 
                        video.src = map_videos.get(escenas.Name_Escena);  
                        alert("enter2" + video.src); 
-                       //video.src = escenas.Escena;
-                       document.getElementById("video_principal").style.display = "none";
+                       document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
-                       //video.style.display = "block";
                        video.controls = true;
-                       //video.load() 
                        video.play();
+                       
+                       document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
+                       current_video = escenas.Name_Escena;
                        inicio=sendEscena(video.src,videos_seq)
+                       alert("incio Interaccion: "+JSON.stringify(inicio));
                        ganador=''
                        video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
                        seteaMetodos(inicio,videos_seq);
@@ -381,7 +405,6 @@
                 var ganadorID = null;
                 alert("ganador: "+ganador);
                 for (var [key, value] of map_videos) {
-                  //alert("o: "+key);
                   if (map_videos.get(key) == (ganador)) {
                     ganadorID = key;
                     alert("ganadorID: "+ganadorID);
@@ -392,11 +415,13 @@
                     alert("map_videos.get(ganadorID): "+map_videos.get(ganadorID))
                     video =document.getElementById(ganadorID);
                     video.src = map_videos.get(ganadorID);
-                    document.getElementById("video_principal").style.display = "none";
+                    document.getElementById(current_video).style.display = "none";
                     document.getElementById(ganadorID).style.display = "block";
-                    //video.load()
                     video.controls = true;
                     video.play();
+                    document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
+                    current_video = ganadorID;
+                    
                     inicio=sendEscena(video.src,videos_seq)
                     ganador=''
                     video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
@@ -405,11 +430,9 @@
                 }
                 
             }        
-             document.getElementById("video_principal").removeEventListener("ended", endedConIteraccion);
+             //document.getElementById("video_principal").removeEventListener("ended", endedConIteraccion);
             
-            //video.src = fileURL;
-            //video.load();  // if HTML source elementj is used
-            //video.play();
+            
         }
   function sendVideoOnArrayInteraccion() {
         var time=searchVideoTimeInteraccion(video.src,videos_seq)
@@ -419,7 +442,7 @@
         var resul=duraction-vTime;
         
         if(time!=-1 && resul <=(time)){ 
-            document.getElementById("video_principal").removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
+            document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
             var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
             socket.emit('opciones', {sala : id,opciones:{escenas}});
             alert("escenas: "+JSON.stringify(escenas));
@@ -515,7 +538,8 @@
         }
 
         function play() {
-            var video = document.getElementById("video_principal");
+            alert("play: "+current_video);
+            var video = document.getElementById(current_video);
             alert("Start: " + video.buffered.start(0)
           + " End: " + video.buffered.end(0));
      
