@@ -339,7 +339,7 @@
                        video =document.getElementById(escenas.Name_Escena); 
                        video.src = map_videos.get(escenas.Name_Escena);  
                        alert("enter2" + video.src); 
-                       document.getElementById("video_principal").style.display = "none";
+                       document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
                        video.controls = true;
                        //video.load() 
@@ -359,14 +359,14 @@
         }
 
         function seteaMetodos(inici,videos_se) {  
-                alert("ENTER seteaMetodos: "+inici.Escena);                  
+                //alert("ENTER seteaMetodos: "+inici.Escena);                  
                if(isVideoInteraccion(inici.Escena, videos_se)){
-                  alert("IniEscena: "+inici.Escena);
+                  //alert("SM con Interaccion: "+inici.Escena);
                   video.addEventListener("timeupdate",sendVideoOnArrayInteraccion);
                    video.addEventListener("ended",endedConIteraccion);
                 }
                 else {
-
+                  //alert("SM sin Interaccion: "+inici.Escena);  
                   video.addEventListener("ended",endedSinIteraccion);
                 }
         }
@@ -377,11 +377,11 @@
                  var escenas = video_default;
                  alert("video_default: "+video_default);
                  if(escenas.length!=0){
-                      alert("enter1: "+escenas.Name_Escena);                    
+                      //alert("enter1: "+escenas.Name_Escena);                    
                      if(map_videos.get(escenas.Name_Escena)){
                        video =document.getElementById(escenas.Name_Escena); 
                        video.src = map_videos.get(escenas.Name_Escena);  
-                       alert("enter2" + video.src); 
+                       //alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
                        video.controls = true;
@@ -390,7 +390,7 @@
                        document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
                        current_video = escenas.Name_Escena;
                        inicio=sendEscena(video.src,videos_seq)
-                       alert("incio Interaccion: "+JSON.stringify(inicio));
+                       //alert("inicio Interaccion: "+JSON.stringify(inicio));
                        ganador=''
                        video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
                        seteaMetodos(inicio,videos_seq);
@@ -403,7 +403,7 @@
             else{
                 var escenas = ganador;
                 var ganadorID = null;
-                alert("ganador: "+ganador);
+                //alert("ganador: "+ganador);
                 for (var [key, value] of map_videos) {
                   if (map_videos.get(key) == (ganador)) {
                     ganadorID = key;
@@ -412,7 +412,7 @@
                   }
                 }
                 if(map_videos.get(ganadorID)){
-                    alert("map_videos.get(ganadorID): "+map_videos.get(ganadorID))
+                    //alert("map_videos.get(ganadorID): "+map_videos.get(ganadorID))
                     video =document.getElementById(ganadorID);
                     video.src = map_videos.get(ganadorID);
                     document.getElementById(current_video).style.display = "none";
