@@ -1383,7 +1383,10 @@ io.sockets.on('connection', function(socket) {
             socket.broadcast.to(data.sala).emit('usuarios_sincronizados', {
                     connections: (io.sockets.adapter.rooms[data.sala].length)-1
             });
-            
+            socket.broadcast.emit('num_usuarios_conectados', {
+                    connections: (io.sockets.adapter.rooms[data.sala].length)-1,
+                    sala: data.sala
+            });
 
             console.log('entro else:', data);
             var msm = "te has conectado a la sala" + data.sala;
@@ -1412,9 +1415,16 @@ io.sockets.on('connection', function(socket) {
             try{
                 var cont = io.sockets.adapter.rooms[sala].length-1;
                 console.log("disconnect "+sala+"-> "+(cont));
+                socket.broadcast.emit('num_usuarios_conectados', {
+                    connections: cont,
+                    sala:  sala
+                });
+                console.log("1 broadcast");
                 socket.broadcast.to(sala).emit('usuarios_sincronizados', {
                         connections: (io.sockets.adapter.rooms[sala].length)-1
                  });
+                
+                console.log("2 broadcast");
             }
             catch(err){
                 console.log("sala "+ sala+" conectados: 0");
@@ -1425,6 +1435,7 @@ io.sockets.on('connection', function(socket) {
           
         }
 
+        
 
     
         socket.broadcast.emit('connections', {

@@ -21,27 +21,49 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 	        <h1 class="page-header" id="page-header">Numero de usuarios conectados</h1>
 	        <div id="numUsers" class="container"></div>
-	           <div id="content"></div>
+	           <!--<div id="content"></div>-->
 	    </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 		<script>
 
             var escenasJson = null;
+            var map_salas = new Map();
             var ip = <%- JSON.stringify(ip) %>;
             var puerto = <%- JSON.stringify(puerto) %>;
             var urlFinal = 'ws://'+ip+':'+puerto;
             alert("urlFinal: "+urlFinal);
             var content = $('#content');
-            var url = 'ws://' + 'localhost:3000';///PONER URLFINAL
-	        var socket = io(urlFinal);
-	        socket.on('connect', function() {
+            var url = 'ws://' + 'localhost:9999';///PONER URLFINAL
+            alert("url: "+url);
+	        //var socket = io(urlFinal);
+	        var socket = io(url);
+            
+            socket.on('connect', function() {
+                alert("connected");
 	        });
           
 
 
-            	socket.on('connections', function(data) {
-            		//alert("numUsers: "+data);
-            		document.getElementById('numUsers').innerHTML = data.connections ;
+            	socket.on('num_usuarios_conectados', function(data) {
+            		alert("numUsers: "+data.sala);
+            		//document.getElementById('numUsers').innerHTML = data.connections ;
+                    if(map_salas.get(data.sala)){
+                        document.getElementById(data.sala).innerHTML = "sala: "+data.sala+" -> conexiones: "+data.connections;
+
+
+                    }else{
+                        map_salas.set(data.sala, data.connections);
+                        alert("insert");
+                        var div = document.createElement('div');
+                        div.setAttribute("id", data.sala);
+                        alert("id: "+data.sala);
+                        alert("sala: "+data.sala+" -> conexiones: "+data.connections+"");
+                        var numUsers = document.getElementById('numUsers');
+                        numUsers.appendChild(div);
+                        document.getElementById(data.sala).innerHTML = "sala: "+data.sala+" -> conexiones: "+data.connections+"";
+                        
+                    }
+                    
 	       		});
                  socket.on('mensaje2',  function(data) {
 
