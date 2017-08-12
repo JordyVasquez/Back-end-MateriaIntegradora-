@@ -11,24 +11,34 @@
   <body>     <div id="template">
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
+        <div class="navbar-header col-sm-3 col-md-2">
+               <div class="col-xs-5 col-sm-12 col-md-12">
+            <a class="navbar-brand" href="contenidos_subidos"><img src="../images/logo.png" class="img-responsive" alt="Mecanixs"></a>
+       </div>
+        <div class="col-xs-7">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar" >
+            <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="page_contenido">MOTORAPP</a>
+                 </div>
+
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
+          <ul class="nav navbar-nav">
             <li><a href="contenidos_subidos">Administrar Contenidos</a></li>
                          <li><a href="subir_cont">Subir Contenidos</a></li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Configuración<span class="caret"></span></a>
+          <ul class="dropdown-menu">
             <li><a href="config_json">Configurar JSON de Escenas</a></li>
-
             <li><a href="config_json_2_pantalla">Configurar JSON IP Servidores</a></li>
-            <li><a href="/cerrar">Salir</a></li>
           </ul>
-
+        </li>
+          </ul>
+  <ul class="nav navbar-nav navbar-right">
+                 <li><a href="/cerrar">Salir</a></li>
+      </ul>
         </div>
       </div>
     </nav>

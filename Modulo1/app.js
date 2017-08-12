@@ -529,11 +529,19 @@ app.post('/config_json2', function(req, res) {
                 res.cookie('remember', 1, {
                     maxAge: minute
                 });
-                res.render('page_contenido', {
-                    Titulo: 'contenido',
-                    band: 'true',
-                    Nombre: id_session,
-                    Expire: expired
+                    MongoClient.connect(url, function(err, db) {
+                    if (err) throw err;
+                    db.collection("Contenidos").find({}).toArray(function(err, result) {
+                        if (err) throw err;
+                        res.render('contenidos_subidos', {
+                            title: 'Escenas Guardadas',
+                            resultado: result,
+                            firebaseConfig: firebaseConfig
+                        });
+                        console.log("escenas: " + JSON.stringify(result));
+                        db.close();
+                    });
+
                 });
 
             } else {
@@ -1334,6 +1342,10 @@ io.sockets.on('connection', function(socket) {
             data: data
         });
     });
+    socket.on('play1', function(data) {
+        // transmitimos el movimiento a todos los clienntes conectados
+            io.to(data.sala).emit('play');
+    });
     socket.on('crearSala', function(data) {
         // transmitimos el movimiento a todos los clienftes conectados
         console.log('Sala:-------------------', data.sala.toString());
@@ -1584,7 +1596,7 @@ app.post('/config_json2', function(req, res) {
                 res.cookie('remember', 1, {
                     maxAge: minute
                 });
-                res.render('page_contenido', {
+                res.render('contenidos_subidos', {
                     Titulo: 'contenido',
                     band: 'true',
                     Nombre: id_session,
