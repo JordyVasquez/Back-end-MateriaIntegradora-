@@ -6,7 +6,6 @@ var request = require('request');
 var id_session = Math.round(Date.now()*Math.random()/100000);
 var ioc = require( 'socket.io-client' );
 
- 
 function handler(req,res){
     fs.readFile(__dirname + '/index.html', function(err,data){
         if(err){
@@ -63,20 +62,20 @@ var elmt = [];
 var band = false;
 var i=0;
 var throughput=0;
-var num_veces = 1000;
+var num_veces = 700;
 var iter=0;
+var ip = null;
 //var num_veces = 0;
 //var iteraciones = 10;
-/*for (j = 1; j <= iteraciones; j++) {
-  num_veces=num_veces+1000
-}*/
+
+
 
 var begin = new Date();
 
 for(i = 1; i <= num_veces; i++){
       
     request.get({
-    url : 'http://localhost:80/ips',
+    url : 'http://config-back-end.appspot.com/ips',
     time : true, 
     qs :  { num_veces: i, iteraciones: num_veces}
     },function(err, response){
