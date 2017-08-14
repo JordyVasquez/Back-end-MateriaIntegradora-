@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dibujemos</title>
+    <title>Mecanixs</title>
     <link rel="stylesheet" href="../stylesheets/style.css">
     <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
@@ -475,6 +475,7 @@
         for (var i = 0; i < myArray.Escenas.length; i++) {
               for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
                     if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0 && myArray.Escenas[i].Default_Escena) {
+                        alert(Key+" ->default: "+myArray.Escenas[i].Name_Escena);
                         return myArray.Escenas[i];
                 }
             }
