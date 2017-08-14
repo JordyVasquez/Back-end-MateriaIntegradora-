@@ -1460,42 +1460,42 @@ io.sockets.on('connection', function(socket) {
         } else {
             if(map_ids_contenido_sala.get(data.sala)==null || map_ids_contenido_sala.get(data.sala).toString().trim() === '')
             {
- socket.emit('confirmacion_join', {
-                msm: 'El codigo escaneado no pertenece a nuestra apliación',
-                contenido_transmedia: 'nada'
-            });
-            }
-else{
-    if(hash_cont_conectados.get(data.sala)){
-                
-                var cont = (hash_cont_conectados.get(data.sala)) + 1;
-                hash_cont_conectados.set(data.sala, cont);  
-                console.log("Get conectados: "+hash_cont_conectados.get(data.sala));  
-
+             socket.emit('confirmacion_join', {
+                            msm: 'El codigo escaneado no pertenece a nuestra apliación',
+                            contenido_transmedia: 'nada'
+                        });
             }
             else{
-                console.log("cont 1 -> sala nueva");
-                hash_cont_conectados.set(data.sala, 1);
+                if(hash_cont_conectados.get(data.sala)){
+                            
+                            var cont = (hash_cont_conectados.get(data.sala)) + 1;
+                            hash_cont_conectados.set(data.sala, cont);  
+                            console.log("Get conectados: "+hash_cont_conectados.get(data.sala));  
+
+                }
+                else{
+                    console.log("cont 1 -> sala nueva");
+                    hash_cont_conectados.set(data.sala, 1);
+                }
+                socket.broadcast.to(data.sala).emit('usuarios_sincronizados', {
+                        connections: (io.sockets.adapter.rooms[data.sala].length)-1
+                });
+                socket.broadcast.emit('num_usuarios_conectados', {
+                        connections: (io.sockets.adapter.rooms[data.sala].length)-1,
+                        sala: data.sala
+                });
+
+                console.log('entro else:', data);
+                var msm = "te has conectado a la sala" + data.sala;
+                var contm = map_ids_contenido_sala.get(data.sala)
+                console.log("msm: "+msm);
+                console.log("contm: "+contm);
+                socket.emit('confirmacion_join', {
+                    msm: msm,
+                    contenido_transmedia: contm
+                });
+
             }
-            socket.broadcast.to(data.sala).emit('usuarios_sincronizados', {
-                    connections: (io.sockets.adapter.rooms[data.sala].length)-1
-            });
-            socket.broadcast.emit('num_usuarios_conectados', {
-                    connections: (io.sockets.adapter.rooms[data.sala].length)-1,
-                    sala: data.sala
-            });
-
-            console.log('entro else:', data);
-            var msm = "te has conectado a la sala" + data.sala;
-            var contm = map_ids_contenido_sala.get(data.sala)
-            console.log("msm: "+msm);
-            console.log("contm: "+contm);
-            socket.emit('confirmacion_join', {
-                msm: msm,
-                contenido_transmedia: contm
-            });
-
-}
         
         }
 
