@@ -540,7 +540,7 @@ app.post('/config_json2', function(req, res) {
                             resultado: result,
                             firebaseConfig: firebaseConfig
                         });
-                        console.log("escenas: " + JSON.stringify(result));
+                        //console.log("escenas: " + JSON.stringify(result));
                         db.close();
                     });
 
@@ -596,10 +596,10 @@ app.get('/total_usuarios', function(req, res) {
                 var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
                 var ip = jsonDecomp.IP_Servidor_Config.ip;
                 var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
-                console.log("result: " + json);
-                console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
-                console.log("ip: " + JSON.stringify(ip));
-                console.log("ip: " + JSON.stringify(socket));
+                //console.log("result: " + json);
+                //console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
+                //console.log("ip: " + JSON.stringify(ip));
+                //console.log("ip: " + JSON.stringify(socket));
 
                 res.render('num_usuarios', {
                     title: 'Usuarios',
@@ -656,10 +656,10 @@ app.get('/usuarios_sala', function(req, res) {
                 var jsonDecomp = JSON.parse(lzstring.decompressFromBase64(json));
                 var ip = jsonDecomp.IP_Servidor_Config.ip;
                 var socket = jsonDecomp.IP_Servidor_Config.puertos.socket;
-                console.log("result: " + json);
-                console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
-                console.log("ip: " + JSON.stringify(ip));
-                console.log("ip: " + JSON.stringify(socket));
+                //console.log("result: " + json);
+                //console.log("jsonDecomp: " + JSON.stringify(jsonDecomp));
+                //console.log("ip: " + JSON.stringify(ip));
+                //console.log("ip: " + JSON.stringify(socket));
 
                 res.render('por_contenido', {
                     title: 'Usuarios total',
@@ -680,7 +680,7 @@ app.get('/usuarios_sala', function(req, res) {
 
 
             }
-            console.log(result.length);
+            //console.log(result.length);
             db.close();
         });
     });
@@ -1098,7 +1098,7 @@ function verificarSesion2(req, res, next) {
 }
 
 app.get('/contenido', function(req, res, next) {
-    console.log("ENTER bien hp");
+    //console.log("ENTER bien hp");
     now = new Date(Date.now());
     console.log("Now: " + now);
     //console.log("Expired: "+expired);
@@ -1117,7 +1117,7 @@ app.get('/contenido', function(req, res, next) {
                 resultado: result,
                 firebaseConfig: firebaseConfig
             });
-            console.log("escenas: " + JSON.stringify(result));
+            //console.log("escenas: " + JSON.stringify(result));
             db.close();
         });
 
@@ -1170,7 +1170,7 @@ app.get('/ver', function(req, res) {
 
 
 app.get('/contenidos_subidos', function(req, res, next) {
-    console.log("Session var INICIO: " + req.cookies.remember);
+    //console.log("Session var INICIO: " + req.cookies.remember);
     now = new Date(Date.now());
     console.log("Now: " + now);
     expired = new Date(Date.now() + minute);
@@ -1188,7 +1188,7 @@ app.get('/contenidos_subidos', function(req, res, next) {
                 resultado: result,
                 firebaseConfig: firebaseConfig
             });
-            console.log("escenas: " + JSON.stringify(result));
+            //console.log("escenas: " + JSON.stringify(result));
             db.close();
         });
 
@@ -1393,7 +1393,38 @@ io.sockets.on('connection', function(socket) {
         connections: connections
     });
 
-    // socket.broadcast.emit('move', data);
+    socket.on('cargar_sincronizados', function(){
+        console.log("Enter evento num_usuarios_conectados");
+        var rooms = io.sockets.adapter.rooms;
+        console.log("keys: "+hash_cont_conectados.keys());
+        var keys = hash_cont_conectados.keys();
+        for (var i=0; i< hash_cont_conectados.keys().length; i++) {
+            console.log("Enter evento num_usuarios_conectados");
+            var sala = keys[i];
+            console.log("salaID: "+sala);
+            try{
+                var cont = io.sockets.adapter.rooms[sala].length-1;
+                console.log("disconnect "+sala+"-> "+(cont));
+                socket.emit('num_usuarios_conectados', {
+                    connections: cont,
+                    sala:  sala
+                });
+                console.log("1 broadcast");
+                
+            }
+            catch(err){
+                console.log("Conectados: 0");
+                break;
+            }
+                
+               
+      
+        } 
+        
+      
+        
+
+    });
 
     socket.on('opcion_2c', function(data) {
         console.log('Sala:', data.sala);
@@ -1809,7 +1840,7 @@ app.get('*', function(req, res) {
                 resultado: result,
                 firebaseConfig: firebaseConfig
             });
-            console.log("escenas: " + JSON.stringify(result));
+            //console.log("escenas: " + JSON.stringify(result));
             db.close();
         });
 

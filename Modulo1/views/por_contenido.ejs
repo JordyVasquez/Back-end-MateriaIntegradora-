@@ -42,9 +42,14 @@
             
             socket.on('connect', function() {
                 alert("connected");
+                /*socket.emit("cargar_sincronizados", function(){
+                    alert("cargar_sincronizados");
+                });*/
 	        });
           
-
+                socket.emit("cargar_sincronizados", function(){
+                    alert("cargar_sincronizados");
+                });
 
             	socket.on('num_usuarios_conectados', function(data) {
             		//alert("numUsers: "+data.sala);
