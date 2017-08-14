@@ -40,8 +40,8 @@
 
  		alert("urlFinal_chat: "+urlFinal_chat);
         var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
-        //var socket = io(urlFinal);
-        var socket = io(url);
+        var socket = io(urlFinal);
+        //var socket = io(url);
         socket.on('connect', function() {
         });
 
@@ -95,6 +95,7 @@
         
         function enviarAccion() {
             var namespaceName = this.value ;
+            alert(namespaceName)
             socket.emit('opcion_2c', {
                 sala: id_sala,
                 option: namespaceName
@@ -128,8 +129,8 @@
             	          alert(data.msm);
             	          alert(data.contenido_transmedia);
 	       		});
-                socket.on('play', function() {
-                          alert("play");
+                socket.on('play', function(data) {
+                          alert("play" + data.escenaCurrent);
                         
                 });
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);

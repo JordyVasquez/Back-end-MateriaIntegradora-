@@ -204,8 +204,8 @@
         // abrimos la conexion
 
         
-        //var socket = io(url);
-        var socket = io(urlf); ///CAMBIAR POR URL 
+        var socket = io(url);
+        //var socket = io(urlf); ///CAMBIAR POR URL 
 
         socket.on('connect', function() {
 
@@ -226,8 +226,45 @@
 
         });
         
+        socket.on('conectando_users', function(e) {
+            
+            var tem_value=0
+            var tem_ip=''
+            for (var [key, value] of myMapOptions) {
+              alert(value)
+              if(value>tem_value){
+                tem_value=value;
+                tem_ip=key
 
-        
+              }
+            }
+            ganador=tem_ip
+            alert(ganador)
+            tem_ip=""
+            tem_value=0;
+        });
+        socket.on('opcion_1c', function(e) {
+            if(myMapOptions.has(e)){
+                myMapOptions.set(e,myMapOptions.get(e)+1)
+            }
+            else {
+                myMapOptions.set(e,1)
+            }
+            var tem_value=0
+            var tem_ip=''
+            for (var [key, value] of myMapOptions) {
+                alert(value)
+              if(value>tem_value){
+                tem_value=value;
+                tem_ip=key
+
+              }
+            }
+            ganador=tem_ip
+            alert(ganador)
+            tem_ip=""
+            tem_value=0;
+        });
         /*var video = document.getElementById("video_principal");
         var inicio = searchInicio(videos_seq)
         alert("videos_seq: "+JSON.stringify(videos_seq));
@@ -287,50 +324,13 @@
         
         seteaMetodos(inicio,videos_seq)
      
-        socket.on('conectando_users', function(e) {
-            
-            var tem_value=0
-            var tem_ip=''
-            for (var [key, value] of myMapOptions) {
-              alert(value)
-              if(value>tem_value){
-                tem_value=value;
-                tem_ip=key
 
-              }
-            }
-            ganador=tem_ip
-            alert(ganador)
-            tem_ip=""
-            tem_value=0;
-        });
         
         var myMapOptions = new Map();
         var ganador=''
         var video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
         
-        socket.on('opcion_1c', function(e) {
-            if(myMapOptions.has(e)){
-                myMapOptions.set(e,myMapOptions.get(e)+1)
-            }
-            else {
-                myMapOptions.set(e,1)
-            }
-            var tem_value=0
-            var tem_ip=''
-            for (var [key, value] of myMapOptions) {
-                alert(value)
-              if(value>tem_value){
-                tem_value=value;
-                tem_ip=key
 
-              }
-            }
-            ganador=tem_ip
-            alert(ganador)
-            tem_ip=""
-            tem_value=0;
-        });
 
 
         function endedSinIteraccion() {                    
@@ -343,8 +343,11 @@
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
                        video.controls = true;
+
                        //video.load() 
                        video.play();
+                       socket.emit('avisoGanador', {sala : id,win:escenas.Id_Escena});
+
                        document.getElementById(current_video).removeEventListener("ended", endedSinIteraccion); 
                        current_video = escenas.Name_Escena;
                        inicio=escenas;
@@ -386,8 +389,10 @@
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
                        video.controls = true;
+
+
                        video.play();
-                       
+                        socket.emit('avisoGanador', {sala : id,win:escenas.Id_Escena});
                        document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
                        current_video = escenas.Name_Escena;
                        inicio=sendEscena(video.src,videos_seq)
@@ -548,7 +553,9 @@
             var qr = document.getElementById("div_qr");
             qr.style.display = 'none'
             video.play();
-            socket.emit('play1', {sala : id});
+            alert(JSON.stringify(inicio))
+            socket.emit('avisoGanador', {sala : id,win:inicio.Id_Escena});
+
         }
 
         function makeQR() {

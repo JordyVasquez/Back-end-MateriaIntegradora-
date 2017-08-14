@@ -11,6 +11,7 @@
 
     <link href="css/font.css" rel='stylesheet' media="screen">
 
+    <link rel="icon" type="image/png" href="images/icono.png" />
 
     <style>
         [class*="foundicon-"] {
@@ -30,7 +31,7 @@
         <h1 class="page-header" id="page-header">Subir al Servidor</h1>
     </div>
     <div class='class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2'>
-        <div class='span8 col-md-8 columns eight large-8'>
+        <div class='span12 col-md-12 columns twelve large-12'>
             <h2>Ingresar los datos para el Contenido</h2>
             <p>La estructura es generada por el json de configuración.</p>
             <form action="/upload" method='POST' id='subir' name="subir" enctype='multipart/form-data'>
@@ -44,7 +45,7 @@
                     </div>
                     <div class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-4 col-xs-offset-1 col-lg-4 col-lg-offset-1">
 
-                        <button class='btn btn-primary col-md-12 col-sm-12 col-xs-12' id='enviar' type="button" >Subir</button>
+                        <button class='btn btn-primary col-md-12 col-sm-12 col-xs-12' id='enviar' type="button">Subir</button>
 
                     </div>
 
@@ -57,9 +58,9 @@
                 <input id='outputbefore' type='hidden' name='outputbefore' style='width: 100%; height: 450px; font-family: monospace;' class='form-control'></input>
                 <input id='IDescena' type='hidden' name='IDescena' class='form-control'></input>
             </form>
- 
+
             <div id='div_barra' tabindex='1' style="display :none">
-                       <h5 id="name_file"></h5>
+                <h5 id="name_file"></h5>
                 <div class="progress progress-striped active">
 
 
@@ -69,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <div class='span4 col-md-4 columns four large-4'>
+        <div class='span12 col-md-12 columns twelve large-12'>
 
             <h2>JSON Generado</h2>
             <p><button class='btn btn-primary' id='setvalue'>Actualizar Json Generado</button></p>
@@ -83,10 +84,8 @@
 
     </div>
 
-    <script src="js/bootstrap.min.js"></script>
     <script src='js/jsoneditor.js'></script>
     <script src='js/LZString.js'></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase-storage.js"></script>
@@ -110,55 +109,53 @@
                 upload.resume();
             });
 
-            function deletefiles(names,z) {
-
-// Create a reference to the file to delete
-alert("voy a borar")
-alert(names[z])
+            function deletefiles(names, z) {
+                alert("voy a borar")
+                alert(names[z])
                 var desertRef = storageRef.child(names[z]);
 
                 // Delete the file
                 desertRef.delete().then(function() {
-                  if(names.length<(z+1)){
-                    deletefiles(names,z+1)
+                    if (names.length < (z + 1)) {
+                        deletefiles(names, z + 1)
 
-                  }
-                  else{
-                      document.subir2.submit();
-                  }
+                    } else {
+                        document.subir2.submit();
+                    }
                 }).catch(function(error) {
-                    alert("errro al borra el archivo :"+ name + "  causa :"+ error)
-                    if(names.length<(z+1)){
-                    deletefiles(names,z+1)
+                    alert("errro al borra el archivo :" + name + "  causa :" + error)
+                    if (names.length < (z + 1)) {
+                        deletefiles(names, z + 1)
 
-                  }
-                  else{
-                      document.subir2.submit();
-                  }
-                  // Uh-oh, an error occurred!
+                    } else {
+                        document.subir2.submit();
+                    }
+                    // Uh-oh, an error occurred!
                 });
 
             }
-            function filesDeletes(str, after){
+
+            function filesDeletes(str, after) {
                 var myRe = /\bhttps:\/\/[^"\s]+/;
                 var myArray = str.match(myRe);
-                var listUrls=[]
-                var listUrlsre=[]
-                while(myArray!=null && myArray[0].localeCompare("")!=0){
-                listUrls.push(myArray[0])
-                str=str.replace(myArray,"")
-                myArray = str.match(myRe);
+                var listUrls = []
+                var listUrlsre = []
+                while (myArray != null && myArray[0].localeCompare("") != 0) {
+                    listUrls.push(myArray[0])
+                    str = str.replace(myArray, "")
+                    myArray = str.match(myRe);
                 }
                 alert(listUrls)
                 for (var i = 0; i < listUrls.length; i++) {
-                    if(!after.includes(listUrls[i])){
+                    if (!after.includes(listUrls[i])) {
                         var myRe2 = /\bo\/[^?]+/;
                         var name = listUrls[i].match(myRe2);
-                     listUrlsre.push(name[0].replace("o/",""))
+                        listUrlsre.push(name[0].replace("o/", ""))
                     }
                 }
                 return listUrlsre;
             }
+
             function veificaNull() {
 
 
@@ -168,23 +165,22 @@ alert(names[z])
                     var $schemaafter = document.getElementById('output2');
                     alert($schemabefore.value)
                     alert($schemaafter.value)
-                    var fls=filesDeletes($schemabefore.value,$schemaafter.value)
+                    var fls = filesDeletes($schemabefore.value, $schemaafter.value)
                     alert(fls)
-                    if(fls!=null && fls.length>0){
-                        deletefiles(fls,0);
+                    if (fls != null && fls.length > 0) {
+                        deletefiles(fls, 0);
+                    } else {
+                        document.subir2.submit();
                     }
-                    else {
-                          document.subir2.submit();
-                    }
-                    
-                  
+
+
                 }
                 if ($("input:file").length > index) {
                     var file = $("input:file")[index].files[0];
                     if (file != null) {
                         $('#name_file').html("Subiendo archivo: " + file.name);
                         $('#div_barra').show();
-                          $( "#div_barra" ).focus();
+                        $("#div_barra").focus();
                         uploaded(file);
                     } else {
                         index = index + 1
@@ -207,8 +203,8 @@ alert(names[z])
                 // Upload file and metadata
                 // .child(file.name) sets the file name in GCS,
                 // .put(...) uploads the data
-                alert($.now() )
-                upload = storageRef.child($.now() +file.name).put(file, metadata);
+                alert($.now())
+                upload = storageRef.child($.now() + file.name).put(file, metadata);
 
                 console.log(upload);
 
@@ -218,11 +214,11 @@ alert(names[z])
                         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                         var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         $('#barra').css('width', progress + '%');
-                        
-                        $('#avance').html(progress+'%')
+
+                        $('#avance').html(progress + '%')
                         if (progress >= 100) {
                             $('#barra').css('width', 0 + '%');
-                             $('#name_file').html("Archivo Subido: " + file.name);
+                            $('#name_file').html("Archivo Subido: " + file.name);
                         }
                         // console.log('Upload is ' + progress + '% done');
                         switch (snapshot.state) {
@@ -249,7 +245,7 @@ alert(names[z])
 
                             case 'storage/canceled':
                                 // User canceled the upload
-                                 alert('cancelo la subida de archivos, no se almaceno la pelicula a subir')
+                                alert('cancelo la subida de archivos, no se almaceno la pelicula a subir')
                                 break;
 
                                 // ...
@@ -258,9 +254,9 @@ alert(names[z])
                                 // Unknown error occurred, inspect error.serverResponse
                                 break;
                             default:
-                                  alert('ha ocurrido un error intentaremos subir de nuevo su archivo')
-                                 uploaded(file) 
-                                         break;
+                                alert('ha ocurrido un error intentaremos subir de nuevo su archivo')
+                                uploaded(file)
+                                break;
 
                         }
                     },
@@ -271,14 +267,15 @@ alert(names[z])
 
                         var downloadURL = upload.snapshot.downloadURL;
                         var $schema3 = document.getElementById('output2');
-                        $schema3.value = $schema3.value.replace(file.name, downloadURL);
+                        $schema3.value = $schema3.value.replace('"'+file.name+'"', '"'+downloadURL+'"');
                         console.log('upload complete, download url is', downloadURL)
                         veificaNull()
                     });
             };
             var schema;
             schema = JSON.parse(LZString.decompressFromBase64('<%= json%>'));
-            var escena = '';
+            var escena = {};
+            var json_back = '';
             escena = LZString.decompressFromBase64('<%= escenas%>');
             //if()
             //alert(LZString.decompressFromBase64('<%= escenas%>'))
@@ -313,20 +310,33 @@ alert(names[z])
                     //alert("json: "+json.ID);
                     //alert("escena: "+ escena);
                     var id = Math.round($.now() * Math.random() / 100000);
+                    //  alert(JSON.stringify(json_back))
+                    json = json_recarga(json)
                     if (escena != null) {
                         if (escena.localeCompare('') == 0) {
                             //alert("a"); 
-                            json.ID = id;
-                            $output.value = JSON.stringify(json, null, 2);
+                            if (estadoEscena == false) {
+                                estadoEscena = true;
+                                json.ID = id;
+                                $output.value = JSON.stringify(json, null, 2);
+                             
+                            } else {
+                                $output.value = JSON.stringify(json, null, 2);
+                           
+
+                            }
+
                         } else {
                             if (estadoEscena == false) {
                                 //alert("b");   
                                 estadoEscena = true;
                                 $output.value = escena;
                                 $outputbefor.value = escena;
+                             
                             } else {
                                 //alert("c"); 
                                 $output.value = JSON.stringify(json, null, 2);
+                             
                             }
 
                         }
@@ -338,10 +348,12 @@ alert(names[z])
                             estadoEscena = true;
                             json.ID = id;
                             $output.value = JSON.stringify(json, null, 2);
+                         
                         } else {
 
 
                             $output.value = JSON.stringify(json, null, 2);
+                           
 
                         }
 
@@ -371,6 +383,48 @@ alert(names[z])
                 }
 
             };
+            var json_recarga = function(js) {
+    
+                 
+
+                        for (var i = 0; i < js.Contenido_Trasmedia.Imagenes.length; i++) {
+                            if (js.Contenido_Trasmedia.Imagenes[i].Name_Imagen.localeCompare('') == 0 && js.Contenido_Trasmedia.Imagenes[i].Imagen.localeCompare('') != 0) {
+                                var myRe2 = /\bo\/[^?]+/;
+                                var name = js.Contenido_Trasmedia.Imagenes[i].Imagen.match(myRe2);
+                                alert(js.Contenido_Trasmedia.Imagenes[i].Imagen)
+                                alert(name)
+                                if (name != null && name.length != 0) {
+                                    js.Contenido_Trasmedia.Imagenes[i].Name_Imagen = '_'+name[0].replace("o/", "")
+                                } else {
+                                    js.Contenido_Trasmedia.Imagenes[i].Name_Imagen = '_'+js.Contenido_Trasmedia.Imagenes[i].Imagen
+                                }
+
+                            }
+                        }
+                     for (var i = 0; i < js.Contenido_Trasmedia.Videos.length; i++) {
+                            if (js.Contenido_Trasmedia.Videos[i].Name_Video.localeCompare('') == 0 && js.Contenido_Trasmedia.Videos[i].Video.localeCompare('') != 0) {
+                                var myRe2 = /\bo\/[^?]+/;
+                                var name = js.Contenido_Trasmedia.Videos[i].Video.match(myRe2);
+                                if (name != null && name.length != 0) {
+                                    js.Contenido_Trasmedia.Videos[i].Name_Video = '_'+name[0].replace("o/", "")
+                                } else {
+                                    js.Contenido_Trasmedia.Videos[i].Name_Video = '_'+js.Contenido_Trasmedia.Videos[i].Video
+                                }
+
+                            }
+                        }
+                         for (var i = 0; i < js.Contenido_Live.Escenas.length; i++) {
+                            if (js.Contenido_Live.Escenas[i].Id_Escena.localeCompare('') == 0 ) {
+                                
+                            js.Contenido_Live.Escenas[i].Id_Escena=Math.round($.now() * Math.random() / 100000);
+                            }
+                        }
+                        
+                    return js;
+                
+
+
+            };
             var rename_file = function() {
                 var header = document.getElementById('editor');
                 var rs = header.getElementsByClassName('row');
@@ -378,7 +432,7 @@ alert(names[z])
                     var inputs = rs[i].getElementsByTagName('input');
                     for (var j = 0; j < inputs.length; j++) {
                         if (inputs[j].type.localeCompare("file") == 0) {
-    
+
                             inputs[j].name = 'archivos';
                         }
                     }
@@ -460,7 +514,7 @@ alert(names[z])
                 if (headerw.value.localeCompare("") != 0) {
 
                     $('#enviar').attr("disabled", true);
-                   
+
                     veificaNull()
 
                 } else {

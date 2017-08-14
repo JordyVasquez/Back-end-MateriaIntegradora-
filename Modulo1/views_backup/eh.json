@@ -1,0 +1,173 @@
+{
+  "title": "Contenido",
+  "type": "object",
+  "properties": {
+    "Titulo": {
+      "type": "string",
+      "description": "Titulo del Contenido a Visualizar",
+      "minLength": 4
+    },
+    "Contenido_Trasmedia": {
+      "type": "object",
+      "title": "Contenido Trasmedia",
+      "properties": {
+        "Imagenes": {
+          "type": "array",
+          "format": "table",
+          "title": "Imagenes",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Imagen",
+            "properties": {
+              "Imagen": {
+                "type": "string",
+                "format": "url",
+                "options": {
+                  "upload": true
+                },
+                "links": [
+                  {
+                    "href": "{{self}}"
+                  }
+                ]
+              },
+              "Tiempo": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "Videos": {
+          "type": "array",
+          "format": "table",
+          "title": "Videos",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Video",
+            "properties": {
+              "Video": {
+                "type": "string",
+                "format": "url",
+                "options": {
+                  "upload": true
+                },
+                "links": [
+                  {
+                    "href": "{{self}}"
+                  }
+                ]
+              },
+              "Tiempo": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "Paginas": {
+          "type": "array",
+          "format": "table",
+          "title": "Paginas",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Pagina",
+            "properties": {
+              "URL": {
+                "type": "string"
+              },
+              "Tiempo": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "Texto": {
+          "type": "array",
+          "format": "table",
+          "title": "Texto",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Texto",
+            "properties": {
+              "Texto": {
+                "type": "string",
+                "format": "url",
+                "options": {
+                  "upload": true
+                },
+                "links": [
+                  {
+                    "href": "{{self}}"
+                  }
+                ]
+              },
+              "Tiempo": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "Chats": {
+          "type": "array",
+          "format": "table",
+          "title": "Chats",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Chat",
+            "properties": {
+              "URL": {
+                "type": "string"
+              },
+              "Tiempo": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Contenido_Live": {
+      "type": "object",
+      "title": "Contenido Live",
+      "properties": {
+        "Escenas": {
+          "type": "array",
+          "format": "table",
+          "title": "Escenas",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "title": "Escena",
+            "properties": {
+              "Id_Escena": {
+                "type": "string"
+              },
+              "Name_Escena": {
+                "type": "string"
+              },
+              "Escena": {
+                "type": "string",
+                "format": "url",
+                "options": {
+                  "upload": true
+                },
+                "links": [
+                  {
+                    "href": "{{self}}"
+                  }
+                ]
+              },
+              "Escena_Padre": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

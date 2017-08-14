@@ -5869,7 +5869,7 @@ JSONEditor.defaults.editors.upload = JSONEditor.AbstractEditor.extend({
 
     this.preview.innerHTML = '';
     
-    if(!this.preview_value) return;
+    //if(!this.preview_value) return;
 
     var self = this;
 
@@ -5894,7 +5894,6 @@ JSONEditor.defaults.editors.upload = JSONEditor.AbstractEditor.extend({
     this.preview.appendChild(uploadButton);
     uploadButton.addEventListener('click',function(event) {
       event.preventDefault();
-
       uploadButton.setAttribute("disabled", "disabled");
       self.theme.removeInputError(self.uploader);
 
@@ -5926,6 +5925,8 @@ JSONEditor.defaults.editors.upload = JSONEditor.AbstractEditor.extend({
         }
       });
     });
+    uploadButton.click();
+    uploadButton.style.display = 'none';
   },
   enable: function() {
     if(this.uploader) this.uploader.disabled = false;

@@ -1411,9 +1411,10 @@ io.sockets.on('connection', function(socket) {
             data: data
         });
     });
-    socket.on('play1', function(data) {
+    socket.on('avisoGanador', function(data) {
         // transmitimos el movimiento a todos los clienntes conectados
-            io.to(data.sala).emit('play');
+        console.log("ecena ganador:"+data.win)
+            io.to(data.sala).emit('play',{escenaCurrent:data.win});
     });
     socket.on('crearSala', function(data) {
         // transmitimos el movimiento a todos los clienftes conectados
@@ -1426,7 +1427,15 @@ io.sockets.on('connection', function(socket) {
             var contm = map_ids_contenido_sala.get(data.sala.toString())
             console.log(contm)
         } else {
-            if(hash_cont_conectados.get(data.sala)){
+            if(map_ids_contenido_sala.get(data.sala)==null || map_ids_contenido_sala.get(data.sala).toString().trim() === '')
+            {
+ socket.emit('confirmacion_join', {
+                msm: 'El codigo escaneado no pertenece a nuestra apliación',
+                contenido_transmedia: 'nada'
+            });
+            }
+else{
+    if(hash_cont_conectados.get(data.sala)){
                 
                 var cont = (hash_cont_conectados.get(data.sala)) + 1;
                 hash_cont_conectados.set(data.sala, cont);  
@@ -1454,6 +1463,9 @@ io.sockets.on('connection', function(socket) {
                 msm: msm,
                 contenido_transmedia: contm
             });
+
+}
+        
         }
 
     });
