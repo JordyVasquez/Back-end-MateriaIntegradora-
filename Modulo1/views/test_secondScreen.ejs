@@ -36,9 +36,9 @@
             var ip_chat = <%- JSON.stringify(ip_chat) %>;
         var puerto_chat = <%- JSON.stringify(puerto_chat) %>;
                 var urlFinal_chat = 'ws://'+ip_chat+':'+puerto_chat;
-        alert("urlFinal: "+urlFinal);
+       // alert("urlFinal: "+urlFinal);
 
- 		alert("urlFinal_chat: "+urlFinal_chat);
+ 		//alert("urlFinal_chat: "+urlFinal_chat);
         var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
 
         var socket = io(urlFinal);
@@ -107,7 +107,7 @@
 
           function enviarinvitacion() {
                 id_sala = document.getElementById("idpeli").value
-                alert(id_sala)
+               // alert(id_sala)
                 socket.emit('crearSala', {
                     sala: id_sala
                 });
@@ -129,7 +129,7 @@
         }
         socket.on('confirmacion_join', function(data) {
             	          alert(data.msm);
-            	          alert(data.contenido_transmedia);
+            	       //   alert(data.contenido_transmedia);
 	       		});
                 socket.on('play', function(data) {
                           alert("play" + data.escenaCurrent);

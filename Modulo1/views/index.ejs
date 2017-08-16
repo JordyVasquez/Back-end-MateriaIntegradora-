@@ -6,6 +6,8 @@
     <title>Mecanixs</title>
     <link rel="stylesheet" href="../stylesheets/style.css">
     <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+      <link rel="icon" type="image/png" href="../images/icono.png" />
+
     <style>
         .loader {
           font-size: 10px;
@@ -190,8 +192,8 @@
         var  Contenido_Trasmedia = JSON.stringify(textt.Contenido_Trasmedia, null, 2);
         var  text = JSON.stringify(textt.Contenido_Live, null, 2);
            
-        alert(text);
-        alert(Contenido_Trasmedia);
+       // alert(text);
+       // alert(Contenido_Trasmedia);
   
 
         var videos_seq = JSON.parse(text);
@@ -231,7 +233,7 @@
             var tem_value=0
             var tem_ip=''
             for (var [key, value] of myMapOptions) {
-              alert(value)
+              //alert(value)
               if(value>tem_value){
                 tem_value=value;
                 tem_ip=key
@@ -239,7 +241,7 @@
               }
             }
             ganador=tem_ip
-            alert(ganador)
+           // alert(ganador)
             tem_ip=""
             tem_value=0;
         });
@@ -253,7 +255,7 @@
             var tem_value=0
             var tem_ip=''
             for (var [key, value] of myMapOptions) {
-                alert(value)
+               // alert(value)
               if(value>tem_value){
                 tem_value=value;
                 tem_ip=key
@@ -261,7 +263,7 @@
               }
             }
             ganador=tem_ip
-            alert(ganador)
+          //  alert(ganador)
             tem_ip=""
             tem_value=0;
         });
@@ -293,10 +295,10 @@
 
         }
         var inicio = searchInicio(videos_seq);
-        alert("inicio: "+inicio.Name_Escena);
+       // alert("inicio: "+inicio.Name_Escena);
         var video = document.getElementById(inicio.Name_Escena);
         video.src = inicio.Escena;
-        video.controls = true;
+        video.controls = false;
         video.setAttribute("preload", "auto"); // if HTML source element is used
         var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
         var current_video = inicio.Name_Escena;
@@ -339,7 +341,7 @@
               if(map_videos.get(escenas.Name_Escena)){
                        video =document.getElementById(escenas.Name_Escena); 
                        video.src = map_videos.get(escenas.Name_Escena);  
-                       alert("enter2" + video.src); 
+                     //  alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
                        video.controls = true;
@@ -379,7 +381,7 @@
             if(ganador.localeCompare('')==0){
 
                  var escenas = video_default;
-                 alert("video default: "+escenas.Name_Escena);
+               //  alert("video default: "+escenas.Name_Escena);
                  if(escenas.length!=0){
                       //alert("enter1: "+escenas.Name_Escena);                    
                      if(map_videos.get(escenas.Name_Escena)){
@@ -413,7 +415,7 @@
                 for (var [key, value] of map_videos) {
                   if (map_videos.get(key) == (ganador)) {
                     ganadorID = key;
-                    alert("ganadorID: "+ganadorID);
+                   // alert("ganadorID: "+ganadorID);
                     break;
                   }
                 }
@@ -425,6 +427,8 @@
                     document.getElementById(ganadorID).style.display = "block";
                     video.controls = true;
                     video.play();
+                    socket.emit('avisoGanador', {sala : id,win:escenas.Id_Escena});
+
                     document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
                     current_video = ganadorID;
                     
@@ -451,9 +455,9 @@
             document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
             var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
             socket.emit('opciones', {sala : id,opciones:{escenas}});
-            alert("escenas: "+JSON.stringify(escenas));
+           // alert("escenas: "+JSON.stringify(escenas));
             if(resul>=15  && resul<=20){
-                alert("quedan 20");
+               // alert("quedan 20");
                 /*for(var i=0; i<escenas.length; i++){
                   alert("escena: "+escenas[i].Escena);
                   var escenaDF = document.getElementById("generico"+[i+1]);
@@ -475,7 +479,7 @@
         for (var i = 0; i < myArray.Escenas.length; i++) {
               for (var j = 0; j < myArray.Escenas[i].Escena_Padre.split(';').length; j++) {
                     if (Key.localeCompare(myArray.Escenas[i].Escena_Padre.split(';')[j]) == 0 && myArray.Escenas[i].Default_Escena) {
-                        alert(Key+" ->default: "+myArray.Escenas[i].Name_Escena);
+                       // alert(Key+" ->default: "+myArray.Escenas[i].Name_Escena);
                         return myArray.Escenas[i];
                 }
             }
@@ -545,16 +549,16 @@
         }
 
         function play() {
-            alert("play: "+current_video);
+           // alert("play: "+current_video);
             var video = document.getElementById(current_video);
-            alert("Start: " + video.buffered.start(0)
-          + " End: " + video.buffered.end(0));
+           // alert("Start: " + video.buffered.start(0)
+         // + " End: " + video.buffered.end(0));
      
             this.style.display = 'none'
             var qr = document.getElementById("div_qr");
             qr.style.display = 'none'
             video.play();
-            alert(JSON.stringify(inicio))
+         //   alert(JSON.stringify(inicio))
             socket.emit('avisoGanador', {sala : id,win:inicio.Id_Escena});
 
         }

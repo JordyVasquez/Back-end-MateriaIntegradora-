@@ -394,9 +394,9 @@
                                 alert(js.Contenido_Trasmedia.Imagenes[i].Imagen)
                                 alert(name)
                                 if (name != null && name.length != 0) {
-                                    js.Contenido_Trasmedia.Imagenes[i].Name_Imagen = '_'+name[0].replace("o/", "")
+                                    js.Contenido_Trasmedia.Imagenes[i].Name_Imagen = $.now()+name[0].replace("o/", "").toLowerCase()
                                 } else {
-                                    js.Contenido_Trasmedia.Imagenes[i].Name_Imagen = '_'+js.Contenido_Trasmedia.Imagenes[i].Imagen
+                                    js.Contenido_Trasmedia.Imagenes[i].Name_Imagen = $.now()+js.Contenido_Trasmedia.Imagenes[i].Imagen.toLowerCase()
                                 }
 
                             }
@@ -406,9 +406,9 @@
                                 var myRe2 = /\bo\/[^?]+/;
                                 var name = js.Contenido_Trasmedia.Videos[i].Video.match(myRe2);
                                 if (name != null && name.length != 0) {
-                                    js.Contenido_Trasmedia.Videos[i].Name_Video = '_'+name[0].replace("o/", "")
+                                    js.Contenido_Trasmedia.Videos[i].Name_Video = $.now()+name[0].replace("o/", "").toLowerCase()
                                 } else {
-                                    js.Contenido_Trasmedia.Videos[i].Name_Video = '_'+js.Contenido_Trasmedia.Videos[i].Video
+                                    js.Contenido_Trasmedia.Videos[i].Name_Video = $.now()+js.Contenido_Trasmedia.Videos[i].Video.toLowerCase()
                                 }
 
                             }
