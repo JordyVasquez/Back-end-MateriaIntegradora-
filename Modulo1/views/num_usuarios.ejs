@@ -21,10 +21,14 @@
             
         
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-	        <h1 class="page-header" id="page-header">Numero de usuarios conectados</h1>
+	        <h1 class="page-header" id="page-header"># Total de usuarios conectados</h1>
 	        <div id="numUsers" class="container"></div>
-	           <div id="content"></div>
+	          <!-- <div id="content"></div>-->
+               <h3>Usuarios conectados: <span id="content" class="label label-primary"></span></h3><br>
+
 	    </div>
+
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 		<script>
 
@@ -44,33 +48,35 @@
                 alert("connected");
 	        });
           
+            socket.emit("cargar_sincronizados", function(){
+                alert("cargar_sincronizados");
+            });
+
+        	socket.on('num_usuarios_conectados', function(data) {
+        		//alert("numUsers: "+data.sala);
+        		if(map_salas.get(data.sala)){
+                    //alert("get");
+                    map_salas.set(data.sala, data.connections);
 
 
-            	socket.on('num_usuarios_conectados', function(data) {
-            		//alert("numUsers: "+data.sala);
-            		if(map_salas.get(data.sala)){
-                        //alert("get");
-                        map_salas.set(data.sala, data.connections);
-
-
-                    }else{
-                        map_salas.set(data.sala, data.connections);
-                        //alert("set");
-                        
-                    }
-                    var cont = 0;
-                    for (var [key, value] of map_salas) {
-                        cont = cont + map_salas.get(key);
-
-                    }
-                    document.getElementById("content").innerHTML = "# Usuarios conectados: "+cont;
+                }else{
+                    map_salas.set(data.sala, data.connections);
+                    //alert("set");
                     
-	       		});
-                 socket.on('mensaje2',  function(data) {
+                }
+                var cont = 0;
+                for (var [key, value] of map_salas) {
+                    cont = cont + map_salas.get(key);
 
-                        content.append(data.data.data + '<br />');
-                });
-                  //socket.emit('mensaje', {data:"pull push"});
+                }
+                document.getElementById("content").innerHTML = cont;
+                
+       		});
+             socket.on('mensaje2',  function(data) {
+
+                    content.append(data.data.data + '<br />');
+            });
+              //socket.emit('mensaje', {data:"pull push"});
 
            
         </script>    
