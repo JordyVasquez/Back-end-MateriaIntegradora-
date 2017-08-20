@@ -9,7 +9,7 @@
  <link href="dist/jsoneditor.css" rel="stylesheet" type="text/css">
       <link rel="icon" type="image/png" href="images/icono.png" />
 
-       
+    <script src="js/html-imports.min.js"></script>   
      <style>
     html, body {
       font: 11pt sans-serif;
@@ -23,11 +23,19 @@
 
 <body>
     <script>
-        var getImport = document.querySelector('#template-file');
-        var getContent = getImport.import.querySelector('#template');
-        document.body.appendChild(document.importNode(getContent, true));
-    </script>
-    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+  document.addEventListener( 'HTMLImportsLoaded', function () 
+    {
+        var link = document.querySelector('#template-file');
+        var template = link.import.querySelector('#template');
+    document.body.appendChild(document.importNode(template, true));  
+
+
+
+    } )
+
+  </script>
+    <div class="col-sm-12  col-md-12  main">
         <h1 class="page-header" id="page-header">Configuración de Json</h1>
         <div class='row'>
             <div class='span12 col-md-12 columns twelve large-12'>
@@ -52,6 +60,8 @@
     </div>
     <script src="dist/jsoneditor.js"></script>
          <script src='js/LZString.js'></script>
+             <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
     <script>
         (function() {
             var schema;

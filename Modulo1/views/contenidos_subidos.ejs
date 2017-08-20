@@ -7,16 +7,23 @@
 <link id="template-file" href="templates/template.ejs" rel="import" />  
           <link href="css/dataTable.css" rel="stylesheet"/>
       <link rel="icon" type="image/png" href="images/icono.png" />
-
+<script src="js/html-imports.min.js"></script>
   </head> 
   <body> 
     <script>
-    var getImport = document.querySelector('#template-file'); 
-var getContent = getImport.import.querySelector('#template'); 
-document.body.appendChild(document.importNode(getContent, true));  
+
+  document.addEventListener( 'HTMLImportsLoaded', function () 
+    {
+        var link = document.querySelector('#template-file');
+        var template = link.import.querySelector('#template');
+    document.body.appendChild(document.importNode(template, true));  
+
+
+
+    } )
 
   </script>
-         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+         <div class="col-sm-12 col-md-12  main">
          
           <h1 class="page-header" id="page-header">Contenidos Subidos al Servidor</h1>
           <form action="/admin_cont_sub" id='subir' name="subir" method="post">
@@ -53,6 +60,8 @@ document.body.appendChild(document.importNode(getContent, true));
 
 </form>
         </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
        <script src="js/dataTable.js"></script>
              <script src='js/LZString.js'></script>
              <script src="https://www.gstatic.com/firebasejs/4.0.0/firebase-app.js"></script>

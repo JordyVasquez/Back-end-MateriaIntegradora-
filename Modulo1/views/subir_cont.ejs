@@ -12,6 +12,7 @@
     <link href="css/font.css" rel='stylesheet' media="screen">
 
     <link rel="icon" type="image/png" href="images/icono.png" />
+<script src="js/html-imports.min.js"></script>
 
     <style>
         [class*="foundicon-"] {
@@ -23,14 +24,22 @@
 
 <body>
     <script>
-        var getImport = document.querySelector('#template-file');
-        var getContent = getImport.import.querySelector('#template');
-        document.body.appendChild(document.importNode(getContent, true));
-    </script>
-    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+
+  document.addEventListener( 'HTMLImportsLoaded', function () 
+    {
+        var link = document.querySelector('#template-file');
+        var template = link.import.querySelector('#template');
+    document.body.appendChild(document.importNode(template, true));  
+
+
+
+    } )
+
+  </script>
+    <div class="col-sm-12 col-md-12 main">
         <h1 class="page-header" id="page-header">Subir al Servidor</h1>
     </div>
-    <div class='class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2'>
+    <div class='class="col-sm-12 col-md-12'>
         <div class='span12 col-md-12 columns twelve large-12'>
             <h2>Ingresar los datos para el Contenido</h2>
             <p>La estructura es generada por el json de configuración.</p>
@@ -83,6 +92,7 @@
         </div>
 
     </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
     <script src='js/jsoneditor.js'></script>
     <script src='js/LZString.js'></script>
@@ -199,10 +209,6 @@
                 if (upload) {
                     upload.cancel();
                 }
-
-                // Upload file and metadata
-                // .child(file.name) sets the file name in GCS,
-                // .put(...) uploads the data
                 alert($.now())
                 upload = storageRef.child($.now() + file.name).put(file, metadata);
 

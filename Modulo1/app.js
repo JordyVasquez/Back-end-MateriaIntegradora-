@@ -506,7 +506,7 @@ app.post('/config_json2', function(req, res) {
         }).toArray(function(err, result) {
             if (err) throw err;
             //resultDB = result;
-            resultDB = result[1];
+            resultDB = result[0];
             resultStr = JSON.stringify(resultDB)
             console.log("dd: " + resultStr);
             resultStr = resultStr.replace('[', '')
@@ -1458,7 +1458,7 @@ io.sockets.on('connection', function(socket) {
             var contm = map_ids_contenido_sala.get(data.sala.toString())
             console.log(contm)
         } else {
-            if(map_ids_contenido_sala.get(data.sala)==null || map_ids_contenido_sala.get(data.sala).toString().trim() === '')
+            if(map_ids_contenido_sala.get(data.sala.toString())==null || map_ids_contenido_sala.get(data.sala.toString()).toString().trim() == '')
             {
              socket.emit('confirmacion_join', {
                             msm: 'El codigo escaneado no pertenece a nuestra apliación',
