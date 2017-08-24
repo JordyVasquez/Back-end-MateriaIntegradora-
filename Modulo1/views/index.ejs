@@ -109,18 +109,16 @@
 <body style="text-align:center">
     <div class="container-fluid">
         <div id="div_principal" style="margin:0 0;" class="row">
-            <!-- Mude o src dessa tag para o nome do video que você possuir 
-            <video id="video_principal" class="bg-video" controls="controls">
-                   HTML5 Video is required for this example
-            </video>-->
-            <!--<video style="display: none" id="generico1" class="bg-video">
-                   HTML5 Video is required for this example
-            </video>
-            <video style="display: none" id="generico2" class="bg-video">
-                   HTML5 Video is required for this example
-            </video>-->
 
 
+
+
+        </div>
+        <div  class="row">
+             <div id="content" class="row" style="display: none">
+            
+            
+        </div>
 
         </div>
         <div class="row">
@@ -146,7 +144,7 @@
     </div>
     <div class="row" id="foo">
 
-        <div id="content" class="col-md-1 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-2 col-xs-offset-1 col-lg-1 col-lg-offset-1">
+        <div id="contentU" class="col-md-1 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-2 col-xs-offset-1 col-lg-1 col-lg-offset-1">
 
             <span class="glyphicon glyphicon-eye-open"></span> <label id="con"></label>
 
@@ -158,7 +156,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="../javascripts/qrcode.js"></script>
     <script src="../javascripts/qart.js"></script>
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src='../js/LZString.js'></script>
@@ -172,6 +169,12 @@
         $schema2.value = JSON.stringify(schema, null, 2);
 
         var contador = 0;
+        var content = $('#content');
+                  var ip_chat = <%- JSON.stringify(ip_chat) %>;
+        var puerto_chat = <%- JSON.stringify(puerto_chat) %>;
+                var urlFinal_chat = 'ws://'+ip_chat+':'+puerto_chat;
+                var socket2 = io(urlFinal_chat);
+     
         //$('#con').html(contador);
         /*sserver.on('message', function(message) {
             // Expect message to be '31415'.
@@ -219,7 +222,19 @@
             });
 
         });
-        
+           socket2.on('connect', function() {
+            socket2.emit('join', id, function() {
+                
+                
+               });
+        });   
+       
+         socket2.on('broadcast', function(msg) {
+              //alert("broadcast: "+msg);
+              content.append('<span class="msm"> '+msg + ' <span /><br />');
+              var elem = document.getElementById('content');
+              elem.scrollTop = elem.scrollHeight;
+            });
         socket.on('usuarios_sincronizados', function(data) {
            $('#con').html(data.connections);
 
@@ -228,7 +243,7 @@
            $('#con').html(data.connections);
 
         });
-        
+         content.append('<h3>Sala de Chat <h3/><br />');
         socket.on('conectando_users', function(e) {
             
             var tem_value=0
@@ -345,7 +360,7 @@
                      //  alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
-                       video.controls = true;
+                       video.controls = false;
 
                        //video.load() 
                        video.play();
@@ -391,7 +406,7 @@
                        //alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
-                       video.controls = true;
+                       video.controls = false;
 
 
                        video.play();
@@ -558,6 +573,8 @@
             this.style.display = 'none'
             var qr = document.getElementById("div_qr");
             qr.style.display = 'none'
+             var q = document.getElementById("content");
+            q.style.display = 'block'
             video.play();
          //   alert(JSON.stringify(inicio))
             socket.emit('avisoGanador', {sala : id,win:inicio.Id_Escena});

@@ -52,10 +52,8 @@
             var ip = <%- JSON.stringify(ip) %>;
             var puerto = <%- JSON.stringify(puerto) %>;
             var urlFinal = 'ws://'+ip+':'+puerto;
-            alert("urlFinal: "+urlFinal);
             var content = $('#content');
             var url = 'ws://' + 'localhost:9999';///PONER URLFINAL
-            alert("url: "+url);
 	        var socket = io(urlFinal);
 	        //var socket = io(url);
             
@@ -63,16 +61,13 @@
 
 
             socket.on('connect', function() {
-                alert("connected");
                 
 	        });
           
             socket.emit("cargar_sincronizados", function(){
-                alert("cargar_sincronizados");
             });
 
         	socket.on('num_usuarios_conectados', function(data) {
-                alert("num_usuarios_conectados");
                 if(document.getElementById(data.sala)){
                     alert("get");
                     var row = document.getElementById(data.sala);

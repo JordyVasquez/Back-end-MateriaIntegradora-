@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+    <head>
+        <title>QArt.js Example</title>
+        <style>
+            body {
+                width: 100%;
+                padding: 0;
+                background-color: #FFFFF6;
+            }
+            h1, h2 {
+                text-align: center;
+            }
+
+            input[type=text] {
+                display: block;
+                width: 380px;
+                height: 30px;
+                margin: 0 auto;
+                font-size: 14pt;
+            }
+
+            input[type=number] {
+                display: block;
+                width: 380px;
+                height: 30px;
+                margin: 0 auto;
+                font-size: 14pt;
+            }
+
+            input[type=file] {
+                display: block;
+                width: 380px;
+                height: 30px;
+                margin: 0 auto;
+            }
+
+            label {
+                display: block;
+                width: 380px;
+                margin: 10px auto;
+            }
+
+            .group {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .clear {
+                clear: both;
+            }
+            #qr {
+                margin: 5px;
+            }
+            #image {
+                margin: 5px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Demo</h1>
+
+        <!--<h2>From</h2>-->
+        <p  align="center" id="value"></p>
+        <label>
+            <input style="display: none " id="file" type="file">
+        </label>
+        <div style="display: none " class="group">
+            <div id="image"><img src="./logo.svg" width="171"></div>
+        </div>
+        <!--<h2>To</h2>-->
+        <div align="center">
+            <div id="combine"></div>
+        </div>
+        <div align="center">
+         <button id="play">Reproducir video</button>
+            <video id="video_principal"  width="640" height="480">
+                HTML5 Video is required for this example
+            </video>
+       </div> 
+        <script src="javascripts/qrcode.js"></script>
+        <script src="javascripts/qart.js"></script>
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+        <script>
+            var room = 555555555;
+            alert(room);
+            document.getElementById('value').innerHTML= room;
+
+            var url = 'http://' + window.location.host;
+            var dir_movies = '/movies/'
+            var btnplay = document.getElementById("play");
+            btnplay.addEventListener('click', function play(){
+                 var video = document.getElementById("video_principal");
+                 video.play();
+                });
+            var video = document.getElementById("video_principal");
+            //var inicio=searchInicio(videos_seq)
+            var fileURL = "/movies/inicial.mp4";
+            video.src = fileURL;
+            video.load();
+
+            $(document).ready(function() {
+                var value = room;
+                var filter = 'color';
+                var version = 8;
+                var imagePath = './logo.svg';
+                var self = this;
+
+                
+                function makeQR() {
+                    // console.log('Current version:', version)
+                    qrcode.qrcode.stringToBytes = qrcode.qrcode.stringToBytesFuncs['UTF-8']
+                    var qr = qrcode.qrcode(version, 'H');
+                    qr.addData(value);
+                    try {
+                      qr.make();
+
+                    } catch (err) {
+                      console.log('Version is low:', version)
+                      console.log('Error:', err)
+                    }
+                    //document.getElementById('qr').innerHTML = qr.createImgTag(3);
+                }
+
+                function makeQArt() {
+                    new QArt({
+                        value: value,
+                        imagePath: imagePath,
+                        filter: filter
+                    }).make(document.getElementById('combine'));
+                }
+
+                function getBase64(file, callback) {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = function () {
+                        callback(reader.result);
+                    };
+                }
+
+                
+                $('#value').keyup(function() {
+                    value = $(this).val();
+                    makeQR();
+                    makeQArt();
+                });
+
+                $('#file').change(function() {
+                    getBase64(this.files[0], function(base64Img) {
+                        var regex = /data:(.*);base64,(.*)/gm;
+                        var parts = regex.exec(base64Img);
+                        imagePath = parts[0];
+                        $('#image img').attr('src', imagePath);
+                        makeQArt();
+                    });
+                });
+
+                $('input[type=radio]').click(function() {
+                    filter = $(this).val();
+                    makeQArt();
+                });
+
+                makeQR();
+                makeQArt();
+            });
+        </script>
+    <body>
+</html>
