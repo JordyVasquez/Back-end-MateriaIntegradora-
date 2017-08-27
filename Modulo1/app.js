@@ -487,7 +487,100 @@ app.post('/config_json2', function(req, res) {
 });
 
 
+
 app.all('*', verificarSesion2);
+
+app.post('/cambiar_credenciales', function(req, res) {
+    var params;
+    var usuario_nombre = null;
+    nombre = req.body.username;
+    console.log("User name = " + nombre);
+    //res.send(nombre);
+    passwordHash = req.body.passwordA;
+    var passwordNuevoMD5 = req.body.passwordN;
+    var salt = req.body.salt;
+    var bytes = CryptoJS.AES.decrypt(salt.toString(), 'My Secret Passphrase');
+    var saltDecAes = bytes.toString(CryptoJS.enc.Utf8);
+    console.log('saldDecrypt AES: ', saltDecAes);
+    console.log("User name = " + nombre + ", password is " + passwordHash + ", salt is " + saltDecAes);
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        db.collection("users").find({
+            username: nombre
+        }).toArray(function(err, result) {
+            if (err) throw err;
+            
+            console.log("result length: "+result.length);
+            if(result.length > 0){
+                resultDB = result[0];
+                resultStr = JSON.stringify(resultDB);
+                console.log("dd: " + resultStr);
+                userDB = JSON.parse(resultStr); //password de la base
+                console.log("PassDB: " + userDB.password);
+
+                params = sha512f(userDB.password, saltDecAes);
+                console.log("Param HashPassDB: " + params.passwordHash);
+                var compare = params.passwordHash.localeCompare(passwordHash);
+                var compare_username = nombre.localeCompare(userDB.username);
+                if ((compare == 0) && (compare_username==0)) {
+                    console.log("CORRECTO");
+                    var query2 = {
+                        username: nombre
+                    };
+                    var newvalues = { username: nombre, password: passwordNuevoMD5};
+
+                    db.collection("users").update(query2, newvalues, function(err, result3) {
+                        if (err) {
+                            console.log("NOOO se guardo la nueva contrasenia");
+
+                        } else {
+                            console.log("Se guardoo la nueva contrasenia: "+ passwordNuevoMD5);
+                            res.render('login_admin', {
+                                title: 'Login Admin',
+                                band: 'false',
+                                msm: 'OK',
+                                username: ''
+
+                            });
+
+                        }
+                        
+                    });
+                        
+
+                }
+                else {
+                    console.log("inCORRECTO");
+                    //res.op_second_screen    ("error: "+nombre);
+                    res.render('login_admin', {
+                        msm: 'error',
+                        band: 'true',
+                        username: nombre
+                    });
+
+                }
+
+
+
+            }
+            //console.log("result: "+JSON.stringify(result[0].username));
+             else {
+                console.log("inCORRECTO");
+                //res.op_second_screen    ("error: "+nombre);
+                res.render('login_admin', {
+                    msm: 'error',
+                    band: 'true',
+                    username: nombre
+                });
+
+            }
+
+            db.close();
+        });
+
+    });
+
+});
 
 app.get('/total_usuarios', function(req, res) {
       //console.log("Session var INICIO: " + req.cookies.remember);
