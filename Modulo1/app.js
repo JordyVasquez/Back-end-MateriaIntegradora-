@@ -88,6 +88,19 @@ if ('development' == app.get('env')) {
 }
 
 ipdinamicas();
+
+/*var passwordMD5 = md5("awesome6");
+console.log("awesome6: "+passwordMD5);
+MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var myobj = { username: "javier", password: passwordMD5};
+      db.collection("users").insertOne(myobj, function(err, res) {
+      if (err) throw err;
+      console.log("1 record inserted");
+      db.close();
+      });
+  });*/
+
 MongoClient.connect(url, function(err, db) {
     if (err) {
         throw err;
@@ -145,7 +158,13 @@ app.get('/', function(req, res) {
     });
 });
 
-
+app.get('/credenciales', function(req, res) {
+    //res.render('login_admin', { title: 'Login Admin' });
+    res.render('credenciales', {
+        title: 'Cambiar_password'
+        
+    });
+});
 
 app.get('/escenas', function(req, res) {
     MongoClient.connect(url, function(err, db) {
@@ -1513,17 +1532,7 @@ MongoClient.connect(url, function(err, db) {
 
 
 }
-/*var passwordMD5 = md5("awesome6");
-console.log("awesome6: "+passwordMD5);
-MongoClient.connect(url, function(err, db) {
-      if (err) throw err;
-      var myobj = { username: "sjcastro", password: passwordMD5};
-      db.collection("users").insertOne(myobj, function(err, res) {
-      if (err) throw err;
-      console.log("1 record inserted");
-      db.close();
-      });
-  });*/
+
 
 
 app.get('/cerrar2', function(req, res) {

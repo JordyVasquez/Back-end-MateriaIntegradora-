@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Credenciales</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="../css/dashboard.css" rel="stylesheet">
+        <link href="css/dataTable.css" rel="stylesheet" />
+        <link id="template-file" href="templates/template.ejs" rel="import" />
+        <link href="css/dashboard.css" rel="stylesheet">
+              <link rel="icon" type="image/png" href="images/icono.png" />
+    <script src="js/html-imports.min.js"></script>  
+    </head>
+
+	<body>
+	`
+         <script>
+
+          document.addEventListener( 'HTMLImportsLoaded', function () 
+            {
+                var link = document.querySelector('#template-file');
+                var template = link.import.querySelector('#template');
+                document.body.appendChild(document.importNode(template, true));  
+
+
+
+            } )
+        </script>
+        
+        <div class="col-sm-12  col-md-12  main">
+	       <form method="post" action="/config_json2" id="loginForm">
+    	        <label>Nombre usuario: <input class="form-control" type="text" id='username' name='username' placeholder="username"/> </label>
+                </br></br>
+                <label>Contrasena actual: <input class="form-control" type="password" id='passwordA' name='passwordA' placeholder="contrasenia actual"/> </label>
+                </br></br>
+                <label>Contrasena nueva: <input class="form-control" type="password" id='passwordN' name='passwordN' placeholder="contrasenia Nueva"/> </label>
+                </br></br>
+                <label>Confirmar nueva contrasena: <input class="form-control" type="password" id='passwordN2' name='passwordN2' placeholder="Confirmar nueva contrasenia"/> </label></br></br>
+                <button type="button" class="btn">Submit</button>
+            </form>
+               <!--<div id="content"></div>-->
+	    </div>
+            <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        <script src="js/dataTable.js"></script>
+		<script>
+
+            
+
+           
+        </script>    
+	</body>
+</html>
