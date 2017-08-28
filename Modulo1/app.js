@@ -28,7 +28,7 @@ var passAdminHash = '';
 var resultDB = '';
 var resultStr = '';
 var finalJson = '';
-var finalPassDB = '';
+var userDB = '';
 var app = express();
 var server = http.createServer(app);
 var app_chat = require('express')();
@@ -88,6 +88,19 @@ if ('development' == app.get('env')) {
 }
 
 ipdinamicas();
+
+/*var passwordMD5 = md5("awesome6");
+console.log("awesome6: "+passwordMD5);
+MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+      var myobj = { username: "javier", password: passwordMD5};
+      db.collection("users").insertOne(myobj, function(err, res) {
+      if (err) throw err;
+      console.log("1 record inserted");
+      db.close();
+      });
+  });*/
+
 MongoClient.connect(url, function(err, db) {
     if (err) {
         throw err;
@@ -145,7 +158,13 @@ app.get('/', function(req, res) {
     });
 });
 
-
+app.get('/credenciales', function(req, res) {
+    //res.render('login_admin', { title: 'Login Admin' });
+    res.render('credenciales', {
+        title: 'Cambiar_password'
+        
+    });
+});
 
 app.get('/escenas', function(req, res) {
     MongoClient.connect(url, function(err, db) {
@@ -368,6 +387,7 @@ app.get('/cerrar', function(req, res) {
 });
 app.post('/config_json2', function(req, res) {
     var params;
+    var usuario_nombre = null;
     nombre = req.body.username;
     console.log("User name = " + nombre);
     //res.send(nombre);
@@ -384,47 +404,71 @@ app.post('/config_json2', function(req, res) {
         }).toArray(function(err, result) {
             if (err) throw err;
             //resultDB = result;
-            resultDB = result[0];
-            resultStr = JSON.stringify(resultDB)
-            console.log("dd: " + resultStr);
-            resultStr = resultStr.replace('[', '')
-            resultStr = resultStr.replace(']', '')
-            console.log("frase2: " + resultStr);
-            finalPassDB = JSON.parse(resultStr); //password de la base
-            console.log("PassDB: " + finalPassDB.password);
+            
+            console.log("result length: "+result.length);
+            
+            if(result.length > 0){
+                /*for (var i = 0; i < result.length; i++) {
+                    usuario_nombre = result[i].username;
+                    console.log("cont "+i+ ": "+usuario_nombre);
+                    break;
+                }*/
+                resultDB = result[0];
+                resultStr = JSON.stringify(resultDB);
+                console.log("dd: " + resultStr);
+                //console.log("frase2: " + resultStr);
+                userDB = JSON.parse(resultStr); //password de la base
+                console.log("PassDB: " + userDB.password);
 
-            params = sha512f(finalPassDB.password, saltDecAes);
-            console.log("Param HashPassDB: " + params.passwordHash);
-            var compare = params.passwordHash.localeCompare(passwordHash);
-            if (compare == 0) {
-                var id_session = Math.round(Date.now() * Math.random() / 100000);
-                console.log("CORRECTO");
-                flagSession = true;
-                cerrar = false;
-                console.log("id: " + id_session);
-                expired = new Date(Date.now() + (20000));
-                console.log("now: " + new Date(Date.now()) + " expired: " + expired);
-                //res.redirect('/contenido');
-                //req.session.mivariable=id_session;
-                res.cookie('remember', 1, {
-                    maxAge: minute
-                });
-                    MongoClient.connect(url, function(err, db) {
-                    if (err) throw err;
-                    db.collection("Contenidos").find({}).toArray(function(err, result) {
+                params = sha512f(userDB.password, saltDecAes);
+                console.log("Param HashPassDB: " + params.passwordHash);
+                var compare = params.passwordHash.localeCompare(passwordHash);
+                var compare_username = nombre.localeCompare(userDB.username);
+                if ((compare == 0) && (compare_username==0)) {
+                    var id_session = Math.round(Date.now() * Math.random() / 100000);
+                    console.log("CORRECTO");
+                    flagSession = true;
+                    cerrar = false;
+                    console.log("id: " + id_session);
+                    expired = new Date(Date.now() + (20000));
+                    console.log("now: " + new Date(Date.now()) + " expired: " + expired);
+                    //res.redirect('/contenido');
+                    //req.session.mivariable=id_session;
+                    res.cookie('remember', 1, {
+                        maxAge: minute
+                    });
+                        MongoClient.connect(url, function(err, db) {
                         if (err) throw err;
-                        res.render('contenidos_subidos', {
-                            title: 'Escenas Guardadas',
-                            resultado: result,
-                            firebaseConfig: firebaseConfig
+                        db.collection("Contenidos").find({}).toArray(function(err, result) {
+                            if (err) throw err;
+                            res.render('contenidos_subidos', {
+                                title: 'Escenas Guardadas',
+                                resultado: result,
+                                firebaseConfig: firebaseConfig
+                            });
+                            //console.log("escenas: " + JSON.stringify(result));
+                            db.close();
                         });
-                        //console.log("escenas: " + JSON.stringify(result));
-                        db.close();
+
                     });
 
-                });
+                }
+                else {
+                    console.log("inCORRECTO");
+                    //res.op_second_screen    ("error: "+nombre);
+                    res.render('login_admin', {
+                        msm: 'error',
+                        band: 'true',
+                        username: nombre
+                    });
 
-            } else {
+                }
+
+
+
+            }
+            //console.log("result: "+JSON.stringify(result[0].username));
+             else {
                 console.log("inCORRECTO");
                 //res.op_second_screen    ("error: "+nombre);
                 res.render('login_admin', {
@@ -443,7 +487,100 @@ app.post('/config_json2', function(req, res) {
 });
 
 
+
 app.all('*', verificarSesion2);
+
+app.post('/cambiar_credenciales', function(req, res) {
+    var params;
+    var usuario_nombre = null;
+    nombre = req.body.username;
+    console.log("User name = " + nombre);
+    //res.send(nombre);
+    passwordHash = req.body.passwordA;
+    var passwordNuevoMD5 = req.body.passwordN;
+    var salt = req.body.salt;
+    var bytes = CryptoJS.AES.decrypt(salt.toString(), 'My Secret Passphrase');
+    var saltDecAes = bytes.toString(CryptoJS.enc.Utf8);
+    console.log('saldDecrypt AES: ', saltDecAes);
+    console.log("User name = " + nombre + ", password is " + passwordHash + ", salt is " + saltDecAes);
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        db.collection("users").find({
+            username: nombre
+        }).toArray(function(err, result) {
+            if (err) throw err;
+            
+            console.log("result length: "+result.length);
+            if(result.length > 0){
+                resultDB = result[0];
+                resultStr = JSON.stringify(resultDB);
+                console.log("dd: " + resultStr);
+                userDB = JSON.parse(resultStr); //password de la base
+                console.log("PassDB: " + userDB.password);
+
+                params = sha512f(userDB.password, saltDecAes);
+                console.log("Param HashPassDB: " + params.passwordHash);
+                var compare = params.passwordHash.localeCompare(passwordHash);
+                var compare_username = nombre.localeCompare(userDB.username);
+                if ((compare == 0) && (compare_username==0)) {
+                    console.log("CORRECTO");
+                    var query2 = {
+                        username: nombre
+                    };
+                    var newvalues = { username: nombre, password: passwordNuevoMD5};
+
+                    db.collection("users").update(query2, newvalues, function(err, result3) {
+                        if (err) {
+                            console.log("NOOO se guardo la nueva contrasenia");
+
+                        } else {
+                            console.log("Se guardoo la nueva contrasenia: "+ passwordNuevoMD5);
+                            res.render('login_admin', {
+                                title: 'Login Admin',
+                                band: 'false',
+                                msm: 'OK',
+                                username: ''
+
+                            });
+
+                        }
+                        
+                    });
+                        
+
+                }
+                else {
+                    console.log("inCORRECTO");
+                    //res.op_second_screen    ("error: "+nombre);
+                    res.render('login_admin', {
+                        msm: 'error',
+                        band: 'true',
+                        username: nombre
+                    });
+
+                }
+
+
+
+            }
+            //console.log("result: "+JSON.stringify(result[0].username));
+             else {
+                console.log("inCORRECTO");
+                //res.op_second_screen    ("error: "+nombre);
+                res.render('login_admin', {
+                    msm: 'error',
+                    band: 'true',
+                    username: nombre
+                });
+
+            }
+
+            db.close();
+        });
+
+    });
+
+});
 
 app.get('/total_usuarios', function(req, res) {
       //console.log("Session var INICIO: " + req.cookies.remember);
@@ -1488,17 +1625,7 @@ MongoClient.connect(url, function(err, db) {
 
 
 }
-/*var passwordMD5 = md5("awesome6");
-console.log("awesome6: "+passwordMD5);
-MongoClient.connect(url, function(err, db) {
-      if (err) throw err;
-      var myobj = { username: "sjcastro", password: passwordMD5};
-      db.collection("users").insertOne(myobj, function(err, res) {
-      if (err) throw err;
-      console.log("1 record inserted");
-      db.close();
-      });
-  });*/
+
 
 
 app.get('/cerrar2', function(req, res) {
