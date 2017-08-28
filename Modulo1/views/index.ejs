@@ -210,7 +210,7 @@
         // abrimos la conexion
 
         
-        var socket = io(url);
+        var socket = io(urlf);
         //var socket = io(urlf); ///CAMBIAR POR URL 
 
         socket.on('connect', function() {
@@ -231,7 +231,7 @@
        
          socket2.on('broadcast', function(msg) {
               //alert("broadcast: "+msg);
-              content.append('<span class="msm"> '+msg + ' <span /><br />');
+              content.append('<span class="msm"> <img src="'+msg.url_imagen+'" class="img-responsive" alt="Mecanixs"></img>' + msg.msm+' <span /><br />');
               var elem = document.getElementById('content');
               elem.scrollTop = elem.scrollHeight;
             });

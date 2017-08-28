@@ -24,7 +24,7 @@ io.sockets.on('connection', function(socket) {
   socket.on('message', function(msg, ack) {
     console.log("msg.canal: "+msg.canal+" msg.mensaje: "+msg.mensaje);
     ;
-    socket.broadcast.to(msg.canal).emit('broadcast', customFilter.clean(msg.mensaje));
+    socket.broadcast.to(msg.canal).emit('broadcast', {msm:customFilter.clean(msg.mensaje),url:msg.url_imagen});
     ack();
  });
 });
