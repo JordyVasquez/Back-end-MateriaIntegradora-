@@ -82,7 +82,7 @@
 	 
 	        $("input[name=sendBtn]").click(function(){
 	            var msg = ""+username + " : " +  $("input[name=chatTxt]").val();
-	            socket2.emit('message', {mensaje : msg, canal: id_sala}, function() {
+	            socket2.emit('message', {mensaje : msg, canal: id_sala, url_imagen:"https://lumiere-a.akamaihd.net/v1/images/image_ccc4b657.jpeg"}, function() {
 	            	//alert("mensaje: "+msg);
 	            	content.append(msg + '<br />');
 		        });
@@ -128,7 +128,7 @@
             
         }
         socket.on('confirmacion_join', function(data) {
-            	          alert(data.msm);
+            	          alert(JSON.stringify(data.contenido_transmedia));
             	       //   alert(data.contenido_transmedia);
 	       		});
                 socket.on('play', function(data) {
