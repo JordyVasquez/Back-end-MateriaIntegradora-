@@ -58,13 +58,13 @@ app.use(express.cookieParser());
 app.use(cookieParser('my secret here'));
 const minute = 10000 * 10000;
 const firebaseConfig = {
-    apiKey: 'AIzaSyDy6C7E3ftZNQyUsLbjzAlpFAi0WSVdQs0',
-    authDomain: 'config-back-end.firebaseapp.com',
-    databaseURL: 'https://config-back-end.firebaseio.com',
-    projectId: 'config-back-end',
+    apiKey: 'AIzaSyAlNrvWc7IjmhdLrlm3L26uZRcohhCPOf0',
+    authDomain: 'config-admin.firebaseapp.com',
+    databaseURL: 'https://config-admin.firebaseio.com',
+    projectId: 'config-admin',
     // A bucket is a container for objects (files).
-    storageBucket: 'config-back-end.appspot.com',
-    messagingSenderId: '216603143387'
+    storageBucket: 'config-admin.appspot.com',
+    messagingSenderId: '82402474237'
 }
 
 //Express 4
@@ -1354,7 +1354,7 @@ io.sockets.on('connection', function(socket) {
     socket.on('crearSala', function(data) {
         // transmitimos el movimiento a todos los clienftes conectados
         console.log('Sala:-------------------', data.sala.toString());
-        console.log('Sala:', data);
+       // console.log('Sala:', data);
         socket.join(data.sala);
         if (data.admin != null && data.admin) {
             console.log('entro if');
@@ -1417,7 +1417,9 @@ io.sockets.on('connection', function(socket) {
             var sala = keys[i];
             console.log("Meth Disconnect salaID: "+sala);
             try{
-                var cont = io.sockets.adapter.rooms[sala].length-1;
+                console.log(rooms);
+                          console.log(io.sockets.adapter.rooms[sala.toString()]);
+                var cont = io.sockets.adapter.rooms[sala.toString()].length-1;
                 console.log("disconnect "+sala+"-> "+(cont));
                 socket.broadcast.emit('num_usuarios_conectados', {
                     connections: cont,
@@ -1425,13 +1427,19 @@ io.sockets.on('connection', function(socket) {
                 });
                 console.log("1 broadcast");
                 socket.broadcast.to(sala).emit('usuarios_sincronizados', {
-                        connections: (io.sockets.adapter.rooms[sala].length)-1
+                        connections: (io.sockets.adapter.rooms[sala.toString()].length)-1
                  });
                 
-                console.log("2 broadcast");
+                console.log("2 broadcast" +cont);
+                if(cont==0 ){
+                    console.log(hash_cont_conectados.keys())
+                            console.log(hash_cont_conectados)
+                hash_cont_conectados.remove(sala.toString())
+                 console.log(hash_cont_conectados.keys())
+                }
             }
             catch(err){
-                console.log("sala "+ sala+" conectados: 0");
+                console.log("Error sala "+ sala+" conectados: 0");
                 break;
             }
             

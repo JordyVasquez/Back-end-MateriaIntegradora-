@@ -146,7 +146,7 @@
 
         <div id="contentU" class="col-md-1 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-2 col-xs-offset-1 col-lg-1 col-lg-offset-1">
 
-            <span class="glyphicon glyphicon-eye-open"></span> <label id="con"></label>
+            <span class="glyphicon glyphicon-eye-open"></span> <label id="con">0</label>
 
         </div>
 
@@ -163,7 +163,7 @@
 
     <script>
         schema = JSON.parse(LZString.decompressFromBase64('<%= escenas%>'));
-
+var current_video ="";
         var $schema2 = document.getElementById('schema2');
 
         $schema2.value = JSON.stringify(schema, null, 2);
@@ -210,7 +210,7 @@
         // abrimos la conexion
 
         
-        var socket = io(url);
+        var socket = io(urlf);
         //var socket = io(urlf); ///CAMBIAR POR URL 
 
         socket.on('connect', function() {
@@ -243,10 +243,13 @@
             });
         socket.on('usuarios_sincronizados', function(data) {
            $('#con').html(data.connections);
-
+      if(data.connections==0){
+         resetar();
+           }
         });
         socket.on('disconnect', function(data) {
            $('#con').html(data.connections);
+     
 
         });
          content.append('<h3>Sala de Chat <h3/><br />');
@@ -321,9 +324,9 @@
         var video = document.getElementById(inicio.Name_Escena);
         video.src = inicio.Escena;
         video.controls = false;
-        video.setAttribute("preload", "auto"); // if HTML source element is used
+        //video.setAttribute("preload", "auto"); // if HTML source element is used
         var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
-        var current_video = inicio.Name_Escena;
+        current_video = inicio.Name_Escena;
         document.getElementById(current_video).style.display = "block";
         var btnplay = document.getElementById("play");
         btnplay.addEventListener('click', play);
@@ -381,7 +384,11 @@
                        myMapOptions = new Map();
             }
           }
-             
+             else {
+
+                alert("video acabado")
+                 resetar();
+             }
           
 
         }
@@ -427,7 +434,10 @@
                        myMapOptions = new Map();
                      }
                 }
-          
+          else {
+
+             resetar();
+          }
            
             }      
             else{
@@ -573,6 +583,7 @@
         function play() {
            // alert("play: "+current_video);
             var video = document.getElementById(current_video);
+              video.style.display = 'block'
            // alert("Start: " + video.buffered.start(0)
          // + " End: " + video.buffered.end(0));
      
@@ -591,6 +602,30 @@
         }
 
 var qrcode;
+function resetar(){
+
+    inicio = searchInicio(videos_seq);
+         video = document.getElementById(inicio.Name_Escena);
+        video.src = inicio.Escena;
+        video.controls = false;
+
+         document.getElementById(current_video).style.display = "none";
+         document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
+         escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
+        current_video = inicio.Name_Escena;
+        document.getElementById(current_video).style.display = "none";
+        var btnplay = document.getElementById("play");
+        btnplay.style.display = "inline-block";
+              var q = document.getElementById("content");
+            q.style.display = 'none'          
+                       ganador=''
+                       video_default = searchVideoDefaultOnArray(inicio.Id_Escena, videos_seq);
+                       seteaMetodos(inicio,videos_seq);
+                       myMapOptions = new Map();
+                       var qr = document.getElementById("div_qr");
+            qr.style.display = 'block'
+            document.body.style.backgroundColor='#FFFFFF';
+}
         function makeQArt() {
             var tam = 0;
             if (document.getElementById('div_qr').offsetHeight <= document.getElementById('div_qr').offsetWidth) {

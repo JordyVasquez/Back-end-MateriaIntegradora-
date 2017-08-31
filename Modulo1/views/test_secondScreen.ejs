@@ -41,7 +41,7 @@
  		//alert("urlFinal_chat: "+urlFinal_chat);
         var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
 
-        var socket = io(urlFinal);
+        var socket = io(url);
         //var socket = io(url); //PONER URL FINAL
 
         socket.on('connect', function() {
