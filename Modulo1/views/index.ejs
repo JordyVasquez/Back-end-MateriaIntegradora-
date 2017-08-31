@@ -172,8 +172,13 @@
         var content = $('#content');
                   var ip_chat = <%- JSON.stringify(ip_chat) %>;
         var puerto_chat = <%- JSON.stringify(puerto_chat) %>;
-                var urlFinal_chat = 'ws://'+ip_chat+':'+puerto_chat;
-                var socket2 = io(urlFinal_chat);
+        var url2 = 'ws://' + 'localhost:3000';
+        var urlFinal_chat = 'ws://'+ip_chat+':'+puerto_chat;
+        var socket2 = io(urlFinal_chat);
+        //var socket2 = io(url2);
+        var hashmap = null;
+        var bandUpdate = false;
+
      
         //$('#con').html(contador);
         /*sserver.on('message', function(message) {
@@ -197,8 +202,9 @@
         var  text = JSON.stringify(textt.Contenido_Live, null, 2);
            
        // alert(text);
-       // alert(Contenido_Trasmedia);
-  
+       //alert("Imagenes: "+JSON.stringify((JSON.parse(Contenido_Trasmedia)).Imagenes));
+
+        
 
         var videos_seq = JSON.parse(text);
         var id = Math.round($.now() * Math.random() / 10000000);
@@ -320,7 +326,7 @@
        // alert("inicio: "+inicio.Name_Escena);
         var video = document.getElementById(inicio.Name_Escena);
         video.src = inicio.Escena;
-        video.controls = false;
+        video.controls = true;
         video.setAttribute("preload", "auto"); // if HTML source element is used
         var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
         var current_video = inicio.Name_Escena;
@@ -366,7 +372,7 @@
                      //  alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
-                       video.controls = false;
+                       video.controls = true;
 
                        //video.load() 
                        video.play();
@@ -387,14 +393,24 @@
         }
 
         function seteaMetodos(inici,videos_se) {  
-                //alert("ENTER seteaMetodos: "+inici.Escena);                  
+                //alert("ENTER seteaMetodos: "+inici.Escena); 
+              hashmap = new Map();
+               for (var i = 0; i < textt.Contenido_Trasmedia.Imagenes.length; i++) {
+                  if (inicio.Id_Escena.localeCompare(textt.Contenido_Trasmedia.Imagenes[i].ID_Escena) == 0) {
+                    alert("Contenido: "+textt.Contenido_Trasmedia.Imagenes[i].Imagen);
+                     hashmap.set(textt.Contenido_Trasmedia.Imagenes[i].Imagen, textt.Contenido_Trasmedia.Imagenes[i].Tiempo);
+
+                  }
+               }
+
                if(isVideoInteraccion(inici.Escena, videos_se)){
                   //alert("SM con Interaccion: "+inici.Escena);
                   video.addEventListener("timeupdate",sendVideoOnArrayInteraccion);
-                   video.addEventListener("ended",endedConIteraccion);
+                  video.addEventListener("ended",endedConIteraccion);
                 }
                 else {
-                  //alert("SM sin Interaccion: "+inici.Escena);  
+                  alert("SM sin Interaccion: "+inici.Escena);  
+                  video.addEventListener("timeupdate",sendImagenSinInteraccion);
                   video.addEventListener("ended",endedSinIteraccion);
                 }
         }
@@ -412,7 +428,7 @@
                        //alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
-                       video.controls = false;
+                       video.controls = true;
 
 
                        video.play();
@@ -467,33 +483,160 @@
             
         }
   function sendVideoOnArrayInteraccion() {
+        var iter = 0;
         var time=searchVideoTimeInteraccion(video.src,videos_seq)
-  
+        try{
+
+          var json = buscarVideo(hashmap);
+          var time_transm = json.tiempo;
+          var url = json.url;
+          //alert("url: "+url);
+          //alert("time_transm: "+time_transm); 
+        }
+         catch(err) {
+            time_transm= null;
+        }
+
+
         var vTime = video.currentTime;
         var duraction=video.duration;
         var resul=duraction-vTime;
-        
-        if(time!=-1 && resul <=(time)){ 
+
+
+        var vTime2 = video.currentTime;
+        var duraction2=video.duration;
+        var resul2=duraction2-vTime2;
+
+        if(resul<=0){
             document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
+            bandUpdate = false;
+            alert("con Interaccion 00");
+        }
+        else{
+
+          if((time!=-1) && (resul <=(time)) && (bandUpdate==false)){ 
+            //document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
             var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
             socket.emit('opciones', {sala : id,opciones:{escenas}});
-           // alert("escenas: "+JSON.stringify(escenas));
-            if(resul>=15  && resul<=20){
-               // alert("quedan 20");
-                /*for(var i=0; i<escenas.length; i++){
-                  alert("escena: "+escenas[i].Escena);
-                  var escenaDF = document.getElementById("generico"+[i+1]);
-                  escenaDF.src = escenas[i].Escena;
-                  escenaDF.setAttribute("preload", "auto");
-                  alert("nombre: "+escenas[i].Name_Escena);
-
-              }*/
-
-            }
+            bandUpdate = true;
+            alert("escenas: "+JSON.stringify(escenas));
               
 
+          }
+
+          if(time_transm!=null && resul2<=time_transm){
+            alert("enter trasnmedia");
+            alert("time: "+time_transm);
+            //var imagen_trasnm = null; 
+            hashmap.delete(url);
+            alert("imagen_trasnm: "+url);
+            socket.emit("imagen", url);
+          
+            
+          }
+
         }
+        
     }
+
+  function sendImagenSinInteraccion() {
+        try{
+
+          var json = buscarVideo(hashmap);
+          //alert("json: "+JSON.stringify(json));
+          var time_transm = json.tiempo;
+          var url = json.url;
+          //alert("url: "+url);
+          //alert("time_transm: "+time_transm); 
+        }
+         catch(err) {
+            time_transm= null;
+        }
+
+
+        var vTime2 = video.currentTime;
+        var duraction2=video.duration;
+        var resul2=duraction2-vTime2;
+
+        if(resul2<=0){
+          document.getElementById(current_video).removeEventListener("timeupdate", sendImagenSinInteraccion);
+          alert("00");
+        }
+        else{
+            if(time_transm!=null && resul2<=time_transm){
+              alert("enter trasnmedia");
+              alert("time: "+time_transm);
+              //var imagen_trasnm = null; 
+              hashmap.delete(url);
+              alert("imagen_trasnm: "+url);
+              socket.emit("imagen", url);
+            
+              
+            }
+
+        }
+
+        
+        
+       /*try{
+
+          var time_transm = searchImageTimeInteraccion(inicio.Id_Escena, textt); 
+          //alert("time_transm: "+time_transm); 
+        }
+         catch(err) {
+            time_transm= null;
+            alert("time_transm: "+time_transm);
+        }
+
+
+        
+        var vTime2 = video.currentTime;
+        var duraction2=video.duration;
+        var resul2=duraction2-vTime2;
+        //alert("resul2: "+resul2);
+        
+
+        if((time_transm!=null) && (resul2<=time_transm)){
+          //alert("enter trasnmedia");
+          var imagen_trasnm = null; 
+          document.getElementById(current_video).removeEventListener("timeupdate", sendImagenSinInteraccion);
+          for (var i = 0; i < textt.Contenido_Trasmedia.Imagenes.length; i++) {
+            if (inicio.Id_Escena.localeCompare(textt.Contenido_Trasmedia.Imagenes[i].ID_Escena) == 0) {
+              imagen_trasnm = textt.Contenido_Trasmedia.Imagenes[i].Imagen;
+              alert("imagen_trasnm: "+imagen_trasnm);
+              socket.emit("imagen", imagen_trasnm);
+
+            }
+            
+          }
+          
+        }*/
+    }
+
+    function buscarVideo(hashmap){
+      var minV = null;
+      var minK = null
+      var resultado = null;
+      //alert("hashmap: "+hashmap.length);
+      for (var [key, value] of hashmap) {
+          //alert("key: "+key);
+          //alert("value: "+value);
+          if (minV == null || minV < value) {
+              minV = value; 
+              minK = key;
+              //alert("min: "+minV);
+          }
+            
+      }
+      resultado= {
+        url : minK,
+        tiempo : minV
+      };
+      //hashmap.remove(min);
+      //alert("resultado: "+resultado);
+      return resultado;
+
+    } 
 
 
    function searchVideoDefaultOnArray(Key, myArray) {
@@ -523,10 +666,24 @@
 
 
         }
-             function searchVideoTimeInteraccion(Key, myArray) {
+        function searchVideoTimeInteraccion(Key, myArray) {
             for (var i = 0; i < myArray.Escenas.length; i++) {
                         if (Key.localeCompare(myArray.Escenas[i].Escena) == 0) {
                            return (myArray.Escenas[i].Tiempo);
+                    }
+                
+            }
+            return -1;
+
+
+        }
+
+        function searchImageTimeInteraccion(Id_Escena, textt) {
+            for (var i = 0; i < textt.Contenido_Trasmedia.Imagenes.length; i++) {
+                        //alert("ID_Escena trasnmedia: "+textt.Contenido_Trasmedia.Imagenes[i].ID_Escena);
+                        if (Id_Escena.localeCompare(textt.Contenido_Trasmedia.Imagenes[i].ID_Escena) == 0) {
+                           //alert("tiempo image: "+textt.Contenido_Trasmedia.Imagenes[i].Tiempo);
+                           return (textt.Contenido_Trasmedia.Imagenes[i].Tiempo);
                     }
                 
             }
