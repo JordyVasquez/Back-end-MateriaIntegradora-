@@ -202,7 +202,10 @@
         var  text = JSON.stringify(textt.Contenido_Live, null, 2);
            
        // alert(text);
+       //alert("Contenido_Trasmedia: "+Contenido_Trasmedia);
        //alert("Imagenes: "+JSON.stringify((JSON.parse(Contenido_Trasmedia)).Imagenes));
+       //alert("Imagenes: "+JSON.stringify(textt.Contenido_Trasmedia.Imagenes));
+       //alert(textt.Contenido_Trasmedia.Imagenes.length);       
 
         
 
@@ -517,8 +520,9 @@
           if((time!=-1) && (resul <=(time)) && (bandUpdate==false)){ 
             //document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
             var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
-            socket.emit('opciones', {sala : id,opciones:{escenas}});
+            socket.emit('opciones', {sala : id, opciones:{escenas}, pregunta: inicio.Pregunta});
             bandUpdate = true;
+            alert("pregunta: "+ inicio.Pregunta);
             alert("escenas: "+JSON.stringify(escenas));
               
 
