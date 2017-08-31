@@ -1338,7 +1338,11 @@ io.sockets.on('connection', function(socket) {
     socket.on('opciones', function(data) {
         // transmitimos el movimiento a todos los clienntes conectados
         console.log('Opciones:', data.opciones);
-        io.to(data.sala).emit('op_second_screen', data.opciones);
+        console.log('Pregunta: ', data.pregunta);
+        //io.to(data.sala).emit('op_second_screen', data.opciones);
+        io.to(data.sala).emit('op_second_screen', {
+                                                    opciones : data.opciones,
+                                                    pregunta: data.pregunta});
     });
     socket.on('mensaje', function(data) {
         // transmitimos el movimiento a todos los clienntes conectados
