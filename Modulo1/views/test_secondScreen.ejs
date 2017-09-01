@@ -135,8 +135,13 @@
                           alert("play" + data.escenaCurrent);
                         
                 });
+                socket.on('imagen', function(data) {
+                          alert("url: " + data);
+                        
+                });
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
         socket.on('op_second_screen', function(e) {
+        	alert("pregunta: "+ e.pregunta);
 
             var op = document.getElementById("opciones");
             var padre = op.parentNode;
@@ -155,6 +160,7 @@
                 nuevoBoton.addEventListener('click', enviarAccion);
                 op.appendChild(nuevoBoton);
             }
+
             padre.appendChild(op);
 
         });
