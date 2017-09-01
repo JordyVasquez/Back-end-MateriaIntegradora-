@@ -41,7 +41,7 @@
  		//alert("urlFinal_chat: "+urlFinal_chat);
         var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
 
-        var socket = io(urlFinal);
+        var socket = io(url);
         //var socket = io(url); //PONER URL FINAL
 
         socket.on('connect', function() {
@@ -132,12 +132,14 @@
             	       //   alert(data.contenido_transmedia);
 	       		});
                 socket.on('play', function(data) {
-                          alert("play" + data.escenaCurrent);
+                        //  alert("play" + data.escenaCurrent);
                         
                 });
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
-        socket.on('op_second_screen', function(e) {
-
+        socket.on('op_second_screen', function(data) {
+            alert(data.pregunta)
+        alert(data.opciones)
+var e=data.opciones;
             var op = document.getElementById("opciones");
             var padre = op.parentNode;
             padre.removeChild(op);

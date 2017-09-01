@@ -219,7 +219,7 @@ var current_video ="";
         // abrimos la conexion
 
         
-        var socket = io(url);
+        var socket = io(urlf);
         //var socket = io(urlf); ///CAMBIAR POR URL 
 
         socket.on('connect', function() {
@@ -407,7 +407,7 @@ var current_video ="";
               hashmap = new Map();
                for (var i = 0; i < textt.Contenido_Trasmedia.Imagenes.length; i++) {
                   if (inicio.Id_Escena.localeCompare(textt.Contenido_Trasmedia.Imagenes[i].ID_Escena) == 0) {
-                    alert("Contenido: "+textt.Contenido_Trasmedia.Imagenes[i].Imagen);
+                 //   alert("Contenido: "+textt.Contenido_Trasmedia.Imagenes[i].Imagen);
                      hashmap.set(textt.Contenido_Trasmedia.Imagenes[i].Imagen, textt.Contenido_Trasmedia.Imagenes[i].Tiempo);
 
                   }
@@ -423,7 +423,7 @@ var current_video ="";
                   video.addEventListener("ended",endedConIteraccion);
                 }
                 else {
-                  alert("SM sin Interaccion: "+inici.Escena);  
+                //  alert("SM sin Interaccion: "+inici.Escena);  
                   video.addEventListener("timeupdate",sendImagenSinInteraccion);
                   video.addEventListener("ended",endedSinIteraccion);
                 }
@@ -527,7 +527,7 @@ var current_video ="";
         if(resul<=0){
             document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
             bandUpdate = false;
-            alert("con Interaccion 00");
+          //  alert("con Interaccion 00");
         }
         else{
 
@@ -536,18 +536,18 @@ var current_video ="";
             var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
             socket.emit('opciones', {sala : id, opciones:{escenas}, pregunta: inicio.Pregunta});
             bandUpdate = true;
-            alert("pregunta: "+ inicio.Pregunta);
-            alert("escenas: "+JSON.stringify(escenas));
+          //  alert("pregunta: "+ inicio.Pregunta);
+           // alert("escenas: "+JSON.stringify(escenas));
               
 
           }
 
           if(time_transm!=null && resul2<=time_transm){
             //alert("enter trasnmedia");
-            alert("time: "+time_transm);
+          //  alert("time: "+time_transm);
             //var imagen_trasnm = null; 
             hashmap.delete(url);
-            alert("imagen_trasnm: "+url);
+           // alert("imagen_trasnm: "+url);
             socket.emit("imagen", url);
           
             
@@ -578,7 +578,7 @@ var current_video ="";
 
         if(resul2<=0){
           document.getElementById(current_video).removeEventListener("timeupdate", sendImagenSinInteraccion);
-          alert("00");
+         // alert("00");
         }
         else{
             if(time_transm!=null && resul2<=time_transm){

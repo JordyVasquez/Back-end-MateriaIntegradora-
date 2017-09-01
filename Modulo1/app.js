@@ -1339,6 +1339,9 @@ io.sockets.on('connection', function(socket) {
         // transmitimos el movimiento a todos los clienntes conectados
         console.log('Opciones:', data.opciones);
         console.log('Pregunta: ', data.pregunta);
+        if(data.pregunta==null || data.pregunta==""){
+            data.pregunta="¿Qué desición debera tomar?"
+        }
         //io.to(data.sala).emit('op_second_screen', data.opciones);
         io.to(data.sala).emit('op_second_screen', {
                                                     opciones : data.opciones,
