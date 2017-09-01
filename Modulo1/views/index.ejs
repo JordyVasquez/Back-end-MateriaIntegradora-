@@ -412,6 +412,10 @@ var current_video ="";
 
                   }
                }
+               /*for (var [key, value] of hashmap) {
+                //alert("key: "+key);
+                alert("value: "+value);
+              }*/
 
                if(isVideoInteraccion(inici.Escena, videos_se)){
                   //alert("SM con Interaccion: "+inici.Escena);
@@ -539,7 +543,7 @@ var current_video ="";
           }
 
           if(time_transm!=null && resul2<=time_transm){
-            alert("enter trasnmedia");
+            //alert("enter trasnmedia");
             alert("time: "+time_transm);
             //var imagen_trasnm = null; 
             hashmap.delete(url);
@@ -578,7 +582,7 @@ var current_video ="";
         }
         else{
             if(time_transm!=null && resul2<=time_transm){
-              alert("enter trasnmedia");
+              //alert("enter trasnmedia");
               alert("time: "+time_transm);
               //var imagen_trasnm = null; 
               hashmap.delete(url);
@@ -633,13 +637,15 @@ var current_video ="";
       var resultado = null;
       //alert("hashmap: "+hashmap.length);
       for (var [key, value] of hashmap) {
-          //alert("key: "+key);
-          //alert("value: "+value);
-          if (minV == null || minV < value) {
+          //alert("value: "+Number(value));
+          //alert("maxV: "+Number(minV));
+          
+          if (minV == null || Number(value) > Number(minV)) {
               minV = value; 
               minK = key;
-              //alert("min: "+minV);
+              //alert("if: "+minV);
           }
+          
             
       }
       resultado= {
@@ -647,7 +653,7 @@ var current_video ="";
         tiempo : minV
       };
       //hashmap.remove(min);
-      //alert("resultado: "+resultado);
+     // alert("resultado: "+resultado.tiempo);
       return resultado;
 
     } 
