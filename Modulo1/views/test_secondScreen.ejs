@@ -41,7 +41,7 @@
  		//alert("urlFinal_chat: "+urlFinal_chat);
         var url = 'ws://' + 'localhost:9999'; //PONER URL FINAL
 
-        var socket = io(url);
+        var socket = io(urlFinal);
         //var socket = io(url); //PONER URL FINAL
 
         socket.on('connect', function() {
@@ -135,11 +135,16 @@
                         //  alert("play" + data.escenaCurrent);
                         
                 });
+                socket.on('imagen', function(data) {
+                          alert("url: " + data);
+                        
+                });
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
         socket.on('op_second_screen', function(data) {
             alert(data.pregunta)
         alert(data.opciones)
 var e=data.opciones;
+
             var op = document.getElementById("opciones");
             var padre = op.parentNode;
             padre.removeChild(op);
@@ -157,6 +162,7 @@ var e=data.opciones;
                 nuevoBoton.addEventListener('click', enviarAccion);
                 op.appendChild(nuevoBoton);
             }
+
             padre.appendChild(op);
 
         });

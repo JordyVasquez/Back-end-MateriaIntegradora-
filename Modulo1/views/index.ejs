@@ -219,7 +219,7 @@ var current_video ="";
         // abrimos la conexion
 
         
-        var socket = io(urlf);
+        var socket = io(url);
         //var socket = io(urlf); ///CAMBIAR POR URL 
 
         socket.on('connect', function() {
@@ -408,6 +408,7 @@ var current_video ="";
                for (var i = 0; i < textt.Contenido_Trasmedia.Imagenes.length; i++) {
                   if (inicio.Id_Escena.localeCompare(textt.Contenido_Trasmedia.Imagenes[i].ID_Escena) == 0) {
                  //   alert("Contenido: "+textt.Contenido_Trasmedia.Imagenes[i].Imagen);
+
                      hashmap.set(textt.Contenido_Trasmedia.Imagenes[i].Imagen, textt.Contenido_Trasmedia.Imagenes[i].Tiempo);
 
                   }
@@ -547,8 +548,8 @@ var current_video ="";
           //  alert("time: "+time_transm);
             //var imagen_trasnm = null; 
             hashmap.delete(url);
-           // alert("imagen_trasnm: "+url);
-            socket.emit("imagen", url);
+
+            socket.emit("image", {sala : id, url : url});
           
             
           }
@@ -587,7 +588,7 @@ var current_video ="";
               //var imagen_trasnm = null; 
               hashmap.delete(url);
               alert("imagen_trasnm: "+url);
-              socket.emit("imagen", url);
+              socket.emit("image", url);
             
               
             }

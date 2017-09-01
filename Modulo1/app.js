@@ -1353,6 +1353,18 @@ io.sockets.on('connection', function(socket) {
             data: data
         });
     });
+    socket.on('image', function(data) {
+        // transmitimos el movimiento a todos los clienntes conectados
+        console.log("IMAGEN: "+data.url);
+        io.to(data.sala).emit('imagen', data.url
+        );
+    });
+    socket.on('mensaje', function(data) {
+        // transmitimos el movimiento a todos los clienntes conectados
+        io.sockets.emit('mensaje2', {
+            data: data
+        });
+    });
     socket.on('avisoGanador', function(data) {
         // transmitimos el movimiento a todos los clienntes conectados
         console.log("ecena ganador:"+data.win)
