@@ -537,7 +537,7 @@ var current_video ="";
             var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
             socket.emit('opciones', {sala : id, opciones:{escenas}, pregunta: inicio.Pregunta});
             bandUpdate = true;
-          //  alert("pregunta: "+ inicio.Pregunta);
+            alert("pregunta: "+ inicio.Pregunta);
            // alert("escenas: "+JSON.stringify(escenas));
               
 
@@ -545,7 +545,8 @@ var current_video ="";
 
           if(time_transm!=null && resul2<=time_transm){
             //alert("enter trasnmedia");
-          //  alert("time: "+time_transm);
+            alert("time: "+time_transm);
+            alert("url: "+url);
             //var imagen_trasnm = null; 
             hashmap.delete(url);
 
@@ -588,8 +589,8 @@ var current_video ="";
               //var imagen_trasnm = null; 
               hashmap.delete(url);
               alert("imagen_trasnm: "+url);
-              socket.emit("image", url);
-            
+              //socket.emit("image", url);
+              socket.emit("image", {sala : id, url : url});
               
             }
 
