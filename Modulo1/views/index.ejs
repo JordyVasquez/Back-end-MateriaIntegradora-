@@ -9,6 +9,26 @@
       <link rel="icon" type="image/png" href="../images/icono.png" />
 
     <style>
+    @font-face {
+    font-family: "MyriadProCondensed";
+    font-style: normal;
+    font-weight: normal;
+    src: local("?"), url("../css/MyriadProCondensed.woff") format("woff"), url("../css/MyriadProCondensed.ttf") format("truetype");
+}
+    @font-face {
+    font-family: "MyriadProBoldCondensed";
+    font-style: normal;
+    font-weight: normal;
+    src: local("?"),url("../css/MyriadProBoldCondensed.woff") format("woff"), url("../css/MyriadProBoldCondensed.ttf") format("truetype");
+}
+    div.avatar {
+    /* cambia estos dos valores para definir el tamaño de tu círculo */
+    /* los siguientes valores son independientes del tamaño del círculo */
+    background-repeat: no-repeat;
+    background-position: 50%;
+    border-radius: 50%;
+    background-size: 100% auto;
+}
         .loader {
           font-size: 10px;
           margin: 30% auto;
@@ -246,7 +266,8 @@ var current_video ="";
                 else{
                     im=msg.url
                 }
-              content.append('<div class="col-sm-12 col-md-12 col-xs-12 col-lg-12"><div class="row"><img src="'+im+'" class="img-responsive m col-lg-4 col-md-4 col-sm-4 col-xs-4"  alt="Mecanixs"></img><div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 m msm"><p> ' + msg.msm+' </p></div></div></div><br /><br />');
+                  var tam=screen.height/14;
+              content.append('<div class="col-sm-12 col-md-12 col-xs-12 col-lg-12" style="padding-bottom: 6px;padding-top: 6px;"><div class="row"><div class="avatar img-responsive col-tamlg-4 col-md-4 col-sm-4 col-xs-4"" style="background-image: url('+im+');height:'+tam+'px;width:'+tam+'px"></div><div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1 m msm " style="word-wrap: break-word;"><p> ' + msg.msm+' </p></div></div></div><br /><br />');
               var elem = document.getElementById('content');
               elem.scrollTop = elem.scrollHeight;
             });
@@ -321,6 +342,7 @@ var current_video ="";
             //alert("escena: "+videos_seq.Escenas[i].Escena);
             videoE.src = videos_seq.Escenas[i].Escena;
             videoE.setAttribute("preload", "auto");
+             videoE.controls = false;
             //alert("nombre: "+videos_seq.Escenas[i].Name_Escena);
             videoE.style.display = "none";
             divPrincipal = document.getElementById("div_principal");
@@ -378,7 +400,7 @@ var current_video ="";
                      //  alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
-                       video.controls = true;
+                     //  video.controls = true;
 
                        //video.load() 
                        video.play();
@@ -395,7 +417,7 @@ var current_video ="";
           }
              else {
 
-                alert("video acabado")
+             //   alert("video acabado")
                  resetar();
              }
           
@@ -443,7 +465,7 @@ var current_video ="";
                        //alert("enter2" + video.src); 
                        document.getElementById(current_video).style.display = "none";
                        document.getElementById(escenas.Name_Escena).style.display = "block";
-                       video.controls = true;
+                     //  video.controls = true;
 
 
                        video.play();
@@ -481,7 +503,7 @@ var current_video ="";
                     video.src = map_videos.get(ganadorID);
                     document.getElementById(current_video).style.display = "none";
                     document.getElementById(ganadorID).style.display = "block";
-                    video.controls = true;
+                 //   video.controls = true;
                     video.play();
                     socket.emit('avisoGanador', {sala : id,win:escenas.Id_Escena});
 
@@ -537,7 +559,7 @@ var current_video ="";
             var escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
             socket.emit('opciones', {sala : id, opciones:{escenas}, pregunta: inicio.Pregunta});
             bandUpdate = true;
-            alert("pregunta: "+ inicio.Pregunta);
+          //  alert("pregunta: "+ inicio.Pregunta);
            // alert("escenas: "+JSON.stringify(escenas));
               
 
@@ -545,8 +567,8 @@ var current_video ="";
 
           if(time_transm!=null && resul2<=time_transm){
             //alert("enter trasnmedia");
-            alert("time: "+time_transm);
-            alert("url: "+url);
+           // alert("time: "+time_transm);
+            //alert("url: "+url);
             //var imagen_trasnm = null; 
             hashmap.delete(url);
 
@@ -585,10 +607,10 @@ var current_video ="";
         else{
             if(time_transm!=null && resul2<=time_transm){
               //alert("enter trasnmedia");
-              alert("time: "+time_transm);
+            //  alert("time: "+time_transm);
               //var imagen_trasnm = null; 
               hashmap.delete(url);
-              alert("imagen_trasnm: "+url);
+              //alert("imagen_trasnm: "+url);
               //socket.emit("image", url);
               socket.emit("image", {sala : id, url : url});
               

@@ -97,7 +97,7 @@
         
         function enviarAccion() {
             var namespaceName = this.value ;
-            alert(namespaceName)
+          //  alert(namespaceName)
             socket.emit('opcion_2c', {
                 sala: id_sala,
                 option: namespaceName
@@ -136,13 +136,13 @@
                         
                 });
                 socket.on('imagen', function(data) {
-                          alert("url: " + data);
+                       //   alert("url: " + data);
                         
                 });
         document.getElementById("bbt").addEventListener('click', enviarinvitacion);
         socket.on('op_second_screen', function(data) {
-            alert(data.pregunta)
-        alert(data.opciones)
+            //alert(data.pregunta)
+        //alert(data.opciones)
 var e=data.opciones;
 
             var op = document.getElementById("opciones");
