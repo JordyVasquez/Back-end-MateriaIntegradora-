@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Credenciales</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="../css/dashboard.css" rel="stylesheet">
+        <link href="css/dataTable.css" rel="stylesheet" />
+        <link id="template-file" href="templates/template.ejs" rel="import" />
+        <link href="css/dashboard.css" rel="stylesheet">
+              <link rel="icon" type="image/png" href="images/icono.png" />
+    <script src="js/html-imports.min.js"></script>  
+    </head>
+
+	<body>
+	`
+         <script>
+
+          document.addEventListener( 'HTMLImportsLoaded', function () 
+            {
+                var link = document.querySelector('#template-file');
+                var template = link.import.querySelector('#template');
+                document.body.appendChild(document.importNode(template, true));  
+
+
+
+            } )
+        </script>
+        
+        <div class="col-sm-12  col-md-12  main">
+	       <form method="post" action="/cambiar_credenciales" id="loginForm" onsubmit="return submitForm(this);">
+    	        <label>Nombre usuario: <input class="form-control" type="text" id='username' name='username' placeholder="username"/> </label>
+                </br></br>
+                <label>Contrase&ntilde;a actual: <input class="form-control" type="password" id='passwordA' name='passwordA' placeholder="contrasenia actual"/> </label>
+                </br></br>
+                <label>Contrase&ntilde;a nueva: <input class="form-control" type="password" id='passwordN' name='passwordN' placeholder="contrasenia Nueva"/> </label>
+                </br></br>
+                <label>Confirmar nueva contrase&ntilde;a: <input class="form-control" type="password" id='passwordN2' name='passwordN2' placeholder="Confirmar nueva contrasenia"/> </label></br></br>
+                <input type="hidden" name="salt" id="salt" value=""> 
+                <button type="button" class="btn" onclick="openWindowWithPost();">Submit</button>
+                </br></br>
+                <div id="error" style=" display: none" class="alert alert-danger">
+                    <strong>Error!</strong> El nombre de usuario o contrase&ntilde;a es incorrecto. Ingrese de nuevo.
+                </div>  
+            </form>
+               
+	    </div>
+            <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        <script src="js/dataTable.js"></script>
+        <script src="javascripts/sha512.js"></script>
+        <script src="javascripts/md5.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+        <script src="javascripts/hmac-sha512.js"></script> 
+        <script src="javascripts/hmac.js"></script> 
+        <script src="javascripts/core.js"></script> 
+		<script>
+            
+            
+            function openWindowWithPost(something, additional, misc) {
+                var f = document.getElementById('loginForm');
+                var usuario = document.getElementById('username').value;
+                var password_actual = document.getElementById('passwordA').value;
+                var password_nueva = document.getElementById('passwordN').value;
+                var password_nueva2 = document.getElementById('passwordN2').value;
+                if((password_nueva.localeCompare(password_nueva2))==0){
+                    var passwordMD5 = CryptoJS.MD5(password_actual);
+                    var passwordMD5Nueva = CryptoJS.MD5(password_nueva);
+                    var passwordMD5Nueva2 = CryptoJS.MD5(password_nueva2);
+                    alert("passwordMD5Nueva: "+passwordMD5Nueva.toString());
+                    //alert("MD5: "+passwordMD5);
+                    var result2 = saltHashPassword(passwordMD5.toString());
+                    document.getElementById('salt').value = result2.salt;
+                    f.passwordA.value = result2.passwordHash;
+                    f.passwordN.value = passwordMD5Nueva.toString();
+                    f.passwordN2.value = passwordMD5Nueva2.toString();
+                    f.submit();
+
+                }
+                else{
+                    var elDiv = document.getElementById('error');
+                    elDiv.style.display = 'block';
+                    document.getElementById('error').innerHTML = "Contrase&ntilde;as nuevas no coinciden";
+                    
+
+                }
+                
+               
+          }
+
+          function sha512func(password, salt){
+              var hmac = CryptoJS.algo.HMAC.create(CryptoJS.algo.SHA512, salt); /** Hashing algorithm sha512 */
+              hmac.update(password);
+              //alert('hash pass: '+hmac.toString(CryptoJS.enc.Hex));
+              var hash = hmac.finalize();
+              //alert('value hash: '+hash);
+          
+              return {
+                  salt:salt,    
+                  passwordHash:hash
+              };
+          }
+
+          function saltHashPassword(userpassword) {
+          
+              salt=stringGen(16) ;    
+              alert("salt: "+salt);
+              var saltAES = CryptoJS.AES.encrypt(salt, "My Secret Passphrase");
+              //alert("saltAES: "+saltAES);
+              passwordData = sha512func(userpassword, salt);
+              //alert('UserPassword = '+userpassword);
+              //alert('Passwordhash = '+passwordData.passwordHash);
+              //alert('nSalt = '+passwordData.salt);
+              return {
+                  salt:saltAES.toString(),   
+                 passwordHash:passwordData.passwordHash
+              };
+          }
+
+          function stringGen(len)
+          {
+              var text = " ";
+          
+              var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
+          
+              for( var i=0; i < len; i++ )
+                  text += charset.charAt(Math.floor(Math.random() * charset.length));
+          
+              return text;
+          }
+            
+
+           
+        </script>    
+	</body>
+</html>

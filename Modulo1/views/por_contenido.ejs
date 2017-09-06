@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Usuarios</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="../css/dashboard.css" rel="stylesheet">
+        <link href="css/dataTable.css" rel="stylesheet" />
+        <link id="template-file" href="templates/template.ejs" rel="import" />
+        <link href="css/dashboard.css" rel="stylesheet">
+              <link rel="icon" type="image/png" href="images/icono.png" />
+    <script src="js/html-imports.min.js"></script>  
+    </head>
+
+	<body>
+	`
+         <script>
+
+  document.addEventListener( 'HTMLImportsLoaded', function () 
+    {
+        var link = document.querySelector('#template-file');
+        var template = link.import.querySelector('#template');
+    document.body.appendChild(document.importNode(template, true));  
+
+
+
+    } )
+        </script>
+        
+        <div class="col-sm-12  col-md-12  main">
+	        <h1 class="page-header" id="page-header"># Usuarios conectados por sala</h1>
+	        <div id="numUsers" class="container"></div>
+            <table id="table_con" class="table table-striped table-hover">
+                <thead class="thead-inverse">
+                    <tr>
+                        <th>Sala</th>
+                        <th>Conectados</th>
+                    </tr>    
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+	           <!--<div id="content"></div>-->
+	    </div>
+            <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+        <script src="js/dataTable.js"></script>
+		<script>
+
+            var escenasJson = null;
+            var map_salas = new Map();
+            var ip = <%- JSON.stringify(ip) %>;
+            var puerto = <%- JSON.stringify(puerto) %>;
+            var urlFinal = 'ws://'+ip+':'+puerto;
+            var content = $('#content');
+            var url = 'ws://' + 'localhost:9999';///PONER URLFINAL
+	        var socket = io(urlFinal);
+	        //var socket = io(url);
+            
+            var table = document.getElementById("table_con").getElementsByTagName("tbody")[0];
+
+
+            socket.on('connect', function() {
+                
+	        });
+          
+            socket.emit("cargar_sincronizados", function(){
+            });
+
+        	socket.on('num_usuarios_conectados', function(data) {
+                if(document.getElementById(data.sala)){
+                    alert("get");
+                    var row = document.getElementById(data.sala);
+                    row.cells[1].innerHTML = data.connections;
+
+                }else{
+                    var row = table.insertRow(0);
+                    var cell1 = row.insertCell(0);
+                    row.id = data.sala;
+
+                    cell1.innerHTML = data.sala;
+                    
+                    var cell2 = row.insertCell(1);
+                    cell2.innerHTML = data.connections; 
+
+
+                    
+                }                   
+                    
+            });       
+             
+                    		//alert("numUsers: "+data.sala);
+            		//document.getElementById('numUsers').innerHTML = data.connections ;
+                    /*if(map_salas.get(data.sala)){
+                        document.getElementById(data.sala).innerHTML = "sala: "+data.sala+" -> conexiones: "+data.connections;
+
+
+                    }else{
+                        
+                        map_salas.set(data.sala, data.connections);
+                        var div = document.createElement('div');
+                        div.setAttribute("id", data.sala);
+                        //alert("id: "+data.sala);
+                        alert("sala: "+data.sala+" -> conexiones: "+data.connections+"");
+                        var numUsers = document.getElementById('numUsers');
+                        numUsers.appendChild(div);
+                        document.getElementById(data.sala).innerHTML = "sala: "+data.sala+" -> conexiones: "+data.connections+"";
+                        
+                    }*/
+                    
+	       		
+             socket.on('mensaje2',  function(data) {
+
+                    content.append(data.data.data + '<br />');
+            });
+              //socket.emit('mensaje', {data:"pull push"});
+
+
+           
+        </script>    
+	</body>
+</html>

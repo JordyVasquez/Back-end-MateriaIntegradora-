@@ -6,48 +6,83 @@
         <link href="../css/dashboard.css" rel="stylesheet">
         <link id="template-file" href="templates/template.ejs" rel="import" />
         <link href="css/dashboard.css" rel="stylesheet">
+              <link rel="icon" type="image/png" href="images/icono.png" />
+<script src="js/html-imports.min.js"></script>
     </head>
 
 	<body>
 	`
 		 
 		 <script>
-	        var getImport = document.querySelector('#template-file');
-	        var getContent = getImport.import.querySelector('#template');
-	        document.body.appendChild(document.importNode(getContent, true));
+
+  document.addEventListener( 'HTMLImportsLoaded', function () 
+    {
+        var link = document.querySelector('#template-file');
+        var template = link.import.querySelector('#template');
+    document.body.appendChild(document.importNode(template, true));  
+
+
+
+    } )
 	    </script>
             
         
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-	        <h1 class="page-header" id="page-header">Numero de usuarios conectados</h1>
+        <div class="col-sm-12 col-md-12  main">
+	        <h1 class="page-header" id="page-header"># Total de usuarios conectados</h1>
 	        <div id="numUsers" class="container"></div>
-	           <div id="content"></div>
+	          <!-- <div id="content"></div>-->
+               <h3>Usuarios conectados: <span id="content" class="label label-primary"></span></h3><br>
+
 	    </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 		<script>
 
             var escenasJson = null;
+            var map_salas = new Map();
             var ip = <%- JSON.stringify(ip) %>;
             var puerto = <%- JSON.stringify(puerto) %>;
             var urlFinal = 'ws://'+ip+':'+puerto;
-            alert("urlFinal: "+urlFinal);
             var content = $('#content');
-            var url = 'ws://' + 'localhost:3000';///PONER URLFINAL
+            var url = 'ws://' + 'localhost:9999';///PONER URLFINAL
 	        var socket = io(urlFinal);
-	        socket.on('connect', function() {
+	        //var socket = io(url);
+            
+            socket.on('connect', function() {
+                alert("connected");
 	        });
           
+            socket.emit("cargar_sincronizados", function(){
+                alert("cargar_sincronizados");
+            });
+
+        	socket.on('num_usuarios_conectados', function(data) {
+        		//alert("numUsers: "+data.sala);
+        		if(map_salas.get(data.sala)){
+                    //alert("get");
+                    map_salas.set(data.sala, data.connections);
 
 
-            	socket.on('connections', function(data) {
-            		//alert("numUsers: "+data);
-            		document.getElementById('numUsers').innerHTML = data.connections ;
-	       		});
-                 socket.on('mensaje2',  function(data) {
+                }else{
+                    map_salas.set(data.sala, data.connections);
+                    //alert("set");
+                    
+                }
+                var cont = 0;
+                for (var [key, value] of map_salas) {
+                    cont = cont + map_salas.get(key);
 
-                        content.append(data.data.data + '<br />');
-                });
-                  socket.emit('mensaje', {data:"pull push"});
+                }
+                document.getElementById("content").innerHTML = cont;
+                
+       		});
+             socket.on('mensaje2',  function(data) {
+
+                    content.append(data.data.data + '<br />');
+            });
+              //socket.emit('mensaje', {data:"pull push"});
 
            
         </script>    

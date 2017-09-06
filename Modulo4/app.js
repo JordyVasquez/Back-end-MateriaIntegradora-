@@ -6,7 +6,6 @@ var request = require('request');
 var id_session = Math.round(Date.now()*Math.random()/100000);
 var ioc = require( 'socket.io-client' );
 
- 
 function handler(req,res){
     fs.readFile(__dirname + '/index.html', function(err,data){
         if(err){
@@ -63,26 +62,30 @@ var elmt = [];
 var band = false;
 var i=0;
 var throughput=0;
-var num_veces = 1000;
+var num_veces = 0;
 var iter=0;
+var ip = null;
 //var num_veces = 0;
 //var iteraciones = 10;
-/*for (j = 1; j <= iteraciones; j++) {
-  num_veces=num_veces+1000
-}*/
+var veces_iteracion = 20;
 
-var begin = new Date();
 
+
+  num_veces=num_veces+50;
+  peticiones(veces_iteracion)
+
+function peticiones(){
+  var begin = new Date();
 for(i = 1; i <= num_veces; i++){
       
     request.get({
-    url : 'http://localhost:80/ips',
+    url : 'http://config-admin.appspot.com/ips',
     time : true, 
     qs :  { num_veces: i, iteraciones: num_veces}
     },function(err, response){
       iter++;
       //console.log("response: "+JSON.stringify(JSON.parse(response.body)));
-      //console.log("response: "+JSON.stringify(JSON.parse(response.body).num_veces));
+     // console.log("response: "+JSON.stringify(JSON.parse(response.body).num_veces));
       //console.log('Request time in ms', response.elapsedTime);
       total=total+response.elapsedTime;
       //if((JSON.parse(response.body).num_veces)==num_veces){
@@ -93,10 +96,17 @@ for(i = 1; i <= num_veces; i++){
         var end = new Date()
         var reqPerSec = i / (( end - begin)/1000 );
         console.log("reqPerSec: "+reqPerSec);
+        num_veces=num_veces+50;
+        veces_iteracion=veces_iteracion-1;
+          console.log(veces_iteracion);
+        if(veces_iteracion>0){
+        peticiones();
+          }
         
       }
       //console.log("total: "+total);
     });
+  }
 
    
 }

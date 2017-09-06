@@ -11,9 +11,12 @@
     "cookie-parser": "^1.4.3",
     "express": "^3.21.2",
     "io": "^0.1.10",
+        "body-parser": "^1.17.2",
+
     "method-override": "^2.1.2",
     "mongoose": "^3.6.20",
     "socket.io": "^1.0.6",
+    "bad-words":"1.5.1",
     "request": "^2.69.0"
   },
   "engines": {
