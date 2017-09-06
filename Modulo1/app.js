@@ -213,6 +213,7 @@ app.get('/peliculas/:movieName', (req, res) => {
     const movieName = req.params.movieName;
    const movieFile = './public/peliculas/'+movieName;
 
+
   screen(movieFile,res,req);
  });
 var i = 0;

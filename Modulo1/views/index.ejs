@@ -174,11 +174,13 @@
         </div>
   <div class="row" id="foo">
 
+
         <div id="contentU" class="col-md-2 col-md-offset-5 col-sm-2 col-sm-offset-5 col-xs-2 col-xs-offset-5 col-lg-2 col-lg-offset-5">
 
             <span class="glyphicon glyphicon-eye-open"></span> <label id="con">0</label>
 
         </div>
+
 
 
 
@@ -197,18 +199,21 @@
     </div>
     <div class="row">
 
-       
+
         <div id="div_qr" align="center">
             <div id="combine"></div>
         </div>
 
     </div>
+
    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
+
     <script src="../js/jquery-qrcode-0.14.0.js"></script>
 
+>>>>>>> a8ffd53f97b2ace66572bb2d3f6402c7b209fe63
     <script src="../js/bootstrap.min.js"></script>
     <script src='../js/LZString.js'></script>
 
@@ -834,6 +839,7 @@ function resetar(){
             document.getElementById(current_video).removeEventListener("timeupdate", sendVideoOnArrayInteraccion);
           document.getElementById(current_video).removeEventListener("timeupdate", sendImagenSinInteraccion);
          document.getElementById(current_video).removeEventListener("ended", endedSinIteraccion);
+
          document.getElementById(current_video).style.display = "none";
          document.getElementById(current_video).removeEventListener("ended", endedConIteraccion);
          escenas=searchVideoOnArray(inicio.Id_Escena,videos_seq);
@@ -865,7 +871,6 @@ render:'canvas',
 size:tam,
 color:'#3A3',
 text: value
-
 
             })
    

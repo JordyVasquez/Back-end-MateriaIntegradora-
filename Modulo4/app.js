@@ -62,13 +62,14 @@ var elmt = [];
 var band = false;
 var i=0;
 var throughput=0;
+
 var num_veces = 0;
 var iter=0;
 var ip = null;
 //var num_veces = 0;
 //var iteraciones = 10;
-var veces_iteracion = 20;
 
+var veces_iteracion = 20;
 
 
   num_veces=num_veces+50;
@@ -79,7 +80,9 @@ function peticiones(){
 for(i = 1; i <= num_veces; i++){
       
     request.get({
+
     url : 'http://config-admin.appspot.com/ips',
+
     time : true, 
     qs :  { num_veces: i, iteraciones: num_veces}
     },function(err, response){

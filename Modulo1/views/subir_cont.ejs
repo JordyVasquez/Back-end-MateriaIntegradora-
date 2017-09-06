@@ -120,7 +120,7 @@
             });
 
             function deletefiles(names, z) {
-                
+
                 var desertRef = storageRef.child(names[z]);
 
                 // Delete the file
@@ -172,7 +172,10 @@
                     $('#div_barra').hide();
                     var $schemabefore = document.getElementById('outputbefore');
                     var $schemaafter = document.getElementById('output2');
+
                     var fls = filesDeletes($schemabefore.value, $schemaafter.value)
+
+                    
                     if (fls != null && fls.length > 0) {
                         deletefiles(fls, 0);
                     } else {
@@ -205,6 +208,7 @@
                 if (upload) {
                     upload.cancel();
                 }
+
                 upload = storageRef.child($.now() + file.name).put(file, metadata);
 
                 console.log(upload);
@@ -392,6 +396,7 @@
                             if (js.Contenido_Trasmedia.Imagenes[i].Name_Imagen.localeCompare('') == 0 && js.Contenido_Trasmedia.Imagenes[i].Imagen.localeCompare('') != 0) {
                                 var myRe2 = /\bo\/[^?]+/;
                                 var name = js.Contenido_Trasmedia.Imagenes[i].Imagen.match(myRe2);
+
                                 if (name != null && name.length != 0) {
                                     js.Contenido_Trasmedia.Imagenes[i].Name_Imagen = $.now()+name[0].replace("o/", "").toLowerCase()
                                 } else {
